@@ -35,7 +35,8 @@ public class JDBCConfig implements DefaultConfig {
 	private int maxIdleTime = DEFAULT_MAX_IDLE_TIME;
 	/**每X秒检查所有连接池中的空闲连接。默认值: 0，不检查*/
 	private int idleConnectionTestPeriod = DEFAULT_IDLE_CONNECTION_TEST_PERIOD;
-	
+	/**异步执行sql线程池，默认8*/
+	private int asyncPoolSize = DEFAULT_ASYNC_POOL_SIZE;
 	
 	public static JDBCConfig newInstance(String jdbcConfigPath){
 		return new JDBCConfig(new Setting(jdbcConfigPath, true));
@@ -91,6 +92,9 @@ public class JDBCConfig implements DefaultConfig {
 		}
 		if (jdbcSetting.get("jdbc.idleConnectionTestPeriod") != null) {
 			idleConnectionTestPeriod = jdbcSetting.getInt("jdbc.idleConnectionTestPeriod");
+		}
+		if (jdbcSetting.get("jdbc.asyncPoolSize") != null) {
+			asyncPoolSize = jdbcSetting.getInt("jdbc.asyncPoolSize");
 		}
 
 	}
@@ -149,6 +153,10 @@ public class JDBCConfig implements DefaultConfig {
 
 	public String getMaxExecuteTimeFilePath() {
 		return maxExecuteTimeFilePath;
+	}
+
+	public int getAsyncPoolSize() {
+		return asyncPoolSize;
 	}
 	
 	

@@ -9,13 +9,13 @@ import java.util.concurrent.Future;
 
 public class FutureInvocationHandler implements InvocationHandler {
 	private static final ExecutorService threadPool = Executors.newSingleThreadExecutor();
-	private SQLExecute target;
+	private SQLAsyncExecute target;
 
 	public FutureInvocationHandler() {
 		super();
 	}
 
-	public FutureInvocationHandler(SQLExecute target) {
+	public FutureInvocationHandler(SQLAsyncExecute target) {
 		super();
 		this.target = target;
 	}

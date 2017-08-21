@@ -1,6 +1,7 @@
 package com.z.quick.orm;
 
 import java.util.List;
+import java.util.concurrent.Future;
 
 public abstract class BaseDao<T> implements Dao<T> {
 	
@@ -32,6 +33,36 @@ public abstract class BaseDao<T> implements Dao<T> {
 	@Override
 	public List<T> find(T t, Class<?> clzz) {
 		return (List<T>) Session.getSession().find(t, clzz);
+	}
+
+	@Override
+	public Future<Integer> asyncSave(T t) {
+		return Session.getSession().getSqlAsyncExecute().save(t);
+	}
+
+	@Override
+	public Future<Integer> asyncUpdate(T t) {
+		return Session.getSession().getSqlAsyncExecute().update(t);
+	}
+
+	@Override
+	public Future<T> asyncGet(T t) {
+		return (Future<T>) Session.getSession().getSqlAsyncExecute().get(t);
+	}
+
+	@Override
+	public Future<T> asyncGet(T t, Class<?> clzz) {
+		return (Future<T>) Session.getSession().getSqlAsyncExecute().get(t, clzz);
+	}
+
+	@Override
+	public Future<List<Object>> asyncFind(T t) {
+		return Session.getSession().getSqlAsyncExecute().find(t);
+	}
+
+	@Override
+	public Future<List<Object>> asyncFind(T t, Class<?> clzz) {
+		return Session.getSession().getSqlAsyncExecute().find(t, clzz);
 	}
 
 }

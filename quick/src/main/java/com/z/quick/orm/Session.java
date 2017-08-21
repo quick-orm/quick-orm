@@ -17,6 +17,7 @@ public class Session implements SQLExecute {
 
 	private DataSource dataSource;
 	private JDBCConfig jdbcConfig;
+	private SQLAsyncExecute sqlAsyncExecute;
 	private static final Session session = new Session();;
 	
 	/**
@@ -26,6 +27,7 @@ public class Session implements SQLExecute {
 		super();
 		jdbcConfig = JDBCConfig.newInstance("jdbc.setting");
 		this.dataSource = new QuickDataSource(jdbcConfig);
+		this.sqlAsyncExecute = new FutureSQLSyncExecute(this, jdbcConfig.getAsyncPoolSize());
 	}
 	public static Session getSession(){
 		return session;
@@ -106,18 +108,19 @@ public class Session implements SQLExecute {
 		}
 	}
 	
+	
+	
+	
+	public SQLAsyncExecute getSqlAsyncExecute() {
+		return sqlAsyncExecute;
+	}
 	public JDBCConfig getJdbcConfig() {
 		return jdbcConfig;
 	}
 	public Object executeSql(String namespace,Class<?> clzz) {
-
 		return null;
 	}
-	
-	
-
 	public void updateSql() {
-
 	}
 
 }

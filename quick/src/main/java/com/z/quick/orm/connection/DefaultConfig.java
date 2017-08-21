@@ -17,6 +17,8 @@ public interface DefaultConfig {
 	public final static long DEFAULT_MAX_EXECUTE_TIME = 1;
 	/**最大耗时sql保存文件路径 默认classes目录下*/
 	public final static String DEFAULT_MAX_EXECUTE_TIME_FILE_PATH = "/";
+	/**异步执行sql线程池，默认8*/
+	public final static int DEFAULT_ASYNC_POOL_SIZE = 8;
 	
 	
 
