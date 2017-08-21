@@ -25,6 +25,10 @@ public class JDBCConfig implements DefaultConfig {
 	private int initialPoolSize = DEFAULT_INITIAL_POOL_SIZE;
 	/**是否启用sql监控*/
 	private boolean executeTimeMonitor = DEFAULT_EXECUTE_TIME_MONITOR;
+	/**启用sql监控后，sql最大执行时长，超过该时长的sql会被记录在文件中*/
+	private long maxExecuteTime = DEFAULT_MAX_EXECUTE_TIME;
+	/**最大耗时sql保存文件路径 默认classes目录下*/
+	private String maxExecuteTimeFilePath = DEFAULT_MAX_EXECUTE_TIME_FILE_PATH;
 	/**单位毫秒 当连接池连接耗尽时，客户端调用getConnection()后等待获取新连接的时间，超时后将抛出RuntimeException。单位毫秒。默认: 10000*/
 	private int maxWait = DEFAULT_MAX_IDLE_TIME;
 	/**最大空闲时间*/
@@ -70,6 +74,15 @@ public class JDBCConfig implements DefaultConfig {
 		if (jdbcSetting.get("jdbc.executeTimeMonitor") != null) {
 			executeTimeMonitor = jdbcSetting.getBool("jdbc.executeTimeMonitor");
 		}
+		if (jdbcSetting.get("jdbc.maxExecuteTime") != null) {
+			maxExecuteTime = jdbcSetting.getLong("jdbc.maxExecuteTime");
+		}
+		if (jdbcSetting.get("jdbc.maxExecuteTimeFilePath") != null) {
+			maxExecuteTimeFilePath = jdbcSetting.getStr("jdbc.maxExecuteTimeFilePath");
+		}else{
+//			maxExecuteTimeFilePath = ClassLoader.getSystemResource("/").getPath();
+			maxExecuteTimeFilePath = Thread.currentThread().getContextClassLoader().getResource("").getPath(); 
+		}
 		if (jdbcSetting.get("jdbc.maxWait") != null) {
 			maxWait = jdbcSetting.getInt("jdbc.maxWait");
 		}
@@ -106,7 +119,7 @@ public class JDBCConfig implements DefaultConfig {
 		return initialPoolSize;
 	}
 
-	public boolean isExecuteTimeMonitor() {
+	public boolean getExecuteTimeMonitor() {
 		return executeTimeMonitor;
 	}
 
@@ -129,5 +142,15 @@ public class JDBCConfig implements DefaultConfig {
 	public int getMinPoolSize() {
 		return minPoolSize;
 	}
+
+	public long getMaxExecuteTime() {
+		return maxExecuteTime;
+	}
+
+	public String getMaxExecuteTimeFilePath() {
+		return maxExecuteTimeFilePath;
+	}
+	
+	
 
 }

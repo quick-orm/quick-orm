@@ -11,7 +11,12 @@ public interface DefaultConfig {
 	public final static int DEFAULT_MAX_IDLE_TIME = 30*60*1000;
 	/**单位毫秒，间隔多少时间检查所有连接池中的空闲连接。默认值: 10分钟检查一次，为0不检查*/
 	public final static int DEFAULT_IDLE_CONNECTION_TEST_PERIOD = 10*60*1000;
+	/**是否启用sql执行时间监控*/
 	public final static boolean DEFAULT_EXECUTE_TIME_MONITOR = false;
+	/**单位毫秒 sql执行最大耗时，超过此耗时的sql会被记录在文件中*/
+	public final static long DEFAULT_MAX_EXECUTE_TIME = 1;
+	/**最大耗时sql保存文件路径 默认classes目录下*/
+	public final static String DEFAULT_MAX_EXECUTE_TIME_FILE_PATH = "/";
 	
 	
 

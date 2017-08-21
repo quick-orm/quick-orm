@@ -13,6 +13,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import com.xiaoleilu.hutool.log.Log;
 import com.xiaoleilu.hutool.log.LogFactory;
+import com.z.quick.monitor.MonitorSql;
 
 public class QuickConnectionPool {
 	private static final Log log = LogFactory.get();
@@ -28,7 +29,20 @@ public class QuickConnectionPool {
 	public QuickConnectionPool(JDBCConfig jdbcConfig) {
 		this.jdbcConfig = jdbcConfig;
 		initConnectionPool(jdbcConfig.getInitialPoolSize());
+		if (jdbcConfig.getExecuteTimeMonitor()) {//开启sql执行耗时监控
+			MonitorSql.start();
+		}
 	}
+	/**
+	 * ********************************************
+	 * method name   : initConnectionPool 
+	 * description   : 初始化连接
+	 * @return       : void
+	 * @param        : @param initialSize
+	 * modified      : zhukaipeng ,  2017年8月18日  下午11:45:31
+	 * @see          : 
+	 * *******************************************
+	 */
 	public void initConnectionPool(int initialSize){
 		lock.lock();
 		try {
@@ -36,6 +50,7 @@ public class QuickConnectionPool {
 				unUsedConn.add(createConnection());
 			}
 			timerClearAllLeisureConnection();
+			log.info("===============Initialize DB Connection Pool SUCCESS===============");
 		} catch (Exception e) {
 			log.error("初始化数据库连接出现异常",e);
 			throw new RuntimeException(e);
@@ -43,7 +58,16 @@ public class QuickConnectionPool {
 			lock.unlock();
 		}
 	}
-	
+	/**
+	 * ********************************************
+	 * method name   : createConnection 
+	 * description   : 创建新连接
+	 * @return       : Connection
+	 * @param        : @return
+	 * modified      : zhukaipeng ,  2017年8月18日  下午11:45:45
+	 * @see          : 
+	 * *******************************************
+	 */
 	private Connection createConnection(){
 		lock.lock();
 		try {
@@ -160,11 +184,14 @@ public class QuickConnectionPool {
 				try {
 					lock.lock();
 					log.debug("开始清理空闲连接。【已创建连接：{}，已使用：{}，空闲：{}】",connSize.get(),usedConn.size(),unUsedConn.size());
-					if (unUsedConn.size() <= jdbcConfig.getMinPoolSize()) return;
+					if (unUsedConn.size() <= jdbcConfig.getMinPoolSize()) 
+						return;
 					unUsedConn.removeIf(c -> {
-						if (unUsedConn.size() <= jdbcConfig.getMinPoolSize()) return false;
+						if (unUsedConn.size() <= jdbcConfig.getMinPoolSize()) 
+							return false;
 						QuickConnectionWrapper qcw = (QuickConnectionWrapper) c;
-						if (getIdleTime(qcw.getLastUsedTime()) < jdbcConfig.getMaxIdleTime()) return false;
+						if (getIdleTime(qcw.getLastUsedTime()) < jdbcConfig.getMaxIdleTime()) 
+							return false;
 						try {
 							qcw.destroy();
 						} catch (Exception e) {

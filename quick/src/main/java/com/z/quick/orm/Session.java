@@ -1,7 +1,5 @@
 package com.z.quick.orm;
 
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Proxy;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
@@ -9,6 +7,7 @@ import java.util.List;
 import javax.sql.DataSource;
 
 import com.z.quick.orm.connection.ConnectionUtils;
+import com.z.quick.orm.connection.JDBCConfig;
 import com.z.quick.orm.connection.QuickDataSource;
 import com.z.quick.orm.sql.SqlInfo;
 import com.z.quick.orm.sql.builder.ISqlBuilder;
@@ -17,23 +16,19 @@ import com.z.quick.orm.sql.builder.SqlBuilderProcessor;
 public class Session implements SQLExecute {
 
 	private DataSource dataSource;
-	
-	private SQLExecute asyncSQLExecute;  
-	
+	private JDBCConfig jdbcConfig;
 	private static final Session session = new Session();;
 	
+	/**
+	 * 暂无对象管理容器，只支持单一数据源，后期优化，配置文件默认为 jdbc.setting
+	 */
 	private Session() {
 		super();
-		this.dataSource = new QuickDataSource("jdbc.setting");
-		InvocationHandler invocationHandler = new FutureInvocationHandler(this); 
-		asyncSQLExecute = (SQLExecute)Proxy.newProxyInstance(this.getClass().getClassLoader(),  
-	            this.getClass().getInterfaces(), invocationHandler);
+		jdbcConfig = JDBCConfig.newInstance("jdbc.setting");
+		this.dataSource = new QuickDataSource(jdbcConfig);
 	}
 	public static Session getSession(){
 		return session;
-	}
-	public SQLExecute getAsyncSQLExecute(){
-		return asyncSQLExecute;
 	}
 	
 	/** ********************************************
@@ -109,6 +104,10 @@ public class Session implements SQLExecute {
 		} catch (SQLException e) {
 			throw new RuntimeException("获取数据库连接出错",e);
 		}
+	}
+	
+	public JDBCConfig getJdbcConfig() {
+		return jdbcConfig;
 	}
 	public Object executeSql(String namespace,Class<?> clzz) {
 

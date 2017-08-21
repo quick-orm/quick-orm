@@ -26,7 +26,7 @@ public abstract class BaseDao<T> implements Dao<T> {
 
 	@Override
 	public List<T> find(T t) {
-		return (List<T>) Session.getSession().get(t);
+		return (List<T>) Session.getSession().find(t);
 	}
 
 	@Override

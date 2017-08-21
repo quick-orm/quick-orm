@@ -22,9 +22,9 @@ public class QuickDataSource implements DataSource{
 	
 	private QuickConnectionPool connPool;
 
-	public QuickDataSource(String jdbcConfig) {
+	public QuickDataSource(JDBCConfig jdbcConfig) {
 		super();
-		connPool = new QuickConnectionPool(JDBCConfig.newInstance(jdbcConfig));
+		connPool = new QuickConnectionPool(jdbcConfig);
 	}
 
 	@Override
