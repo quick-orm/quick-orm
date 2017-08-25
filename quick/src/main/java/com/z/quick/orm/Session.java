@@ -2,6 +2,8 @@ package com.z.quick.orm;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -9,15 +11,15 @@ import javax.sql.DataSource;
 import com.z.quick.orm.connection.ConnectionUtils;
 import com.z.quick.orm.connection.JDBCConfig;
 import com.z.quick.orm.connection.QuickDataSource;
+import com.z.quick.orm.exception.ConnectionException;
 import com.z.quick.orm.sql.SqlInfo;
 import com.z.quick.orm.sql.builder.ISqlBuilder;
 import com.z.quick.orm.sql.builder.SqlBuilderProcessor;
+public class Session implements SqlExecute {
 
-public class Session implements SQLExecute {
-
-	private DataSource dataSource;
 	private JDBCConfig jdbcConfig;
-	private SQLAsyncExecute sqlAsyncExecute;
+	private DataSource dataSource;
+	private SqlAsyncExecute sqlAsyncExecute;
 	private static final Session session = new Session();;
 	
 	/**
@@ -27,10 +29,17 @@ public class Session implements SQLExecute {
 		super();
 		jdbcConfig = JDBCConfig.newInstance("jdbc.setting");
 		this.dataSource = new QuickDataSource(jdbcConfig);
-		this.sqlAsyncExecute = new FutureSQLSyncExecute(this, jdbcConfig.getAsyncPoolSize());
+		this.sqlAsyncExecute = new FutureSqlAsyncExecute(this, jdbcConfig.getAsyncPoolSize());
 	}
+	
 	public static Session getSession(){
 		return session;
+	}
+	public SqlAsyncExecute getSqlAsyncExecute() {
+		return sqlAsyncExecute;
+	}
+	public JDBCConfig getJdbcConfig() {
+		return jdbcConfig;
 	}
 	
 	/** ********************************************
@@ -41,6 +50,12 @@ public class Session implements SQLExecute {
 	@Override
 	public int save(Object o) {
 		SqlInfo sqlInfo = SqlBuilderProcessor.getSql(ISqlBuilder.SBType.SAVE, o);
+		return ConnectionUtils.update(getConnection(), sqlInfo);
+	}
+	
+	@Override
+	public int delete(Object o) {
+		SqlInfo sqlInfo = SqlBuilderProcessor.getSql(ISqlBuilder.SBType.DELETE, o);
 		return ConnectionUtils.update(getConnection(), sqlInfo);
 	}
 	
@@ -55,7 +70,6 @@ public class Session implements SQLExecute {
 		SqlInfo sqlInfo = SqlBuilderProcessor.getSql(ISqlBuilder.SBType.UPDATE, o);
 		return ConnectionUtils.update(getConnection(), sqlInfo);
 	}
-
 	
 	/** ********************************************
 	 * method name   : get 
@@ -77,7 +91,6 @@ public class Session implements SQLExecute {
 		SqlInfo sqlInfo = SqlBuilderProcessor.getSql(ISqlBuilder.SBType.GET, o);
 		return ConnectionUtils.get(getConnection(), sqlInfo,clzz);
 	}
-
 	
 	/** ********************************************
 	 * method name   : find 
@@ -85,8 +98,8 @@ public class Session implements SQLExecute {
 	 * @see          : @see com.z.quick.orm.SQLHandler#find(java.lang.Object)
 	 * ********************************************/     
 	@Override
-	public List<Object> find(Object o) {
-		return this.find(o, o.getClass());
+	public List<Object> list(Object o) {
+		return this.list(o, o.getClass());
 	}
 	
 	/** ********************************************
@@ -95,32 +108,38 @@ public class Session implements SQLExecute {
 	 * @see          : @see com.z.quick.orm.SQLHandler#find(java.lang.Object, java.lang.Class)
 	 * ********************************************/     
 	@Override
-	public List<Object> find(Object o,Class<?> clzz) {
-		SqlInfo sqlInfo = SqlBuilderProcessor.getSql(ISqlBuilder.SBType.FIND, o);
-		return ConnectionUtils.find(getConnection(), sqlInfo,clzz);
+	public List<Object> list(Object o,Class<?> clzz) {
+		SqlInfo sqlInfo = SqlBuilderProcessor.getSql(ISqlBuilder.SBType.LIST, o);
+		return ConnectionUtils.list(getConnection(), sqlInfo,clzz);
 	}
 	
+	@Override
+	public Object get(String sql,Class<?> clzz,Object...params) {
+		SqlInfo sqlInfo = new SqlInfo(sql, new LinkedList<Object>(Arrays.asList(params)));
+		return ConnectionUtils.get(getConnection(), sqlInfo, clzz);
+	}
+	@Override
+	public List<Object> list(String sql,Class<?> clzz,Object...params) {
+		SqlInfo sqlInfo = new SqlInfo(sql, new LinkedList<Object>(Arrays.asList(params)));
+		return ConnectionUtils.list(getConnection(), sqlInfo, clzz);
+	}
+	@Override
+	public int save(String sql,Object...params) {
+		SqlInfo sqlInfo = new SqlInfo(sql, new LinkedList<Object>(Arrays.asList(params)));
+		return ConnectionUtils.update(getConnection(), sqlInfo);
+	}
+	@Override
+	public int update(String sql,Object...params) {
+		SqlInfo sqlInfo = new SqlInfo(sql, new LinkedList<Object>(Arrays.asList(params)));
+		return ConnectionUtils.update(getConnection(), sqlInfo);
+	}
 	private Connection getConnection(){
 		try {
 			return dataSource.getConnection();
 		} catch (SQLException e) {
-			throw new RuntimeException("获取数据库连接出错",e);
+			throw new ConnectionException("Get db connection error",e);
 		}
 	}
 	
 	
-	
-	
-	public SQLAsyncExecute getSqlAsyncExecute() {
-		return sqlAsyncExecute;
-	}
-	public JDBCConfig getJdbcConfig() {
-		return jdbcConfig;
-	}
-	public Object executeSql(String namespace,Class<?> clzz) {
-		return null;
-	}
-	public void updateSql() {
-	}
-
 }

@@ -21,7 +21,7 @@ import com.z.quick.orm.Session;
  */
 public class MonitorSql {
 	private static final Log log = LogFactory.get();
-	private static final LinkedBlockingQueue<String> queue = new LinkedBlockingQueue<String>(128);
+	private static LinkedBlockingQueue<String> queue ;
 	private static final String contentModel = "Execute SQL:%s TIME:%smm;";
 	private static final String fileSuffix = ".txt";
 	
@@ -34,6 +34,7 @@ public class MonitorSql {
 	}
 	
 	public static void start(){
+		queue = new LinkedBlockingQueue<String>(128);
 		new Thread(()->{
 			long size = 0;
 			PrintWriter writer = null;

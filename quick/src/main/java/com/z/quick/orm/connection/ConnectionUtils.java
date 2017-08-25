@@ -7,13 +7,14 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import com.xiaoleilu.hutool.log.Log;
 import com.xiaoleilu.hutool.log.LogFactory;
+import com.z.quick.orm.cache.ClassCache;
+import com.z.quick.orm.exception.ExecuteSqlException;
 import com.z.quick.orm.sql.SqlInfo;
 import com.z.quick.orm.sql.convert.FieldConvertProcessor;
 
@@ -27,7 +28,7 @@ public class ConnectionUtils {
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			log.error(e, "execute sql error");
-			throw new RuntimeException(e);
+			throw new ExecuteSqlException(e);
 		} finally {
 			close(stmt);
 			close(conn);
@@ -47,10 +48,10 @@ public class ConnectionUtils {
 			if (list.size()==1) {
 				return list.get(0);
 			}
-			throw new RuntimeException("query out multiple results!");
+			throw new ExecuteSqlException("query out multiple results!");
 		} catch (SQLException e) {
 			log.error(e, "execute sql error");
-			throw new RuntimeException(e);
+			throw new ExecuteSqlException(e);
 		} finally {
 			close(stmt);
 			close(conn);
@@ -58,7 +59,7 @@ public class ConnectionUtils {
 		}
 	}
 
-	public static List<Object> find(Connection conn, SqlInfo sqlInfo,Class<?> clzz) {
+	public static List<Object> list(Connection conn, SqlInfo sqlInfo,Class<?> clzz) {
 		PreparedStatementWrapper stmt = null;
 		ResultSet rs = null;
 		try {
@@ -67,13 +68,14 @@ public class ConnectionUtils {
 			return parseResultSetToMap(rs,clzz);
 		} catch (Exception e) {
 			log.error(e, "execute sql error");
-			throw new RuntimeException(e);
+			throw new ExecuteSqlException(e);
 		} finally {
 			close(stmt);
 			close(conn);
 			close(rs);
 		}
 	}
+	
 	
 	private static List<Object> parseResultSetToMap(ResultSet rs,Class<?> clzz) {
 		List<Object> list = new ArrayList<>();
@@ -93,7 +95,7 @@ public class ConnectionUtils {
 			return list;
 		} catch (SQLException e) {
 			log.error(e, "parse query result error");
-			throw new RuntimeException(e);
+			throw new ExecuteSqlException(e);
 		}
 	}
 	
@@ -108,7 +110,7 @@ public class ConnectionUtils {
 				stmt.setObject(i + 1, params.get(i));
 			} catch (Exception e) {
 				log.error(e);
-				throw new RuntimeException("setting sql param error",e);
+				throw new ExecuteSqlException("setting sql param error",e);
 			}
 		}
 		return new PreparedStatementWrapper(stmt, sqlInfo);
@@ -116,9 +118,12 @@ public class ConnectionUtils {
 	
 	private static Object toJavaObject(Map<String,Object> result,Class<?> clzz){
 		try {
+			if (clzz.isAssignableFrom(Map.class)) {
+				return result;
+			}
 			Object o = clzz.newInstance();
-			Field[] fields = clzz.getDeclaredFields();
-			Arrays.asList(fields).forEach((f)->{
+			List<Field> list = ClassCache.getDeclaredFields(clzz);
+			list.forEach((f)->{
 				String k = f.getName();
 				Object v = result.get(k);
 				if (v != null) {

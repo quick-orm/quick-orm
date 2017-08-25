@@ -14,6 +14,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import com.xiaoleilu.hutool.log.Log;
 import com.xiaoleilu.hutool.log.LogFactory;
 import com.z.quick.monitor.MonitorSql;
+import com.z.quick.orm.exception.ConnectionException;
 
 public class QuickConnectionPool {
 	private static final Log log = LogFactory.get();
@@ -52,8 +53,8 @@ public class QuickConnectionPool {
 			timerClearAllLeisureConnection();
 			log.info("===============Initialize DB Connection Pool SUCCESS===============");
 		} catch (Exception e) {
-			log.error("初始化数据库连接出现异常",e);
-			throw new RuntimeException(e);
+			log.error("Initialize db connection error",e);
+			throw new ConnectionException(e);
 		}finally {
 			lock.unlock();
 		}
@@ -75,11 +76,11 @@ public class QuickConnectionPool {
 					jdbcConfig.getUsername(), jdbcConfig.getPassword());
 			connSize.incrementAndGet();
 			Connection qcw = new QuickConnectionWrapper(conn,this);
-			log.debug("创建连接：{}成功",qcw);
+			log.debug("Create db connection：{} success",qcw);
 			return qcw;
 		} catch (SQLException e) {
-			log.error("创建数据库连接出错",e);
-			throw new RuntimeException("创建数据库连接出错",e);
+			log.error("Create db connection error",e);
+			throw new ConnectionException("Create db connection error",e);
 		}finally{
 			lock.unlock();
 		}
@@ -122,7 +123,7 @@ public class QuickConnectionPool {
 				}
 				if (waitTime.get() > jdbcConfig.getMaxWait()) {
 					waitTime.set(0L);
-					throw new RuntimeException("当前数据库连接已达上线，无法再创建连接");
+					throw new ConnectionException("当前数据库连接已达上线，无法再创建连接");
 				}
 				waitTime.set(waitTime.get()+2000);
 				wait(2000);
@@ -130,8 +131,8 @@ public class QuickConnectionPool {
 			}
 			
 		} catch (Exception e) {
-			log.error("获取数据库连接出错",e);
-			throw new RuntimeException("获取数据库连接出错",e);
+			log.error("Get connection error",e);
+			throw new ConnectionException("Get connection error",e);
 		}finally {
 			if (isReleaseLock) {
 				lock.unlock();
@@ -142,7 +143,7 @@ public class QuickConnectionPool {
 		if (jdbcConfig.getUsername().equals(username) && jdbcConfig.getPassword().equals(password)) {
 			return getConnection();
 		}
-		throw new RuntimeException("用户名密码错误!");
+		throw new ConnectionException("Username or password error");
 	}
 	private void wait(int mSeconds) {  
         try {  
@@ -269,7 +270,7 @@ public class QuickConnectionPool {
 //			log.debug("当前连接情况【已创建：{}，已使用：{}，空闲：{}】",connSize.get(),usedConn.size(),unUsedConn.size());
 		} catch (Exception e) {
 			log.error("回收连接出现异常", e);
-			throw new RuntimeException("回收连接出现异常",e);
+			throw new ConnectionException("回收连接出现异常",e);
 		}finally{
 			lock.unlock();
 		}

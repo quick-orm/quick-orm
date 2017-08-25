@@ -1,0 +1,29 @@
+package com.z.quick.orm;
+
+import java.util.List;
+import java.util.concurrent.Future;
+
+public interface SqlAsyncExecute {
+
+	Future<Integer> save(Object o);
+
+	Future<Integer> update(Object o);
+
+	Future<Object> get(Object o);
+
+	Future<Object> get(Object o, Class<?> clzz);
+
+	Future<List<Object>> list(Object o);
+
+	Future<List<Object>> list(Object o, Class<?> clzz);
+	
+	Future<Integer> save(String sql, Object[] params);
+	
+	Future<Integer> update(String sql, Object[] params);
+	
+	Future<Object> get(String sql, Class<?> clzz, Object[] params);
+
+	Future<List<Object>> list(String sql, Class<?> clzz, Object[] params);
+
+
+}

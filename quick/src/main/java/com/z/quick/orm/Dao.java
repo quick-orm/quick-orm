@@ -25,7 +25,7 @@ public interface Dao<T> {
 
 	Future<T> asyncGet(T t, Class<?> clzz);
 
-	Future<List<Object>> asyncFind(T t);
+	Future<List<Object>> asyncList(T t);
 
-	Future<List<Object>> asyncFind(T t, Class<?> clzz);
+	Future<List<Object>> asyncList(T t, Class<?> clzz);
 }

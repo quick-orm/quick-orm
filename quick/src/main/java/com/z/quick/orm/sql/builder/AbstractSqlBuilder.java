@@ -6,10 +6,13 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.z.quick.orm.annotation.Exclude;
-import com.z.quick.orm.annotation.Table;
-import com.z.quick.orm.sql.convert.FieldConvertProcessor;
+import com.z.quick.orm.exception.SqlBuilderException;
+import com.z.quick.orm.oop.Schema;
+import com.z.quick.orm.util.AnnotationSqlBuilderUtils;
+import com.z.quick.orm.util.ObjectSqlBuilderUtils;
 
 public abstract class AbstractSqlBuilder implements ISqlBuilder {
+	//TODO 删除
 	protected static final String space = " ";
 	protected static final String placeholder = "?";
 	/**
@@ -23,9 +26,62 @@ public abstract class AbstractSqlBuilder implements ISqlBuilder {
 	 * @see          : 
 	 * *******************************************
 	 */
-	protected String getTableName(Class<?> clzz){
-		return clzz.getAnnotation(Table.class).value();
+	protected String getTableName(Object o){
+		String tableName = ObjectSqlBuilderUtils.getTableName(o);
+		if (tableName!=null) {
+			return tableName;
+		}else {
+			if (o instanceof Schema) {
+				throw new SqlBuilderException("TableName is null");
+			}
+		}
+		return AnnotationSqlBuilderUtils.getTableName(o);
 	}
+	
+	protected String getSelect(Object o){
+		String select = ObjectSqlBuilderUtils.getSelect(o);
+		if (select != null) {
+			return select;
+		}
+		select = AnnotationSqlBuilderUtils.getSelect(o);
+		if (select == null || "".equals(select)) {
+			throw new SqlBuilderException("Select list is null");
+		}
+		return select;
+	}
+	protected void getInsert(Object o,StringBuffer insertParam,StringBuffer insertValue,List<Object> valueList){
+		ObjectSqlBuilderUtils.getInsert(o, insertParam, insertValue, valueList);
+		if (valueList.size()>0) {
+			return ;
+		}
+		AnnotationSqlBuilderUtils.getInsert(o, insertParam, insertValue, valueList);;
+		if (valueList.size()<=0) {
+			throw new SqlBuilderException("Insert param is null");
+		}
+	}
+	
+	protected String getCondition(Object o,List<Object> valueList){
+		
+		String condition = ObjectSqlBuilderUtils.getCondition(o, valueList);
+		if (condition != null) {
+			return condition;
+		}
+		condition = AnnotationSqlBuilderUtils.getCondition(o, valueList);
+		return condition;
+	}
+	protected String getModif(Object o,List<Object> valueList){
+		
+		String modif = ObjectSqlBuilderUtils.getModif(o, valueList);
+		if (modif != null) {
+			return modif.substring(0,modif.lastIndexOf(","));
+		}
+		modif = AnnotationSqlBuilderUtils.getModif(o, valueList);
+		if (modif.length()<=0) {
+			throw new SqlBuilderException("modif param is null");
+		}
+		return modif.substring(0,modif.lastIndexOf(","));
+	}
+	
 	/**
 	 * ********************************************
 	 * method name   : getFields 
@@ -41,37 +97,11 @@ public abstract class AbstractSqlBuilder implements ISqlBuilder {
 		Field[] fields =  clzz.getDeclaredFields();
 		List<Field> fieldList = new ArrayList<Field>(Arrays.asList(fields));
 		fieldList.removeIf(f -> {
-			f.setAccessible(true);
+			//f.setAccessible(true);
 			Exclude e = f.getAnnotation(Exclude.class);
 			return e != null;
 		}); 
 		return fieldList;
-	}
-	/**
-	 * ********************************************
-	 * method name   : getValue 
-	 * description   : 获取转换成数据库类型的属性值
-	 * @return       : Object
-	 * @param        : @param f
-	 * @param        : @param o
-	 * @param        : @return
-	 * modified      : zhukaipeng ,  2017年8月14日  下午4:42:57
-	 * @see          : 
-	 * *******************************************
-	 */
-	protected Object getValue(Field f,Object o){
-		Object v = null;
-		try {
-			v = f.get(o);
-			if (v == null) {
-				return null;
-			}
-		} catch (IllegalArgumentException e) {
-			throw new RuntimeException("通过反射获取属性值出错!",e);
-		} catch (IllegalAccessException e) {
-			throw new RuntimeException("通过反射获取属性值出错!",e);
-		}
-		return FieldConvertProcessor.toDB(v);
 	}
 }
 

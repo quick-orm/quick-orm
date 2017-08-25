@@ -19,6 +19,14 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.Executor;
 
+import com.z.quick.orm.exception.ConnectionException;
+/**
+ * class       :  QuickConnectionWrapper
+ * @author     :  zhukaipeng
+ * @version    :  1.0  
+ * description :  jdbc Connection装饰类
+ * @see        :  *
+ */
 public class QuickConnectionWrapper implements Connection{
 	
 	private Connection connection;
@@ -92,7 +100,7 @@ public class QuickConnectionWrapper implements Connection{
 			this.connection.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
-			throw new RuntimeException("关闭连接出现异常",e);
+			throw new ConnectionException("关闭连接出现异常",e);
 		}	
 	}
 	
@@ -125,7 +133,7 @@ public class QuickConnectionWrapper implements Connection{
 	public String getCatalog() throws SQLException {
 		return this.connection.getCatalog();
 	}
-
+	
 	@Override
 	public void setTransactionIsolation(int level) throws SQLException {
 		this.connection.setTransactionIsolation(level);		

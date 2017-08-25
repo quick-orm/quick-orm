@@ -2,7 +2,7 @@ package com.z.quick.orm;
 
 import java.util.List;
 import java.util.concurrent.Future;
-
+@SuppressWarnings("unchecked")
 public abstract class BaseDao<T> implements Dao<T> {
 	
 	@Override
@@ -27,12 +27,12 @@ public abstract class BaseDao<T> implements Dao<T> {
 
 	@Override
 	public List<T> find(T t) {
-		return (List<T>) Session.getSession().find(t);
+		return (List<T>) Session.getSession().list(t);
 	}
 
 	@Override
 	public List<T> find(T t, Class<?> clzz) {
-		return (List<T>) Session.getSession().find(t, clzz);
+		return (List<T>) Session.getSession().list(t, clzz);
 	}
 
 	@Override
@@ -56,13 +56,13 @@ public abstract class BaseDao<T> implements Dao<T> {
 	}
 
 	@Override
-	public Future<List<Object>> asyncFind(T t) {
-		return Session.getSession().getSqlAsyncExecute().find(t);
+	public Future<List<Object>> asyncList(T t) {
+		return Session.getSession().getSqlAsyncExecute().list(t);
 	}
 
 	@Override
-	public Future<List<Object>> asyncFind(T t, Class<?> clzz) {
-		return Session.getSession().getSqlAsyncExecute().find(t, clzz);
+	public Future<List<Object>> asyncList(T t, Class<?> clzz) {
+		return Session.getSession().getSqlAsyncExecute().list(t, clzz);
 	}
 
 }

@@ -3,7 +3,8 @@ package com.z.quick.orm.connection;
 import com.xiaoleilu.hutool.log.Log;
 import com.xiaoleilu.hutool.log.LogFactory;
 import com.xiaoleilu.hutool.setting.Setting;
-import com.z.quick.orm.sql.JdbcUtils;
+import com.z.quick.orm.exception.ConnectionException;
+import com.z.quick.orm.util.JdbcUtils;
 
 public class JDBCConfig implements DefaultConfig {
 	private static final Log log = LogFactory.get();
@@ -29,7 +30,7 @@ public class JDBCConfig implements DefaultConfig {
 	private long maxExecuteTime = DEFAULT_MAX_EXECUTE_TIME;
 	/**最大耗时sql保存文件路径 默认classes目录下*/
 	private String maxExecuteTimeFilePath = DEFAULT_MAX_EXECUTE_TIME_FILE_PATH;
-	/**单位毫秒 当连接池连接耗尽时，客户端调用getConnection()后等待获取新连接的时间，超时后将抛出RuntimeException。单位毫秒。默认: 10000*/
+	/**单位毫秒 当连接池连接耗尽时，客户端调用getConnection()后等待获取新连接的时间，超时后将抛出ConnectionException。单位毫秒。默认: 10000*/
 	private int maxWait = DEFAULT_MAX_IDLE_TIME;
 	/**最大空闲时间*/
 	private int maxIdleTime = DEFAULT_MAX_IDLE_TIME;
@@ -60,7 +61,7 @@ public class JDBCConfig implements DefaultConfig {
 				Class.forName(driverClassName);
 			} catch (ClassNotFoundException e) {
 				log.error("加载数据库驱动出错",e);
-				throw new RuntimeException("加载数据库驱动出错",e);
+				throw new ConnectionException("加载数据库驱动出错",e);
 			}
 		}
 		if (jdbcSetting.get("jdbc.minPoolSize") != null) {
@@ -81,7 +82,6 @@ public class JDBCConfig implements DefaultConfig {
 		if (jdbcSetting.get("jdbc.maxExecuteTimeFilePath") != null) {
 			maxExecuteTimeFilePath = jdbcSetting.getStr("jdbc.maxExecuteTimeFilePath");
 		}else{
-//			maxExecuteTimeFilePath = ClassLoader.getSystemResource("/").getPath();
 			maxExecuteTimeFilePath = Thread.currentThread().getContextClassLoader().getResource("").getPath(); 
 		}
 		if (jdbcSetting.get("jdbc.maxWait") != null) {

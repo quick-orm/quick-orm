@@ -121,8 +121,21 @@ class BigDecimalFieldConvert implements IFieldConvert {
 	}
 	
 }
-
+//TODO 测试
 class TimestampFieldConvert implements IFieldConvert {
+	
+	@Override
+	public Object toJava(Object o) {
+		return o;
+	}
+	
+	@Override
+	public Object toDB(Object o) {
+		return o;
+	}
+	
+}
+class DefaultFieldConvert implements IFieldConvert {
 	
 	@Override
 	public Object toJava(Object o) {

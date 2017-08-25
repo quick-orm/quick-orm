@@ -10,8 +10,10 @@ public class SqlBuilderProcessor {
 	
 	static{
 		sqlBuilderContainer.put(ISqlBuilder.SBType.SAVE, new SaveSqlBuilder());
+		sqlBuilderContainer.put(ISqlBuilder.SBType.DELETE, new DeleteSqlBuilder());
+		sqlBuilderContainer.put(ISqlBuilder.SBType.UPDATE, new UpdateSqlBuilder());
 		sqlBuilderContainer.put(ISqlBuilder.SBType.GET, new GetSqlBuilder());
-		sqlBuilderContainer.put(ISqlBuilder.SBType.FIND, new FindSqlBuilder());
+		sqlBuilderContainer.put(ISqlBuilder.SBType.LIST, new ListSqlBuilder());
 		String dbType = "MySQL";
 		if("com.ibm.db2.jcc.DB2Driver".equals(dbType)){
 			//sqlBuilderContainer.put(ISqlBuilder.SBType.PAGE_COUNT, new DB2PageSqlBuilder());

@@ -12,14 +12,19 @@ import com.z.quick.orm.sql.SqlInfo;
  * ***********************************************
  */
 public interface ISqlBuilder {
+	final String SPACE = " ";
+	final String PLACEHOLDER = "?";
 	enum SBType{
 		SAVE,
+		DELETE,
 		UPDATE,
 		GET,
-		FIND,
+		LIST,
 		PAGE_COUNT,
 		PAGE_LIST
 	}
 	SqlInfo builderSql(Object o);
+	
+	
 	
 }
