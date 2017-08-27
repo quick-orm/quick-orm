@@ -20,11 +20,11 @@ import javax.sql.DataSource;
  */
 public class QuickDataSource implements DataSource{
 	
-	private QuickConnectionPool connPool;
+	private ConnectionPool connPool;
 
 	public QuickDataSource(JDBCConfig jdbcConfig) {
 		super();
-		connPool = new QuickConnectionPool(jdbcConfig);
+		connPool = new ConnectionPool(jdbcConfig);
 	}
 
 	@Override

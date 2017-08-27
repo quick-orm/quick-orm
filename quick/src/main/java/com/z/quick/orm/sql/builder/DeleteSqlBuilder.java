@@ -13,7 +13,6 @@ import com.z.quick.orm.sql.SqlInfo;
  * @see        :  *
  */
 public class DeleteSqlBuilder extends AbstractSqlBuilder {
-	private static final String template = "DELETE FROM #tableName #condition;";
 
 	@Override
 	public SqlInfo builderSql(Object o) {
@@ -24,7 +23,7 @@ public class DeleteSqlBuilder extends AbstractSqlBuilder {
 		if (condition == null || "".equals(condition)) {
 			throw new SqlBuilderException("disallow full table delete");
 		}
-		String sql = template.replace("#tableName", tableName);
+		String sql = DELETE_TEMPLATE.replace("#tableName", tableName);
 		sql = sql.replace("#select", select);
 		sql = sql.replace("#condition", condition);
 		return new SqlInfo(sql, valueList);

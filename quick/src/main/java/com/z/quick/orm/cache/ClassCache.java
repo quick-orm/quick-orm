@@ -1,6 +1,7 @@
 package com.z.quick.orm.cache;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -12,7 +13,7 @@ import com.z.quick.orm.annotation.Exclude;
 import com.z.quick.orm.annotation.NoFind;
 import com.z.quick.orm.annotation.PrimaryKey;
 import com.z.quick.orm.annotation.Table;
-import com.z.quick.orm.sql.builder.ISqlBuilder;
+import com.z.quick.orm.common.Constants;
 public class ClassCache {
 	
 	private static final Map<Class<?>,Map<String,Field>> allFieldClassCache = new HashMap<>();
@@ -33,12 +34,27 @@ public class ClassCache {
 		return fieldMap;
 	}
 	
-	public static List<Field> getDeclaredFields(Class<?> clzz){
+	private static List<Field> getDeclaredFields(Class<?> clzz){
+		Field[] fields = clzz.getDeclaredFields();
+		List<Field> list = new ArrayList<>(Arrays.asList(fields));
+		list.removeIf(f->{
+			int m = f.getModifiers();
+			if ((Modifier.STATIC & m) == Modifier.STATIC) {
+				return true;
+			}else if((Modifier.FINAL & m) == Modifier.FINAL) {
+				return true;
+			}
+			return false;
+		});
+		return list;
+		
+	}
+	
+	public static List<Field> getAllDeclaredFields(Class<?> clzz){
 		if (declaredFieldsCache.get(clzz) != null) {
 			return declaredFieldsCache.get(clzz);
 		}
-		Field[] fields = clzz.getDeclaredFields();
-		List<Field> list = new ArrayList<>(Arrays.asList(fields));
+		List<Field> list = getDeclaredFields(clzz);
 		declaredFieldsCache.put(clzz, list);
 		return list;
 	}
@@ -63,13 +79,12 @@ public class ClassCache {
 		if (annationSelectCache.get(clzz) != null) {
 			return annationSelectCache.get(clzz);
 		}
-		Field[] fields =  clzz.getDeclaredFields();
-		List<Field> fieldList = new ArrayList<Field>(Arrays.asList(fields));
+		List<Field> fieldList = getDeclaredFields(clzz);
 		fieldList.removeIf(f -> f.getAnnotation(Exclude.class)!=null); 
 		fieldList.removeIf(f -> f.getAnnotation(NoFind.class)!=null); 
 		StringBuffer selectsb = new StringBuffer();
 		fieldList.forEach((f) -> {
-			selectsb.append(ISqlBuilder.SPACE).append(f.getName()).append(",");
+			selectsb.append(Constants.SPACE).append(f.getName()).append(",");
 		});
 		if (selectsb.length() == 0) {
 			annationSelectCache.put(clzz, "");
@@ -85,8 +100,7 @@ public class ClassCache {
 		if (annationPKCache.get(clzz) != null) {
 			return annationPKCache.get(clzz);
 		}
-		Field[] fields =  clzz.getDeclaredFields();
-		List<Field> fieldList = new ArrayList<Field>(Arrays.asList(fields));
+		List<Field> fieldList = getDeclaredFields(clzz);
 		fieldList.removeIf(f -> f.getAnnotation(PrimaryKey.class)==null); 
 		annationPKCache.put(clzz, fieldList);
 		return fieldList;
@@ -96,8 +110,7 @@ public class ClassCache {
 		if (annationConditionCache.get(clzz) != null) {
 			return annationConditionCache.get(clzz);
 		}
-		Field[] fields =  clzz.getDeclaredFields();
-		List<Field> fieldList = new ArrayList<Field>(Arrays.asList(fields));
+		List<Field> fieldList = getDeclaredFields(clzz);
 		fieldList.removeIf(f -> f.getAnnotation(Condition.class)==null); 
 		annationConditionCache.put(clzz, fieldList);
 		return fieldList;
@@ -106,8 +119,7 @@ public class ClassCache {
 		if (insertParamCache.get(clzz) != null) {
 			return insertParamCache.get(clzz);
 		}
-		Field[] fields =  clzz.getDeclaredFields();
-		List<Field> fieldList = new ArrayList<Field>(Arrays.asList(fields));
+		List<Field> fieldList = getDeclaredFields(clzz);
 		fieldList.removeIf(f -> f.getAnnotation(Exclude.class)!=null); 
 		insertParamCache.put(clzz, fieldList);
 		return fieldList;
@@ -116,10 +128,10 @@ public class ClassCache {
 	
 	private static Map<String,Field> parseClass(Class<?> clzz){
 		Map<String,Field> fieldMap = new HashMap<>();
-		Field[] fields = clzz.getDeclaredFields();
-		for (Field field : fields) {
-			fieldMap.put(field.getName(), field);
-		}
+		List<Field> list = getDeclaredFields(clzz);
+		list.forEach(f->{
+			fieldMap.put(f.getName(), f);
+		});
 		if (clzz.getSuperclass() != null) {
 			fieldMap.putAll(parseClass(clzz.getSuperclass()));
 		}

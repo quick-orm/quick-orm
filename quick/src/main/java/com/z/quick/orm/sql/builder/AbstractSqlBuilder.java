@@ -12,9 +12,12 @@ import com.z.quick.orm.util.AnnotationSqlBuilderUtils;
 import com.z.quick.orm.util.ObjectSqlBuilderUtils;
 
 public abstract class AbstractSqlBuilder implements ISqlBuilder {
-	//TODO 删除
-	protected static final String space = " ";
-	protected static final String placeholder = "?";
+	public static final String SAVE_TEMPLATE = "INSERT INTO #tableName(#insertParam) VALUES(#insertValue)";
+	public static final String DELETE_TEMPLATE = "DELETE FROM #tableName #condition";
+	public static final String UPDATE_TEMPLATE = "UPDATE #tableName SET #modif #condition";
+	public static final String GET_TEMPLATE = "SELECT #select FROM #tableName #condition";
+	public static final String LIST_TEMPLATE = "SELECT #select FROM #tableName #condition";
+	
 	/**
 	 * ********************************************
 	 * method name   : getTableName 
@@ -67,6 +70,15 @@ public abstract class AbstractSqlBuilder implements ISqlBuilder {
 			return condition;
 		}
 		condition = AnnotationSqlBuilderUtils.getCondition(o, valueList);
+		return condition;
+	}
+	protected String getModifCondition(Object o,List<Object> valueList){
+		
+		String condition = ObjectSqlBuilderUtils.getCondition(o, valueList);
+		if (condition != null) {
+			return condition;
+		}
+		condition = AnnotationSqlBuilderUtils.getPrimaryKey(o, valueList);
 		return condition;
 	}
 	protected String getModif(Object o,List<Object> valueList){

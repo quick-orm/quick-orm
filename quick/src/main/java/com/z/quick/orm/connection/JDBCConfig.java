@@ -34,7 +34,7 @@ public class JDBCConfig implements DefaultConfig {
 	private int maxWait = DEFAULT_MAX_IDLE_TIME;
 	/**最大空闲时间*/
 	private int maxIdleTime = DEFAULT_MAX_IDLE_TIME;
-	/**每X秒检查所有连接池中的空闲连接。默认值: 0，不检查*/
+	/**每X毫秒检查所有连接池中的空闲连接。默认值: 0，不检查*/
 	private int idleConnectionTestPeriod = DEFAULT_IDLE_CONNECTION_TEST_PERIOD;
 	/**异步执行sql线程池，默认8*/
 	private int asyncPoolSize = DEFAULT_ASYNC_POOL_SIZE;

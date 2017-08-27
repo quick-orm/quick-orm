@@ -27,17 +27,19 @@ import com.z.quick.orm.exception.ConnectionException;
  * description :  jdbc Connection装饰类
  * @see        :  *
  */
-public class QuickConnectionWrapper implements Connection{
+public class ConnectionWrapper implements Connection{
 	
 	private Connection connection;
 	private Long lastUsedTime;
-	private QuickConnectionPool pool;
+	private Long createTime;
+	private ConnectionPool pool;
 
-	public QuickConnectionWrapper(Connection connection,QuickConnectionPool pool) {
+	public ConnectionWrapper(Connection connection,ConnectionPool pool) {
 		super();
 		this.connection = connection;
 		this.pool = pool;
 		lastUsedTime = System.currentTimeMillis();
+		createTime = System.currentTimeMillis();
 	}
 
 	@Override
@@ -329,6 +331,10 @@ public class QuickConnectionWrapper implements Connection{
 
 	public void setLastUsedTime(Long lastUsedTime) {
 		this.lastUsedTime = lastUsedTime;
+	}
+
+	public Long getSurviveTime() {
+		return System.currentTimeMillis() - createTime;
 	}
 	
 	

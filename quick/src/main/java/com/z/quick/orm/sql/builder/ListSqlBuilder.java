@@ -14,7 +14,6 @@ import com.z.quick.orm.sql.SqlInfo;
  * ***********************************************
  */
 public class ListSqlBuilder extends AbstractSqlBuilder {
-	private static final String template = "SELECT #select FROM #tableName #condition;";
 
 	@Override
 	public SqlInfo builderSql(Object o) {
@@ -22,7 +21,7 @@ public class ListSqlBuilder extends AbstractSqlBuilder {
 		String select = super.getSelect(o);
 		List<Object> valueList = new ArrayList<>();
 		String condition = super.getCondition(o,valueList);
-		String sql = template.replace("#tableName", tableName);
+		String sql = LIST_TEMPLATE.replace("#tableName", tableName);
 		sql = sql.replace("#select", select);
 		sql = sql.replace("#condition", condition);
 		return new SqlInfo(sql, valueList);

@@ -2,6 +2,7 @@ package com.z.quick.orm.oop;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -75,7 +76,7 @@ public class Schema extends ObjectOperate<Schema> {
 		List<Schema> list = new ArrayList<>();
 		Session.getSession().list(this,Map.class).forEach(o->{
 			Schema s = new Schema();
-			s.setResult((Map<String, Object>) o);
+			s.result = (Map<String, Object>) o;
 			list.add(s);
 		});
 		return list;
@@ -124,13 +125,13 @@ public class Schema extends ObjectOperate<Schema> {
 		return result.get(column)==null?null:result.get(column).toString();
 	}
 
-	public Map<String, Object> getResult() {
+	public Map<String, Object> result() {
 		return result;
 	}
 
-	public void setResult(Map<String, Object> result) {
-		this.result = result;
-	}
+//	public void setResult(Map<String, Object> result) {
+//		this.result = result;
+//	}
 	
 	public boolean isResult(){
 		return result!=null;
@@ -142,20 +143,28 @@ public class Schema extends ObjectOperate<Schema> {
 		}
 		try {
 			Object o = clzz.newInstance();
-			result.forEach((c,v)->{
-				try {
-					Field f = clzz.getDeclaredField(c);
-					f.setAccessible(true);
-					v = FieldConvertProcessor.toJava(f.getType(), v);
-					f.set(o, v);
-				} catch (Exception e) {
-					return ;
+			@SuppressWarnings("rawtypes")
+			List<Field> fields = new ArrayList(Arrays.asList(clzz.getDeclaredFields()));
+			fields.forEach(f->{
+				String k = f.getName().toUpperCase();
+				Object v = result.get(k);
+				if (v != null) {
+					try {
+						f.setAccessible(true);
+						f.set(o, FieldConvertProcessor.toJava(f.getType(),v));
+					} catch (Exception e) {
+					}
 				}
 			});
 			return o;
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	@Override
+	public String toString() {
+		return "Schema [result=" + result + "]";
 	}
 	
 }

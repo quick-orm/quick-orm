@@ -48,7 +48,7 @@ public class ConnectionUtils {
 			if (list.size()==1) {
 				return list.get(0);
 			}
-			throw new ExecuteSqlException("query out multiple results!");
+			throw new ExecuteSqlException("Query out multiple results!");
 		} catch (SQLException e) {
 			log.error(e, "execute sql error");
 			throw new ExecuteSqlException(e);
@@ -87,7 +87,7 @@ public class ConnectionUtils {
 				for (int i = 0; i < count; i++) {
 					String cloumn = rsmd.getColumnName(i + 1);
 					Object value = rs.getObject(i + 1);
-					result.put(cloumn, value);
+					result.put(cloumn.toUpperCase(), value);
 				}
 				 Object o = toJavaObject(result, clzz);
 				 list.add(o);
@@ -110,7 +110,7 @@ public class ConnectionUtils {
 				stmt.setObject(i + 1, params.get(i));
 			} catch (Exception e) {
 				log.error(e);
-				throw new ExecuteSqlException("setting sql param error",e);
+				throw new ExecuteSqlException("Setting sql param error",e);
 			}
 		}
 		return new PreparedStatementWrapper(stmt, sqlInfo);
@@ -122,9 +122,9 @@ public class ConnectionUtils {
 				return result;
 			}
 			Object o = clzz.newInstance();
-			List<Field> list = ClassCache.getDeclaredFields(clzz);
+			List<Field> list = ClassCache.getAllDeclaredFields(clzz);
 			list.forEach((f)->{
-				String k = f.getName();
+				String k = f.getName().toUpperCase();
 				Object v = result.get(k);
 				if (v != null) {
 					try {

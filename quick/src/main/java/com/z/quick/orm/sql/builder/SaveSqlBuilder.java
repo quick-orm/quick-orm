@@ -12,7 +12,6 @@ import com.z.quick.orm.sql.SqlInfo;
  * @see        :  *
  */
 public class SaveSqlBuilder extends AbstractSqlBuilder {
-	private static final String template = "INSERT INTO #tableName(#insertParam) VALUES(#insertValue);";
 
 	@Override
 	public SqlInfo builderSql(Object o) {
@@ -25,7 +24,7 @@ public class SaveSqlBuilder extends AbstractSqlBuilder {
 		insertParam.deleteCharAt(insertParam.lastIndexOf(","));
 		insertValue.deleteCharAt(insertValue.lastIndexOf(","));
 
-		String sql = template.replace("#tableName", tableName);
+		String sql = SAVE_TEMPLATE.replace("#tableName", tableName);
 		sql = sql.replace("#insertParam", insertParam);
 		sql = sql.replace("#insertValue", insertValue);
 		return new SqlInfo(sql, valueList);

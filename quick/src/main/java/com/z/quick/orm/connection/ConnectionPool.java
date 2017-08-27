@@ -16,8 +16,9 @@ import com.xiaoleilu.hutool.log.LogFactory;
 import com.z.quick.monitor.MonitorSql;
 import com.z.quick.orm.exception.ConnectionException;
 
-public class QuickConnectionPool {
+public class ConnectionPool {
 	private static final Log log = LogFactory.get();
+	private static final Long CONNECTION_SURVIVE_TIME = 30*60*1000L;
 	private JDBCConfig jdbcConfig;
 	private final ReentrantLock lock = new ReentrantLock(true);
 	private final List<Connection> unUsedConn = new LinkedList<Connection>();
@@ -27,7 +28,7 @@ public class QuickConnectionPool {
 	/**用于处理空闲、过期连接*/
 	private final ScheduledExecutorService clearService = Executors.newSingleThreadScheduledExecutor();
 	
-	public QuickConnectionPool(JDBCConfig jdbcConfig) {
+	public ConnectionPool(JDBCConfig jdbcConfig) {
 		this.jdbcConfig = jdbcConfig;
 		initConnectionPool(jdbcConfig.getInitialPoolSize());
 		if (jdbcConfig.getExecuteTimeMonitor()) {//开启sql执行耗时监控
@@ -75,7 +76,7 @@ public class QuickConnectionPool {
 			Connection conn = DriverManager.getConnection(jdbcConfig.getUrl(),
 					jdbcConfig.getUsername(), jdbcConfig.getPassword());
 			connSize.incrementAndGet();
-			Connection qcw = new QuickConnectionWrapper(conn,this);
+			Connection qcw = new ConnectionWrapper(conn,this);
 			log.debug("Create db connection：{} success",qcw);
 			return qcw;
 		} catch (SQLException e) {
@@ -85,27 +86,20 @@ public class QuickConnectionPool {
 			lock.unlock();
 		}
 	}
-	/**
-	 * ********************************************
-	 * method name   : setConnectionLastUserdTime 
-	 * description   : 设置连接最后使用时间
-	 * @return       : void
-	 * @param        : @param conn
-	 * modified      : zhukaipeng ,  2017年8月17日  上午11:03:08
-	 * @see          : 
-	 * *******************************************
-	 */
-	private void setConnectionLastUserdTime(Connection conn){
-		QuickConnectionWrapper qcw = (QuickConnectionWrapper) conn;
-		qcw.setLastUsedTime(System.currentTimeMillis());
-	}
 	public Connection getConnection(){
 		lock.lock();
 		boolean isReleaseLock= true;
 		try {
 			if (unUsedConn.size() > 0) {
 				Connection conn = unUsedConn.get(0);
-				setConnectionLastUserdTime(conn);
+				ConnectionWrapper qcw = (ConnectionWrapper) conn;
+				if(qcw.getSurviveTime() > CONNECTION_SURVIVE_TIME){
+					qcw.destroy();
+					unUsedConn.remove(conn);
+					connSize.decrementAndGet();
+					return getConnection();
+				}
+				qcw.setLastUsedTime(System.currentTimeMillis());
 				unUsedConn.remove(conn);
 				usedConn.add(conn);
 				return conn;
@@ -190,7 +184,7 @@ public class QuickConnectionPool {
 					unUsedConn.removeIf(c -> {
 						if (unUsedConn.size() <= jdbcConfig.getMinPoolSize()) 
 							return false;
-						QuickConnectionWrapper qcw = (QuickConnectionWrapper) c;
+						ConnectionWrapper qcw = (ConnectionWrapper) c;
 						if (getIdleTime(qcw.getLastUsedTime()) < jdbcConfig.getMaxIdleTime()) 
 							return false;
 						try {
@@ -219,7 +213,7 @@ public class QuickConnectionPool {
 	 *                 规避连接泄露风险
 	 * @return       : void
 	 * @param        : 
-	 * modified      : zhukaipeng ,  2017年8月17日  上午10:41:00
+	 * modified      : zhukaipeng ,  2017年8月17日 
 	 * @see          : 
 	 * *******************************************
 	 */
@@ -234,7 +228,7 @@ public class QuickConnectionPool {
 					lock.lock();
 					log.info("开始清理已使用未归还连接。【已创建连接：{}，已使用：{}，空闲：{}】",connSize.get(),usedConn.size(),unUsedConn.size());
 					usedConn.removeIf(c -> {
-						QuickConnectionWrapper qcw = (QuickConnectionWrapper) c;
+						ConnectionWrapper qcw = (ConnectionWrapper) c;
 						if (getIdleTime(qcw.getLastUsedTime()) < idle) {
 							return false;
 						}

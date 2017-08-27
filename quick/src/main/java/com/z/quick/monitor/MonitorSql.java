@@ -22,7 +22,7 @@ import com.z.quick.orm.Session;
 public class MonitorSql {
 	private static final Log log = LogFactory.get();
 	private static LinkedBlockingQueue<String> queue ;
-	private static final String contentModel = "Execute SQL:%s TIME:%smm;";
+	private static final String contentModel = "Execute SQL:%s; TIME:%smm;";
 	private static final String fileSuffix = ".txt";
 	
 	public static void record(String sql,long executeTime){
