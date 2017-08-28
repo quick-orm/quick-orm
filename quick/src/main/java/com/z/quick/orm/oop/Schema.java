@@ -129,10 +129,6 @@ public class Schema extends ObjectOperate<Schema> {
 		return result;
 	}
 
-//	public void setResult(Map<String, Object> result) {
-//		this.result = result;
-//	}
-	
 	public boolean isResult(){
 		return result!=null;
 	}

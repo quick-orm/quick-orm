@@ -21,7 +21,7 @@ public class FutureSqlAsyncExecute implements SqlAsyncExecute{
 	public Future<Integer> save(Object o) {
 		return threadPool.submit(new Callable<Integer>() {
 			public Integer call() throws Exception {
-				return sqlExecute.update(o);
+				return sqlExecute.save(o);
 			}
 		});
 	}

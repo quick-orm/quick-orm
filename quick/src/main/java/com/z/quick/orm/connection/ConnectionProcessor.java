@@ -18,7 +18,7 @@ import com.z.quick.orm.exception.ExecuteSqlException;
 import com.z.quick.orm.sql.SqlInfo;
 import com.z.quick.orm.sql.convert.FieldConvertProcessor;
 
-public class ConnectionUtils {
+public class ConnectionProcessor {
 	private static final Log log = LogFactory.get();
 
 	public static int update(Connection conn, SqlInfo sqlInfo) {

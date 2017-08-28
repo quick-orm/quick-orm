@@ -1,9 +1,9 @@
 package com.z.quick.orm.register;
 
-import com.z.quick.orm.sql.builder.ISqlBuilder;
+import com.z.quick.orm.sql.builder.SqlBuilder;
 import com.z.quick.orm.sql.builder.SqlBuilderProcessor;
 import com.z.quick.orm.sql.convert.FieldConvertProcessor;
-import com.z.quick.orm.sql.convert.IFieldConvert;
+import com.z.quick.orm.sql.convert.FieldConvert;
 
 /**
  * ******************  类说明  *********************
@@ -27,7 +27,7 @@ public class QuickRegister {
 	 * @see          : 
 	 * *******************************************
 	 */
-	public static void registerSqlBuilder(ISqlBuilder.SBType sBType,ISqlBuilder sqlBuilder) {
+	public static void registerSqlBuilder(SqlBuilder.SBType sBType,SqlBuilder sqlBuilder) {
 		SqlBuilderProcessor.registerSqlBuilder(sBType, sqlBuilder);
 	}
 	/**
@@ -41,7 +41,7 @@ public class QuickRegister {
 	 * @see          : 
 	 * *******************************************
 	 */
-	public static void registerConvert(Class<?> clzz,IFieldConvert ac){
+	public static void registerConvert(Class<?> clzz,FieldConvert ac){
 		FieldConvertProcessor.registerConvert(clzz, ac);
 	}
 }

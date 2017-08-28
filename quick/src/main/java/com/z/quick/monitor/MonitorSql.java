@@ -29,7 +29,7 @@ public class MonitorSql {
 		try {
 			queue.put(String.format(contentModel, sql,executeTime));
 		} catch (InterruptedException e) {
-			log.error("put timeout sql loga error",e);
+			log.error("Put timeout sql loga error",e);
 		}
 	}
 	
@@ -62,10 +62,10 @@ public class MonitorSql {
 						//防止队列出错，造成死循环，占用cpu资源
 						Thread.sleep(2*1000);
 					} catch (InterruptedException e1) {
-						log.error("get timeout sql loga error",e);
+						log.error("Get timeout sql loga error",e);
 					}
 				}catch (Exception e) {
-					log.error("writer timeout sql error",e);
+					log.error("Writer timeout sql error",e);
 				}
 			}
 		}).start();

@@ -11,7 +11,7 @@ import com.z.quick.orm.exception.SqlBuilderException;
 
 public class FieldConvertProcessor {
 	
-	private static final Map<Class<?>,IFieldConvert> converts = new HashMap<Class<?>,IFieldConvert>();
+	private static final Map<Class<?>,FieldConvert> converts = new HashMap<Class<?>,FieldConvert>();
 	
 	static{
 		registerConvert(Boolean.class, new BooleanFieldConvert());
@@ -26,19 +26,19 @@ public class FieldConvertProcessor {
 		registerConvert(LinkedHashMap.class, new DefaultFieldConvert());
 	}
 	
-	public static void registerConvert(Class<?> clzz,IFieldConvert ac){
+	public static void registerConvert(Class<?> clzz,FieldConvert ac){
 		converts.put(clzz, ac);
 	}
 	
 	public static Object toJava(Class<?>clzz, Object o){
-		IFieldConvert ac = converts.get(clzz);
+		FieldConvert ac = converts.get(clzz);
 		if (ac == null) {
 			return o;
 		}
 		return ac.toJava(o);
 	}
 	public static Object toDB(Object o){
-		IFieldConvert ac = converts.get(o.getClass());
+		FieldConvert ac = converts.get(o.getClass());
 		if (ac == null) {
 			throw new SqlBuilderException(o.getClass()+"未注册转换器");
 		}

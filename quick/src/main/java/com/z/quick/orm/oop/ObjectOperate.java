@@ -1,6 +1,10 @@
 package com.z.quick.orm.oop;
 
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Future;
+
+import com.z.quick.orm.Session;
 
 @SuppressWarnings("unchecked")
 public abstract class ObjectOperate<T> extends LogicOperate<T> {
@@ -87,22 +91,6 @@ public abstract class ObjectOperate<T> extends LogicOperate<T> {
 		return (T) this;
 	}
 
-//	public int save() {
-//		return Session.getSession().save(this);
-//	}
-//
-//	public int update() {
-//		return Session.getSession().update(this);
-//	}
-//
-//	public T get() {
-//		return (T) Session.getSession().get(this);
-//	}
-//
-//	public List<T> list() {
-//		return (List<T>) Session.getSession().list(this);
-//	}
-//
 //	public Future<Integer> asyncSave() {
 //		return Session.getSession().getSqlAsyncExecute().save(this);
 //	}

@@ -2,7 +2,7 @@ package com.z.quick.orm.sql.convert;
 
 import java.math.BigDecimal;
 
-public interface IFieldConvert {
+public interface FieldConvert {
 
 	Object toJava(Object o);
 	
@@ -10,7 +10,7 @@ public interface IFieldConvert {
 
 }
 
-class BooleanFieldConvert implements IFieldConvert {
+class BooleanFieldConvert implements FieldConvert {
 
 	@Override
 	public Object toJava(Object o) {
@@ -24,7 +24,7 @@ class BooleanFieldConvert implements IFieldConvert {
 
 }
 
-class StringFieldConvert implements IFieldConvert {
+class StringFieldConvert implements FieldConvert {
 	
 	@Override
 	public Object toJava(Object o) {
@@ -38,7 +38,7 @@ class StringFieldConvert implements IFieldConvert {
 	
 }
 
-class IntegerFieldConvert implements IFieldConvert {
+class IntegerFieldConvert implements FieldConvert {
 	
 	@Override
 	public Object toJava(Object o) {
@@ -52,7 +52,7 @@ class IntegerFieldConvert implements IFieldConvert {
 	
 }
 
-class FloatFieldConvert implements IFieldConvert {
+class FloatFieldConvert implements FieldConvert {
 	
 	@Override
 	public Object toJava(Object o) {
@@ -66,7 +66,7 @@ class FloatFieldConvert implements IFieldConvert {
 	
 }
 
-class ShortFieldConvert implements IFieldConvert {
+class ShortFieldConvert implements FieldConvert {
 	
 	@Override
 	public Object toJava(Object o) {
@@ -80,7 +80,7 @@ class ShortFieldConvert implements IFieldConvert {
 	
 }
 
-class LongFieldConvert implements IFieldConvert {
+class LongFieldConvert implements FieldConvert {
 	
 	@Override
 	public Object toJava(Object o) {
@@ -94,7 +94,7 @@ class LongFieldConvert implements IFieldConvert {
 	
 }
 
-class DoubleFieldConvert implements IFieldConvert {
+class DoubleFieldConvert implements FieldConvert {
 	
 	@Override
 	public Object toJava(Object o) {
@@ -108,7 +108,7 @@ class DoubleFieldConvert implements IFieldConvert {
 	
 }
 
-class BigDecimalFieldConvert implements IFieldConvert {
+class BigDecimalFieldConvert implements FieldConvert {
 	
 	@Override
 	public Object toJava(Object o) {
@@ -122,7 +122,7 @@ class BigDecimalFieldConvert implements IFieldConvert {
 	
 }
 //TODO 测试
-class TimestampFieldConvert implements IFieldConvert {
+class TimestampFieldConvert implements FieldConvert {
 	
 	@Override
 	public Object toJava(Object o) {
@@ -135,7 +135,7 @@ class TimestampFieldConvert implements IFieldConvert {
 	}
 	
 }
-class DefaultFieldConvert implements IFieldConvert {
+class DefaultFieldConvert implements FieldConvert {
 	
 	@Override
 	public Object toJava(Object o) {

@@ -6,14 +6,14 @@ import java.util.Map;
 import com.z.quick.orm.sql.SqlInfo;
 
 public class SqlBuilderProcessor {
-	private static final Map<ISqlBuilder.SBType,ISqlBuilder> sqlBuilderContainer = new HashMap<ISqlBuilder.SBType,ISqlBuilder>();
+	private static final Map<SqlBuilder.SBType,SqlBuilder> sqlBuilderContainer = new HashMap<SqlBuilder.SBType,SqlBuilder>();
 	
 	static{
-		sqlBuilderContainer.put(ISqlBuilder.SBType.SAVE, new SaveSqlBuilder());
-		sqlBuilderContainer.put(ISqlBuilder.SBType.DELETE, new DeleteSqlBuilder());
-		sqlBuilderContainer.put(ISqlBuilder.SBType.UPDATE, new UpdateSqlBuilder());
-		sqlBuilderContainer.put(ISqlBuilder.SBType.GET, new GetSqlBuilder());
-		sqlBuilderContainer.put(ISqlBuilder.SBType.LIST, new ListSqlBuilder());
+		sqlBuilderContainer.put(SqlBuilder.SBType.SAVE, new SaveSqlBuilder());
+		sqlBuilderContainer.put(SqlBuilder.SBType.DELETE, new DeleteSqlBuilder());
+		sqlBuilderContainer.put(SqlBuilder.SBType.UPDATE, new UpdateSqlBuilder());
+		sqlBuilderContainer.put(SqlBuilder.SBType.GET, new GetSqlBuilder());
+		sqlBuilderContainer.put(SqlBuilder.SBType.LIST, new ListSqlBuilder());
 		String dbType = "MySQL";
 		if("com.ibm.db2.jcc.DB2Driver".equals(dbType)){
 			//sqlBuilderContainer.put(ISqlBuilder.SBType.PAGE_COUNT, new DB2PageSqlBuilder());
@@ -27,11 +27,11 @@ public class SqlBuilderProcessor {
 	
 	//TODO 从配置文件加载
 	
-	public static void registerSqlBuilder(ISqlBuilder.SBType sBType,ISqlBuilder sqlBuilder) {
+	public static void registerSqlBuilder(SqlBuilder.SBType sBType,SqlBuilder sqlBuilder) {
 		sqlBuilderContainer.put(sBType, sqlBuilder);
 	}
 	
-	public static SqlInfo getSql(ISqlBuilder.SBType sBType,Object o){
+	public static SqlInfo getSql(SqlBuilder.SBType sBType,Object o){
 		return sqlBuilderContainer.get(sBType).builderSql(o);
 	}
 	

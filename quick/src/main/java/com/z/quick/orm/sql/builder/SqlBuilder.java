@@ -11,7 +11,7 @@ import com.z.quick.orm.sql.SqlInfo;
  * @see        :                        
  * ***********************************************
  */
-public interface ISqlBuilder {
+public interface SqlBuilder {
 	
 	enum SBType{
 		SAVE,

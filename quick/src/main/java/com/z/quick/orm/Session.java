@@ -8,12 +8,12 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import com.z.quick.orm.connection.ConnectionUtils;
+import com.z.quick.orm.connection.ConnectionProcessor;
 import com.z.quick.orm.connection.JDBCConfig;
 import com.z.quick.orm.connection.QuickDataSource;
 import com.z.quick.orm.exception.ConnectionException;
 import com.z.quick.orm.sql.SqlInfo;
-import com.z.quick.orm.sql.builder.ISqlBuilder;
+import com.z.quick.orm.sql.builder.SqlBuilder;
 import com.z.quick.orm.sql.builder.SqlBuilderProcessor;
 
 public class Session implements SqlExecute {
@@ -50,14 +50,14 @@ public class Session implements SqlExecute {
 	 * ********************************************/     
 	@Override
 	public int save(Object o) {
-		SqlInfo sqlInfo = SqlBuilderProcessor.getSql(ISqlBuilder.SBType.SAVE, o);
-		return ConnectionUtils.update(getConnection(), sqlInfo);
+		SqlInfo sqlInfo = SqlBuilderProcessor.getSql(SqlBuilder.SBType.SAVE, o);
+		return ConnectionProcessor.update(getConnection(), sqlInfo);
 	}
 	
 	@Override
 	public int delete(Object o) {
-		SqlInfo sqlInfo = SqlBuilderProcessor.getSql(ISqlBuilder.SBType.DELETE, o);
-		return ConnectionUtils.update(getConnection(), sqlInfo);
+		SqlInfo sqlInfo = SqlBuilderProcessor.getSql(SqlBuilder.SBType.DELETE, o);
+		return ConnectionProcessor.update(getConnection(), sqlInfo);
 	}
 	
 	
@@ -68,8 +68,8 @@ public class Session implements SqlExecute {
 	 * ********************************************/     
 	@Override
 	public int update(Object o) {
-		SqlInfo sqlInfo = SqlBuilderProcessor.getSql(ISqlBuilder.SBType.UPDATE, o);
-		return ConnectionUtils.update(getConnection(), sqlInfo);
+		SqlInfo sqlInfo = SqlBuilderProcessor.getSql(SqlBuilder.SBType.UPDATE, o);
+		return ConnectionProcessor.update(getConnection(), sqlInfo);
 	}
 	
 	/** ********************************************
@@ -89,8 +89,8 @@ public class Session implements SqlExecute {
 	 * ********************************************/     
 	@Override
 	public Object get(Object o,Class<?> clzz) {
-		SqlInfo sqlInfo = SqlBuilderProcessor.getSql(ISqlBuilder.SBType.GET, o);
-		return ConnectionUtils.get(getConnection(), sqlInfo,clzz);
+		SqlInfo sqlInfo = SqlBuilderProcessor.getSql(SqlBuilder.SBType.GET, o);
+		return ConnectionProcessor.get(getConnection(), sqlInfo,clzz);
 	}
 	
 	/** ********************************************
@@ -110,29 +110,29 @@ public class Session implements SqlExecute {
 	 * ********************************************/     
 	@Override
 	public List<Object> list(Object o,Class<?> clzz) {
-		SqlInfo sqlInfo = SqlBuilderProcessor.getSql(ISqlBuilder.SBType.LIST, o);
-		return ConnectionUtils.list(getConnection(), sqlInfo,clzz);
+		SqlInfo sqlInfo = SqlBuilderProcessor.getSql(SqlBuilder.SBType.LIST, o);
+		return ConnectionProcessor.list(getConnection(), sqlInfo,clzz);
 	}
 	
 	@Override
 	public Object get(String sql,Class<?> clzz,Object...params) {
 		SqlInfo sqlInfo = new SqlInfo(sql, new LinkedList<Object>(Arrays.asList(params)));
-		return ConnectionUtils.get(getConnection(), sqlInfo, clzz);
+		return ConnectionProcessor.get(getConnection(), sqlInfo, clzz);
 	}
 	@Override
 	public List<Object> list(String sql,Class<?> clzz,Object...params) {
 		SqlInfo sqlInfo = new SqlInfo(sql, new LinkedList<Object>(Arrays.asList(params)));
-		return ConnectionUtils.list(getConnection(), sqlInfo, clzz);
+		return ConnectionProcessor.list(getConnection(), sqlInfo, clzz);
 	}
 	@Override
 	public int save(String sql,Object...params) {
 		SqlInfo sqlInfo = new SqlInfo(sql, new LinkedList<Object>(Arrays.asList(params)));
-		return ConnectionUtils.update(getConnection(), sqlInfo);
+		return ConnectionProcessor.update(getConnection(), sqlInfo);
 	}
 	@Override
 	public int update(String sql,Object...params) {
 		SqlInfo sqlInfo = new SqlInfo(sql, new LinkedList<Object>(Arrays.asList(params)));
-		return ConnectionUtils.update(getConnection(), sqlInfo);
+		return ConnectionProcessor.update(getConnection(), sqlInfo);
 	}
 	private Connection getConnection(){
 		try {

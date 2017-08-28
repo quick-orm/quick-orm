@@ -21,7 +21,7 @@ public class UpdateSqlBuilder extends AbstractSqlBuilder {
 		String modif = super.getModif(o, valueList);
 		String condition = super.getModifCondition(o,valueList);
 		if (condition == null || "".equals(condition)) {
-			throw new SqlBuilderException("disallow full table update");
+			throw new SqlBuilderException("No update condition,disallow full table update!");
 		}
 		String sql = UPDATE_TEMPLATE.replace("#tableName", tableName);
 		sql = sql.replace("#select", select);
