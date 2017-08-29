@@ -8,7 +8,7 @@ import com.xiaoleilu.hutool.date.DateUtil;
 import com.xiaoleilu.hutool.io.FileUtil;
 import com.xiaoleilu.hutool.log.Log;
 import com.xiaoleilu.hutool.log.LogFactory;
-import com.z.quick.orm.Session;
+import com.z.quick.orm.session.Session;
 
 /**
  * ******************  类说明  *********************

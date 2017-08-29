@@ -1,7 +1,9 @@
-package com.z.quick.orm;
+package com.z.quick.orm.dao;
 
 import java.util.List;
 import java.util.concurrent.Future;
+
+import com.z.quick.orm.session.Session;
 @SuppressWarnings("unchecked")
 public abstract class BaseDao<T> implements Dao<T> {
 	
@@ -42,32 +44,32 @@ public abstract class BaseDao<T> implements Dao<T> {
 
 	@Override
 	public Future<Integer> asyncSave(T t) {
-		return Session.getSession().getSqlAsyncExecute().save(t);
+		return Session.getSession().getFuture().save(t);
 	}
 
 	@Override
 	public Future<Integer> asyncUpdate(T t) {
-		return Session.getSession().getSqlAsyncExecute().update(t);
+		return Session.getSession().getFuture().update(t);
 	}
 
 	@Override
 	public Future<T> asyncGet(T t) {
-		return (Future<T>) Session.getSession().getSqlAsyncExecute().get(t);
+		return (Future<T>) Session.getSession().getFuture().get(t);
 	}
 
 	@Override
 	public Future<T> asyncGet(T t, Class<?> clzz) {
-		return (Future<T>) Session.getSession().getSqlAsyncExecute().get(t, clzz);
+		return (Future<T>) Session.getSession().getFuture().get(t, clzz);
 	}
 
 	@Override
 	public Future<List<Object>> asyncList(T t) {
-		return Session.getSession().getSqlAsyncExecute().list(t);
+		return Session.getSession().getFuture().list(t);
 	}
 
 	@Override
 	public Future<List<Object>> asyncList(T t, Class<?> clzz) {
-		return Session.getSession().getSqlAsyncExecute().list(t, clzz);
+		return Session.getSession().getFuture().list(t, clzz);
 	}
 
 	@Override

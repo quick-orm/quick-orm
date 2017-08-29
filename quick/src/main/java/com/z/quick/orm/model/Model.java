@@ -1,10 +1,10 @@
-package com.z.quick.orm.oop;
+package com.z.quick.orm.model;
 
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Future;
 
-import com.z.quick.orm.Session;
+import com.z.quick.orm.session.Session;
 @SuppressWarnings("unchecked")
 public abstract class Model<T> extends LogicOperate<T> {
 	
@@ -156,19 +156,19 @@ public abstract class Model<T> extends LogicOperate<T> {
 	}
 
 	public Future<Integer> asyncSave() {
-		return Session.getSession().getSqlAsyncExecute().save(this);
+		return Session.getSession().getFuture().save(this);
 	}
 
 	public Future<Integer> asyncUpdate() {
-		return Session.getSession().getSqlAsyncExecute().update(this);
+		return Session.getSession().getFuture().update(this);
 	}
 
 	public Future<T> asyncGet() {
-		return (Future<T>) Session.getSession().getSqlAsyncExecute().get(this);
+		return (Future<T>) Session.getSession().getFuture().get(this);
 	}
 
 	public Future<List<Object>> asyncList() {
-		return Session.getSession().getSqlAsyncExecute().list(this);
+		return Session.getSession().getFuture().list(this);
 	}
 
 }

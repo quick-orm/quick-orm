@@ -1,4 +1,4 @@
-package com.z.quick.orm.oop;
+package com.z.quick.orm.model;
 
 import java.util.HashMap;
 import java.util.Map;

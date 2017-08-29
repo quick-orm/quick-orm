@@ -7,7 +7,7 @@ import java.sql.SQLException;
 import com.xiaoleilu.hutool.date.DateUtil;
 import com.xiaoleilu.hutool.date.TimeInterval;
 import com.z.quick.monitor.MonitorSql;
-import com.z.quick.orm.Session;
+import com.z.quick.orm.session.Session;
 import com.z.quick.orm.sql.SqlInfo;
 
 /**

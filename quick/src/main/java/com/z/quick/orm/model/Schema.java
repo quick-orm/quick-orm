@@ -1,4 +1,4 @@
-package com.z.quick.orm.oop;
+package com.z.quick.orm.model;
 
 import java.lang.reflect.Field;
 import java.util.List;

@@ -3,7 +3,7 @@ package com.z.quick.orm.sql.builder;
 import java.util.List;
 
 import com.z.quick.orm.exception.SqlBuilderException;
-import com.z.quick.orm.oop.Schema;
+import com.z.quick.orm.model.Schema;
 import com.z.quick.orm.util.AnnotationSqlBuilderUtils;
 import com.z.quick.orm.util.ObjectSqlBuilderUtils;
 

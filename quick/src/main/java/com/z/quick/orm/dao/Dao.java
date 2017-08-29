@@ -1,4 +1,4 @@
-package com.z.quick.orm;
+package com.z.quick.orm.dao;
 
 import java.util.List;
 import java.util.concurrent.Future;

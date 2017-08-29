@@ -1,4 +1,4 @@
-package com.z.quick.orm;
+package com.z.quick.orm.session;
 
 import java.sql.Connection;
 import java.util.Arrays;
@@ -13,12 +13,18 @@ import com.z.quick.orm.connection.QuickDataSource;
 import com.z.quick.orm.sql.SqlInfo;
 import com.z.quick.orm.sql.builder.SqlBuilder;
 import com.z.quick.orm.sql.builder.SqlBuilderProcessor;
-
-public class Session implements SqlExecute {
+/**
+ * class       :  Session
+ * @author     :  zhukaipeng
+ * @version    :  1.0  
+ * description :  如何抽象？支持数据库、redis等操作
+ * @see        :  *
+ */
+public class Session {
 
 	private JDBCConfig jdbcConfig;
 	private DataSource dataSource;
-	private SqlAsyncExecute sqlAsyncExecute;
+	private FutureSession future;
 	private static final Session session = new Session();;
 	/**
 	 * 暂无对象管理容器，只支持单一数据源，后期优化，配置文件默认为 jdbc.setting
@@ -27,14 +33,14 @@ public class Session implements SqlExecute {
 		super();
 		jdbcConfig = JDBCConfig.newInstance("jdbc.setting");
 		this.dataSource = new QuickDataSource(jdbcConfig);
-		this.sqlAsyncExecute = new FutureSqlAsyncExecute(this, jdbcConfig.getAsyncPoolSize());
+		this.future = new FutureSession(this, jdbcConfig.getAsyncPoolSize());
 	}
 	
 	public static Session getSession(){
 		return session;
 	}
-	public SqlAsyncExecute getSqlAsyncExecute() {
-		return sqlAsyncExecute;
+	public FutureSession getFuture() {
+		return future;
 	}
 	public JDBCConfig getJdbcConfig() {
 		return jdbcConfig;
@@ -45,13 +51,13 @@ public class Session implements SqlExecute {
 	 * modified      : zhukaipeng ,  2017年8月17日
 	 * @see          : @see com.z.quick.orm.SQLHandler#save(java.lang.Object)
 	 * ********************************************/     
-	@Override
+	
 	public int save(Object o) {
 		SqlInfo sqlInfo = SqlBuilderProcessor.getSql(SqlBuilder.SBType.SAVE, o);
 		return ConnectionProcessor.update(getConnection(), sqlInfo);
 	}
 	
-	@Override
+	
 	public int delete(Object o) {
 		SqlInfo sqlInfo = SqlBuilderProcessor.getSql(SqlBuilder.SBType.DELETE, o);
 		return ConnectionProcessor.update(getConnection(), sqlInfo);
@@ -63,7 +69,7 @@ public class Session implements SqlExecute {
 	 * modified      : zhukaipeng ,  2017年8月17日
 	 * @see          : @see com.z.quick.orm.SQLHandler#update(java.lang.Object)
 	 * ********************************************/     
-	@Override
+	
 	public int update(Object o) {
 		SqlInfo sqlInfo = SqlBuilderProcessor.getSql(SqlBuilder.SBType.UPDATE, o);
 		return ConnectionProcessor.update(getConnection(), sqlInfo);
@@ -74,7 +80,7 @@ public class Session implements SqlExecute {
 	 * modified      : zhukaipeng ,  2017年8月17日
 	 * @see          : @see com.z.quick.orm.SQLHandler#get(java.lang.Object)
 	 * ********************************************/     
-	@Override
+	
 	public Object get(Object o) {
 		return this.get(o, o.getClass());
 	}
@@ -84,7 +90,7 @@ public class Session implements SqlExecute {
 	 * modified      : zhukaipeng ,  2017年8月17日
 	 * @see          : @see com.z.quick.orm.SQLHandler#get(java.lang.Object, java.lang.Class)
 	 * ********************************************/     
-	@Override
+	
 	public Object get(Object o,Class<?> clzz) {
 		SqlInfo sqlInfo = SqlBuilderProcessor.getSql(SqlBuilder.SBType.GET, o);
 		return ConnectionProcessor.get(getConnection(), sqlInfo,clzz);
@@ -95,7 +101,7 @@ public class Session implements SqlExecute {
 	 * modified      : zhukaipeng ,  2017年8月17日
 	 * @see          : @see com.z.quick.orm.SQLHandler#find(java.lang.Object)
 	 * ********************************************/     
-	@Override
+	
 	public List<Object> list(Object o) {
 		return this.list(o, o.getClass());
 	}
@@ -105,33 +111,33 @@ public class Session implements SqlExecute {
 	 * modified      : zhukaipeng ,  2017年8月17日
 	 * @see          : @see com.z.quick.orm.SQLHandler#find(java.lang.Object, java.lang.Class)
 	 * ********************************************/     
-	@Override
+	
 	public List<Object> list(Object o,Class<?> clzz) {
 		SqlInfo sqlInfo = SqlBuilderProcessor.getSql(SqlBuilder.SBType.LIST, o);
 		return ConnectionProcessor.list(getConnection(), sqlInfo,clzz);
 	}
 	
-	@Override
+	
 	public Object get(String sql,Class<?> clzz,Object...params) {
 		SqlInfo sqlInfo = new SqlInfo(sql, new LinkedList<Object>(Arrays.asList(params)));
 		return ConnectionProcessor.get(getConnection(), sqlInfo, clzz);
 	}
-	@Override
+	
 	public List<Object> list(String sql,Class<?> clzz,Object...params) {
 		SqlInfo sqlInfo = new SqlInfo(sql, new LinkedList<Object>(Arrays.asList(params)));
 		return ConnectionProcessor.list(getConnection(), sqlInfo, clzz);
 	}
-	@Override
+	
 	public int save(String sql,Object...params) {
 		SqlInfo sqlInfo = new SqlInfo(sql, new LinkedList<Object>(Arrays.asList(params)));
 		return ConnectionProcessor.update(getConnection(), sqlInfo);
 	}
-	@Override
+	
 	public int update(String sql,Object...params) {
 		SqlInfo sqlInfo = new SqlInfo(sql, new LinkedList<Object>(Arrays.asList(params)));
 		return ConnectionProcessor.update(getConnection(), sqlInfo);
 	}
-	@Override
+	
 	public int delete(String sql, Object... params) {
 		SqlInfo sqlInfo = new SqlInfo(sql, new LinkedList<Object>(Arrays.asList(params)));
 		return ConnectionProcessor.update(getConnection(), sqlInfo);

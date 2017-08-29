@@ -19,7 +19,7 @@ import com.z.quick.orm.cache.ClassCache;
 import com.z.quick.orm.exception.ConnectionException;
 import com.z.quick.orm.exception.ExecuteSqlException;
 import com.z.quick.orm.exception.TransactionException;
-import com.z.quick.orm.oop.Schema;
+import com.z.quick.orm.model.Schema;
 import com.z.quick.orm.sql.SqlInfo;
 import com.z.quick.orm.sql.convert.FieldConvertProcessor;
 
