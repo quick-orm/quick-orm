@@ -11,16 +11,62 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.sql.DataSource;
+
 import com.xiaoleilu.hutool.log.Log;
 import com.xiaoleilu.hutool.log.LogFactory;
 import com.z.quick.orm.cache.ClassCache;
+import com.z.quick.orm.exception.ConnectionException;
 import com.z.quick.orm.exception.ExecuteSqlException;
+import com.z.quick.orm.exception.TransactionException;
+import com.z.quick.orm.oop.Schema;
 import com.z.quick.orm.sql.SqlInfo;
 import com.z.quick.orm.sql.convert.FieldConvertProcessor;
 
 public class ConnectionProcessor {
 	private static final Log log = LogFactory.get();
 
+	public static Connection getConnection(DataSource dataSource){
+		try {
+			return SingleThreadConnectionHolder.getConnection(dataSource);
+		} catch (SQLException e) {
+			throw new ConnectionException("Get db connection error",e);
+		}
+	}
+	
+	public static void setAutoCommit(Connection conn,boolean commit){
+		try {
+			conn.setAutoCommit(commit);
+		} catch (SQLException e) {
+			throw new TransactionException("Open transaction error",e);
+		}
+	}
+	
+	public static void rollback(Connection conn){
+		try {
+			conn.rollback();
+		} catch (SQLException e) {
+			throw new TransactionException("Rollback transaction error",e);
+		}
+	}
+	
+	public static void commit(Connection conn){
+		try {
+			conn.commit();
+		} catch (SQLException e) {
+			throw new TransactionException("Commit transaction error",e);
+		}
+	}
+	public static void close(Connection conn){
+		try {
+			conn.setAutoCommit(true);
+			conn.close();
+			SingleThreadConnectionHolder.removeConnection(conn);
+		} catch (SQLException e) {
+			throw new TransactionException("Close transaction error",e);
+		}
+	}
+	
 	public static int update(Connection conn, SqlInfo sqlInfo) {
 		PreparedStatementWrapper stmt = null;
 		try {
@@ -31,7 +77,7 @@ public class ConnectionProcessor {
 			throw new ExecuteSqlException(e);
 		} finally {
 			close(stmt);
-			close(conn);
+			release(conn);
 		}
 	}
 
@@ -54,8 +100,8 @@ public class ConnectionProcessor {
 			throw new ExecuteSqlException(e);
 		} finally {
 			close(stmt);
-			close(conn);
 			close(rs);
+			release(conn);
 		}
 	}
 
@@ -71,8 +117,8 @@ public class ConnectionProcessor {
 			throw new ExecuteSqlException(e);
 		} finally {
 			close(stmt);
-			close(conn);
 			close(rs);
+			release(conn);
 		}
 	}
 	
@@ -121,6 +167,12 @@ public class ConnectionProcessor {
 			if (clzz.isAssignableFrom(Map.class)) {
 				return result;
 			}
+			if (clzz.isAssignableFrom(Schema.class)) {
+				Schema s = new Schema();
+				s.setResult(result);
+				return s;
+			}
+			
 			Object o = clzz.newInstance();
 			List<Field> list = ClassCache.getAllDeclaredFields(clzz);
 			list.forEach((f)->{
@@ -144,10 +196,13 @@ public class ConnectionProcessor {
 		
 	}
 	
-	private final static void close(Connection x) {
+	private final static void release(Connection x) {
 		if (x != null) {
 			try {
-				x.close();
+				if (x.getAutoCommit()) {
+					x.close();
+					SingleThreadConnectionHolder.removeConnection(x);
+				}
 			} catch (Exception e) {
 				log.error("close connection error", e);
 			}

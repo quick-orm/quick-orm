@@ -43,13 +43,23 @@ public class ClassCache {
 				return true;
 			}else if((Modifier.FINAL & m) == Modifier.FINAL) {
 				return true;
+			}else if((Modifier.VOLATILE & m) == Modifier.VOLATILE) {
+				return true;
 			}
 			return false;
 		});
 		return list;
 		
 	}
-	
+	/**
+	 * method name   : getAllDeclaredFields 
+	 * description   : 获取该类(不包含父类及被static、final、volatile修饰的属性)所有属性
+	 * @return       : List<Field>
+	 * @param        : @param clzz
+	 * @param        : @return
+	 * modified      : zhukaipeng ,  2017年8月29日
+	 * @see          : *
+	 */
 	public static List<Field> getAllDeclaredFields(Class<?> clzz){
 		if (declaredFieldsCache.get(clzz) != null) {
 			return declaredFieldsCache.get(clzz);
@@ -62,7 +72,6 @@ public class ClassCache {
 		return getAllFieldMap(clzz).get(fieldName);
 	}
 	public static String getTableName(Class<?> clzz){
-		//TODO scham tableName判断
 		if (annationTableNameCache.get(clzz) != null) {
 			return annationTableNameCache.get(clzz);
 		}

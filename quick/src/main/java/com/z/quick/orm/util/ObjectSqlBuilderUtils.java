@@ -10,7 +10,7 @@ import com.z.quick.orm.cache.ClassCache;
 import com.z.quick.orm.common.Constants;
 import com.z.quick.orm.exception.SqlBuilderException;
 import com.z.quick.orm.oop.LogicConstants;
-import com.z.quick.orm.oop.ObjectOperate;
+import com.z.quick.orm.oop.Model;
 import com.z.quick.orm.oop.Schema;
 import com.z.quick.orm.sql.convert.FieldConvertProcessor;
 
@@ -20,7 +20,7 @@ public class ObjectSqlBuilderUtils {
 	private static final List<String> CONDITION_PARAM = new ArrayList<>(Arrays.asList("lt", "gt", "le", "ge", "eq", "neq"));
 
 	public static String getTableName(Object o) {
-		if (o instanceof ObjectOperate) {
+		if (o instanceof Model) {
 			Field f = ClassCache.getField(o.getClass(), "tableName");
 			Object v = FieldConvertProcessor.toDB(f, o);
 			if (v != null) {
@@ -31,7 +31,7 @@ public class ObjectSqlBuilderUtils {
 	}
 
 	public static String getSelect(Object o) {
-		if (o instanceof ObjectOperate) {
+		if (o instanceof Model) {
 			try {
 				Class<?> clzz = o.getClass();
 				Field f = ClassCache.getField(clzz, "select");
@@ -50,10 +50,10 @@ public class ObjectSqlBuilderUtils {
 	}
 
 	public static String getCondition(Object o, List<Object> valueList) {
-		if (o instanceof ObjectOperate) {
+		if (o instanceof Model) {
 			Class<?> clzz = o.getClass();
 			StringBuffer condition = new StringBuffer();
-			if (o instanceof ObjectOperate) {
+			if (o instanceof Model) {
 				CONDITION_PARAM.forEach(s -> {
 					Field f = ClassCache.getField(clzz, s);
 					assemblyCondition(o, f, condition, valueList);
@@ -75,7 +75,7 @@ public class ObjectSqlBuilderUtils {
 	}
 
 	public static String getModif(Object o, List<Object> valueList) {
-		if (o instanceof ObjectOperate) {
+		if (o instanceof Model) {
 			Class<?> clzz = o.getClass();
 			StringBuffer modif = new StringBuffer();
 			Field f = ClassCache.getField(clzz, "modif");
@@ -95,7 +95,7 @@ public class ObjectSqlBuilderUtils {
 	}
 
 	public static void getInsert(Object o, StringBuffer insertParam, StringBuffer insertValue, List<Object> valueList) {
-		if (o instanceof ObjectOperate) {
+		if (o instanceof Model) {
 			try {
 				Class<?> clzz = o.getClass();
 				Field f = ClassCache.getField(clzz, "insert");
@@ -117,7 +117,7 @@ public class ObjectSqlBuilderUtils {
 	}
 
 	private static void assemblyCondition(Object o, Field f, StringBuffer condition, List<Object> valueList) {
-		if (o instanceof ObjectOperate) {
+		if (o instanceof Model) {
 			try {
 				Object v = FieldConvertProcessor.toDB(f, o);
 				String logicOperation = LogicConstants.LOGIC_OPERATION.get(f.getName());

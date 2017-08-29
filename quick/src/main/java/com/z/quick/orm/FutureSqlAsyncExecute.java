@@ -107,4 +107,22 @@ public class FutureSqlAsyncExecute implements SqlAsyncExecute{
 		});
 	}
 
+	@Override
+	public Future<Integer> delete(Object o) {
+		return threadPool.submit(new Callable<Integer>() {
+			public Integer call() throws Exception {
+				return sqlExecute.delete(o);
+			}
+		});
+	}
+
+	@Override
+	public Future<Integer> delete(String sql, Object[] params) {
+		return threadPool.submit(new Callable<Integer>() {
+			public Integer call() throws Exception {
+				return sqlExecute.update(sql, params);
+			}
+		});
+	}
+
 }

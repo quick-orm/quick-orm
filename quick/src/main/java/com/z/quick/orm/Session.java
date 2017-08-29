@@ -1,7 +1,6 @@
 package com.z.quick.orm;
 
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -11,7 +10,6 @@ import javax.sql.DataSource;
 import com.z.quick.orm.connection.ConnectionProcessor;
 import com.z.quick.orm.connection.JDBCConfig;
 import com.z.quick.orm.connection.QuickDataSource;
-import com.z.quick.orm.exception.ConnectionException;
 import com.z.quick.orm.sql.SqlInfo;
 import com.z.quick.orm.sql.builder.SqlBuilder;
 import com.z.quick.orm.sql.builder.SqlBuilderProcessor;
@@ -22,7 +20,6 @@ public class Session implements SqlExecute {
 	private DataSource dataSource;
 	private SqlAsyncExecute sqlAsyncExecute;
 	private static final Session session = new Session();;
-	
 	/**
 	 * 暂无对象管理容器，只支持单一数据源，后期优化，配置文件默认为 jdbc.setting
 	 */
@@ -134,13 +131,28 @@ public class Session implements SqlExecute {
 		SqlInfo sqlInfo = new SqlInfo(sql, new LinkedList<Object>(Arrays.asList(params)));
 		return ConnectionProcessor.update(getConnection(), sqlInfo);
 	}
-	private Connection getConnection(){
-		try {
-			return dataSource.getConnection();
-		} catch (SQLException e) {
-			throw new ConnectionException("Get db connection error",e);
-		}
+	@Override
+	public int delete(String sql, Object... params) {
+		SqlInfo sqlInfo = new SqlInfo(sql, new LinkedList<Object>(Arrays.asList(params)));
+		return ConnectionProcessor.update(getConnection(), sqlInfo);
 	}
+	private Connection getConnection(){
+		return ConnectionProcessor.getConnection(dataSource);
+	}
+	
+	public void start(){
+		ConnectionProcessor.setAutoCommit(getConnection(), false);
+	}
+	public void rollback(){
+		ConnectionProcessor.rollback(getConnection());
+	}
+	public void commit(){
+		ConnectionProcessor.commit(getConnection());
+	}
+	public void close(){
+		ConnectionProcessor.close(getConnection());
+	}
+
 	
 	
 }

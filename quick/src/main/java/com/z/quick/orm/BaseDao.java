@@ -9,7 +9,12 @@ public abstract class BaseDao<T> implements Dao<T> {
 	public int save(T t) {
 		return Session.getSession().save(t);
 	}
-
+	
+	@Override
+	public int delete(Object o) {
+		return Session.getSession().delete(o);
+	}
+	
 	@Override
 	public int update(T t) {
 		return Session.getSession().update(t);
@@ -63,6 +68,31 @@ public abstract class BaseDao<T> implements Dao<T> {
 	@Override
 	public Future<List<Object>> asyncList(T t, Class<?> clzz) {
 		return Session.getSession().getSqlAsyncExecute().list(t, clzz);
+	}
+
+	@Override
+	public Object get(String sql, Class<?> clzz, Object[] params) {
+		return Session.getSession().get(sql, clzz, params);
+	}
+
+	@Override
+	public List<Object> list(String sql, Class<?> clzz, Object[] params) {
+		return Session.getSession().list(sql, clzz, params);
+	}
+
+	@Override
+	public int save(String sql, Object[] params) {
+		return Session.getSession().save(sql, params);
+	}
+
+	@Override
+	public int update(String sql, Object[] params) {
+		return Session.getSession().update(sql, params);
+	}
+
+	@Override
+	public int delete(String sql, Object[] params) {
+		return Session.getSession().delete(sql, params);
 	}
 
 }

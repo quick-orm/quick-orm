@@ -11,19 +11,23 @@ public interface SqlExecute {
 	Object get(Object o);
 
 	Object get(Object o, Class<?> clzz);
+	
+	int delete(Object o);
 
 	List<Object> list(Object o);
 
 	List<Object> list(Object o, Class<?> clzz);
 
-	Object get(String sql, Class<?> clzz, Object[] params);
+	Object get(String sql, Class<?> clzz, Object...params);
 
-	List<Object> list(String sql, Class<?> clzz, Object[] params);
+	List<Object> list(String sql, Class<?> clzz, Object...params);
 
-	int save(String sql, Object[] params);
+	int save(String sql, Object...params);
 
-	int update(String sql, Object[] params);
+	int update(String sql, Object...params);
+	
+	int delete(String sql, Object...params);
 
-	int delete(Object o);
+	
 
 }

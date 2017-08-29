@@ -7,6 +7,8 @@ public interface SqlAsyncExecute {
 
 	Future<Integer> save(Object o);
 
+	Future<Integer> delete(Object o);
+	
 	Future<Integer> update(Object o);
 
 	Future<Object> get(Object o);
@@ -18,6 +20,8 @@ public interface SqlAsyncExecute {
 	Future<List<Object>> list(Object o, Class<?> clzz);
 	
 	Future<Integer> save(String sql, Object[] params);
+	
+	Future<Integer> delete(String sql, Object[] params);
 	
 	Future<Integer> update(String sql, Object[] params);
 	
