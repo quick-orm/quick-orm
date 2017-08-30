@@ -4,11 +4,9 @@ import java.util.List;
 
 import com.z.quick.orm.connection.JDBCConfig;
 
-public interface DataBaseManipulation {
+public interface DataBaseManipulation<T> {
 	
 	JDBCConfig getJdbcConfig();
-
-	FutureDataBaseManipulation getFuture();
 
 	int save(Object o);
 
@@ -16,13 +14,13 @@ public interface DataBaseManipulation {
 
 	int update(Object o);
 
-	Object get(Object o);
+	T get(Object o);
 
-	Object get(Object o, Class<?> clzz);
+	T get(Object o, Class<?> clzz);
 
-	List<Object> list(Object o);
+	List<T> list(Object o);
 
-	List<Object> list(Object o, Class<?> clzz);
+	List<T> list(Object o, Class<?> clzz);
 
 	int save(String sql, Object... params);
 
@@ -30,9 +28,9 @@ public interface DataBaseManipulation {
 	
 	int update(String sql, Object... params);
 
-	Object get(String sql, Class<?> clzz, Object... params);
+	T get(String sql, Class<?> clzz, Object... params);
 
-	List<Object> list(String sql, Class<?> clzz, Object... params);
+	List<T> list(String sql, Class<?> clzz, Object... params);
 
 	void start();
 

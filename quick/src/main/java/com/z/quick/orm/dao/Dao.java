@@ -25,25 +25,25 @@ public interface Dao<T> {
 	
 	List<T> list(String sql, Object...params);
 	
-	Future<Integer> asyncSave(T t);
+	Future<Integer> ftSave(T t);
 
-	Future<Integer> asyncDelete(T t);
+	Future<Integer> ftDelete(T t);
 	
-	Future<Integer> asyncUpdate(T t);
+	Future<Integer> ftUpdate(T t);
 
-	Future<T> asyncGet(T t);
+	Future<T> ftGet(T t);
 
-	Future<List<Object>> asyncList(T t);
+	Future<List<Object>> ftList(T t);
 	
-	Future<Integer> asyncSave(String sql, Object...params);
+	Future<Integer> ftSave(String sql, Object...params);
 
-	Future<Integer> asyncDelete(String sql, Object...params);
+	Future<Integer> ftDelete(String sql, Object...params);
 	
-	Future<Integer> asyncUpdate(String sql, Object...params);
+	Future<Integer> ftUpdate(String sql, Object...params);
 	
-	Future<T> asyncGet(String sql, Object...params);
+	Future<T> ftGet(String sql, Object...params);
 	
-	Future<List<Object>> asyncList(String sql, Object...params);
+	Future<List<Object>> ftList(String sql, Object...params);
 
 }
 

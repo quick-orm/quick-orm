@@ -11,9 +11,12 @@ import com.z.quick.orm.session.Session;
 public abstract class BaseDao<T> implements Dao<T> {
 
 	private Class<T> genericityClass;
+	
+	private Session session;
 
 	public BaseDao() {
 		this.genericityClass = (Class<T>) getSuperClassGenricType(getClass(), 0);
+		session = Session.getSession();
 	}
 
 	private static Class<?> getSuperClassGenricType(Class<?> clazz, int index) {
@@ -85,53 +88,53 @@ public abstract class BaseDao<T> implements Dao<T> {
 	}
 
 	@Override
-	public Future<Integer> asyncSave(T t) {
-		return Session.getSession().getFuture().save(t);
+	public Future<Integer> ftSave(T t) {
+		return session.ftSave(t);
 	}
 
 	@Override
-	public Future<Integer> asyncDelete(T t) {
-		return Session.getSession().getFuture().delete(t);
+	public Future<Integer> ftDelete(T t) {
+		return session.ftDelete(t);
 	}
 
 	@Override
-	public Future<Integer> asyncUpdate(T t) {
-		return Session.getSession().getFuture().update(t);
+	public Future<Integer> ftUpdate(T t) {
+		return session.ftUpdate(t);
 	}
 
 	@Override
-	public Future<T> asyncGet(T t) {
-		return (Future<T>) Session.getSession().getFuture().get(t);
+	public Future<T> ftGet(T t) {
+		return (Future<T>) session.get(t);
 	}
 
 	@Override
-	public Future<List<Object>> asyncList(T t) {
-		return Session.getSession().getFuture().list(t);
+	public Future<List<Object>> ftList(T t) {
+		return session.ftList(t);
 	}
 
 	@Override
-	public Future<Integer> asyncSave(String sql, Object...params) {
-		return Session.getSession().getFuture().save(sql, params);
+	public Future<Integer> ftSave(String sql, Object...params) {
+		return session.ftSave(sql, params);
 	}
 
 	@Override
-	public Future<Integer> asyncDelete(String sql, Object...params) {
-		return Session.getSession().getFuture().delete(sql, params);
+	public Future<Integer> ftDelete(String sql, Object...params) {
+		return session.ftDelete(sql, params);
 	}
 
 	@Override
-	public Future<Integer> asyncUpdate(String sql, Object...params) {
-		return Session.getSession().getFuture().update(sql, params);
+	public Future<Integer> ftUpdate(String sql, Object...params) {
+		return session.ftUpdate(sql, params);
 	}
 
 	@Override
-	public Future<T> asyncGet(String sql, Object...params) {
-		return (Future<T>) Session.getSession().getFuture().get(sql, genericityClass, params);
+	public Future<T> ftGet(String sql, Object...params) {
+		return (Future<T>) session.ftGet(sql, genericityClass, params);
 	}
 
 	@Override
-	public Future<List<Object>> asyncList(String sql, Object...params) {
-		return Session.getSession().getFuture().list(sql, genericityClass, params);
+	public Future<List<Object>> ftList(String sql, Object...params) {
+		return session.ftList(sql, genericityClass, params);
 	}
 
 }

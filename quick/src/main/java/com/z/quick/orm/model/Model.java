@@ -13,6 +13,12 @@ public abstract class Model<T> extends LogicOperate<T> {
 	private String where;
 	private Map<String, Object> insert;
 	private Map<String, Object> modif;
+	
+	private Session session;
+	
+	public Model(){
+		session = Session.getSession();
+	}
 
 	public String tableName() {
 		return tableName;
@@ -136,39 +142,57 @@ public abstract class Model<T> extends LogicOperate<T> {
 	}
 	
 	public int save() {
-		return Session.getSession().save(this);
+		return session.save(this);
 	}
 	
 	public int delete() {
-		return Session.getSession().delete(this);
+		return session.delete(this);
 	}
 
 	public int update() {
-		return Session.getSession().update(this);
+		return session.update(this);
 	}
 
 	public T get() {
-		return (T) Session.getSession().get(this);
+		return (T) session.get(this);
 	}
 
 	public List<T> list() {
-		return (List<T>) Session.getSession().list(this);
+		return (List<T>) session.list(this);
+	}
+	
+	public T get(String sql,Object...params) {
+		return (T) session.get(sql, this.getClass(), params);
+	}
+	
+	public List<T> list(String sql,Object...params) {
+		return (List<T>) session.list(sql, this.getClass(), params);
+	}
+	
+
+	public Future<Integer> ftSave() {
+		return session.ftSave(this);
 	}
 
-	public Future<Integer> asyncSave() {
-		return Session.getSession().getFuture().save(this);
+	public Future<Integer> ftUpdate() {
+		return session.ftUpdate(this);
 	}
 
-	public Future<Integer> asyncUpdate() {
-		return Session.getSession().getFuture().update(this);
+	public Future<T> ftGet() {
+		return (Future<T>) session.get(this);
 	}
 
-	public Future<T> asyncGet() {
-		return (Future<T>) Session.getSession().getFuture().get(this);
+	public Future<List<Object>> ftList() {
+		return session.ftList(this);
+	}
+	
+	public Future<T> ftGet(String sql, Object... params) {
+		return (Future<T>) session.ftGet(sql, this.getClass(), params);
 	}
 
-	public Future<List<Object>> asyncList() {
-		return Session.getSession().getFuture().list(this);
+	public Future<List<Object>> ftList(String sql, Object... params) {
+		return session.ftList(sql, this.getClass(), params);
 	}
-
+	
+	
 }
