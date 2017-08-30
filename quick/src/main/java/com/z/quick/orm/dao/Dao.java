@@ -15,15 +15,15 @@ public interface Dao<T> {
 
 	List<T> find(T t);
 
-	int save(String sql, Object...params);
+	int save(String sql, List<Object> params);
 
-	int delete(String sql, Object...params);
+	int delete(String sql, List<Object> params);
 	
-	int update(String sql, Object...params);
+	int update(String sql, List<Object> params);
 	
-	T get(String sql, Object...params);
+	T get(String sql, List<Object> params);
 	
-	List<T> list(String sql, Object...params);
+	List<T> list(String sql, List<Object> params);
 	
 	Future<Integer> ftSave(T t);
 
@@ -35,15 +35,15 @@ public interface Dao<T> {
 
 	Future<List<Object>> ftList(T t);
 	
-	Future<Integer> ftSave(String sql, Object...params);
+	Future<Integer> ftSave(String sql, List<Object> params);
 
-	Future<Integer> ftDelete(String sql, Object...params);
+	Future<Integer> ftDelete(String sql, List<Object> params);
 	
-	Future<Integer> ftUpdate(String sql, Object...params);
+	Future<Integer> ftUpdate(String sql, List<Object> params);
 	
-	Future<T> ftGet(String sql, Object...params);
+	Future<T> ftGet(String sql, List<Object> params);
 	
-	Future<List<Object>> ftList(String sql, Object...params);
+	Future<List<Object>> ftList(String sql, List<Object> params);
 
 }
 

@@ -63,27 +63,27 @@ public abstract class BaseDao<T> implements Dao<T> {
 	}
 
 	@Override
-	public T get(String sql, Object...params) {
+	public T get(String sql, List<Object> params) {
 		return (T) Session.getSession().get(sql, genericityClass, params);
 	}
 
 	@Override
-	public List<T> list(String sql, Object...params) {
+	public List<T> list(String sql, List<Object> params) {
 		return (List<T>) Session.getSession().list(sql, genericityClass, params);
 	}
 
 	@Override
-	public int save(String sql, Object...params) {
+	public int save(String sql, List<Object> params) {
 		return Session.getSession().save(sql, params);
 	}
 
 	@Override
-	public int update(String sql, Object...params) {
+	public int update(String sql, List<Object> params) {
 		return Session.getSession().update(sql, params);
 	}
 
 	@Override
-	public int delete(String sql, Object...params) {
+	public int delete(String sql, List<Object> params) {
 		return Session.getSession().delete(sql, params);
 	}
 
@@ -113,27 +113,27 @@ public abstract class BaseDao<T> implements Dao<T> {
 	}
 
 	@Override
-	public Future<Integer> ftSave(String sql, Object...params) {
+	public Future<Integer> ftSave(String sql, List<Object> params) {
 		return session.ftSave(sql, params);
 	}
 
 	@Override
-	public Future<Integer> ftDelete(String sql, Object...params) {
+	public Future<Integer> ftDelete(String sql, List<Object> params) {
 		return session.ftDelete(sql, params);
 	}
 
 	@Override
-	public Future<Integer> ftUpdate(String sql, Object...params) {
+	public Future<Integer> ftUpdate(String sql, List<Object> params) {
 		return session.ftUpdate(sql, params);
 	}
 
 	@Override
-	public Future<T> ftGet(String sql, Object...params) {
+	public Future<T> ftGet(String sql, List<Object> params) {
 		return (Future<T>) session.ftGet(sql, genericityClass, params);
 	}
 
 	@Override
-	public Future<List<Object>> ftList(String sql, Object...params) {
+	public Future<List<Object>> ftList(String sql, List<Object> params) {
 		return session.ftList(sql, genericityClass, params);
 	}
 

@@ -1,8 +1,6 @@
 package com.z.quick.orm.session;
 
 import java.sql.Connection;
-import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
@@ -89,32 +87,32 @@ public class Session implements DataBaseManipulation<Object>,FutureDataBaseManip
 	}
 	
 	@Override
-	public int save(String sql,Object...params) {
-		SqlInfo sqlInfo = new SqlInfo(sql, new LinkedList<Object>(Arrays.asList(params)));
+	public int save(String sql,List<Object> params) {
+		SqlInfo sqlInfo = new SqlInfo(sql, params);
 		return ConnectionProcessor.update(getConnection(), sqlInfo);
 	}
 	
 	@Override
-	public int delete(String sql, Object... params) {
-		SqlInfo sqlInfo = new SqlInfo(sql, new LinkedList<Object>(Arrays.asList(params)));
+	public int delete(String sql, List<Object> params) {
+		SqlInfo sqlInfo = new SqlInfo(sql, params);
 		return ConnectionProcessor.update(getConnection(), sqlInfo);
 	}
 	
 	@Override
-	public int update(String sql,Object...params) {
-		SqlInfo sqlInfo = new SqlInfo(sql, new LinkedList<Object>(Arrays.asList(params)));
+	public int update(String sql,List<Object> params) {
+		SqlInfo sqlInfo = new SqlInfo(sql, params);
 		return ConnectionProcessor.update(getConnection(), sqlInfo);
 	}
 	
 	@Override
-	public Object get(String sql,Class<?> clzz,Object...params) {
-		SqlInfo sqlInfo = new SqlInfo(sql, new LinkedList<Object>(Arrays.asList(params)));
+	public Object get(String sql,Class<?> clzz,List<Object> params) {
+		SqlInfo sqlInfo = new SqlInfo(sql, params);
 		return ConnectionProcessor.get(getConnection(), sqlInfo, clzz);
 	}
 	
 	@Override
-	public List<Object> list(String sql,Class<?> clzz,Object...params) {
-		SqlInfo sqlInfo = new SqlInfo(sql, new LinkedList<Object>(Arrays.asList(params)));
+	public List<Object> list(String sql,Class<?> clzz,List<Object> params) {
+		SqlInfo sqlInfo = new SqlInfo(sql, params);
 		return ConnectionProcessor.list(getConnection(), sqlInfo, clzz);
 	}
 	
@@ -207,7 +205,7 @@ public class Session implements DataBaseManipulation<Object>,FutureDataBaseManip
 	}
 
 	@Override
-	public Future<Integer> ftSave(String sql, Object... params) {
+	public Future<Integer> ftSave(String sql, List<Object> params) {
 		return threadPool.submit(new Callable<Integer>() {
 			public Integer call() throws Exception {
 				return save(sql, params);
@@ -216,7 +214,7 @@ public class Session implements DataBaseManipulation<Object>,FutureDataBaseManip
 	}
 
 	@Override
-	public Future<Integer> ftDelete(String sql, Object... params) {
+	public Future<Integer> ftDelete(String sql, List<Object> params) {
 		return threadPool.submit(new Callable<Integer>() {
 			public Integer call() throws Exception {
 				return update(sql, params);
@@ -225,7 +223,7 @@ public class Session implements DataBaseManipulation<Object>,FutureDataBaseManip
 	}
 
 	@Override
-	public Future<Integer> ftUpdate(String sql, Object... params) {
+	public Future<Integer> ftUpdate(String sql, List<Object> params) {
 		return threadPool.submit(new Callable<Integer>() {
 			public Integer call() throws Exception {
 				return update(sql, params);
@@ -234,7 +232,7 @@ public class Session implements DataBaseManipulation<Object>,FutureDataBaseManip
 	}
 
 	@Override
-	public Future<Object> ftGet(String sql, Class<?> clzz, Object... params) {
+	public Future<Object> ftGet(String sql, Class<?> clzz, List<Object> params) {
 		return threadPool.submit(new Callable<Object>() {
 			public Object call() throws Exception {
 				return get(sql, clzz, params);
@@ -243,7 +241,7 @@ public class Session implements DataBaseManipulation<Object>,FutureDataBaseManip
 	}
 
 	@Override
-	public Future<List<Object>> ftList(String sql, Class<?> clzz, Object... params) {
+	public Future<List<Object>> ftList(String sql, Class<?> clzz, List<Object> params) {
 		return threadPool.submit(new Callable<List<Object>>() {
 			public List<Object> call() throws Exception {
 				return list(sql, clzz, params);

@@ -22,15 +22,15 @@ public interface DataBaseManipulation<T> {
 
 	List<T> list(Object o, Class<?> clzz);
 
-	int save(String sql, Object... params);
+	int save(String sql, List<Object> params);
 
-	int delete(String sql, Object... params);
+	int delete(String sql, List<Object> params);
 	
-	int update(String sql, Object... params);
+	int update(String sql, List<Object> params);
 
-	T get(String sql, Class<?> clzz, Object... params);
+	T get(String sql, Class<?> clzz, List<Object> params);
 
-	List<T> list(String sql, Class<?> clzz, Object... params);
+	List<T> list(String sql, Class<?> clzz, List<Object> params);
 
 	void start();
 

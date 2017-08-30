@@ -161,11 +161,11 @@ public abstract class Model<T> extends LogicOperate<T> {
 		return (List<T>) session.list(this);
 	}
 	
-	public T get(String sql,Object...params) {
+	public T get(String sql,List<Object> params) {
 		return (T) session.get(sql, this.getClass(), params);
 	}
 	
-	public List<T> list(String sql,Object...params) {
+	public List<T> list(String sql,List<Object> params) {
 		return (List<T>) session.list(sql, this.getClass(), params);
 	}
 	
@@ -186,11 +186,11 @@ public abstract class Model<T> extends LogicOperate<T> {
 		return session.ftList(this);
 	}
 	
-	public Future<T> ftGet(String sql, Object... params) {
+	public Future<T> ftGet(String sql, List<Object> params) {
 		return (Future<T>) session.ftGet(sql, this.getClass(), params);
 	}
 
-	public Future<List<Object>> ftList(String sql, Object... params) {
+	public Future<List<Object>> ftList(String sql, List<Object> params) {
 		return session.ftList(sql, this.getClass(), params);
 	}
 	

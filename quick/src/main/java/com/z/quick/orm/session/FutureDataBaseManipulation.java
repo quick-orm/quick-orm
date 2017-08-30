@@ -19,15 +19,15 @@ public interface FutureDataBaseManipulation<T> {
 
 	Future<List<T>> ftList(Object o, Class<?> clzz);
 
-	Future<Integer> ftSave(String sql, Object...params);
+	Future<Integer> ftSave(String sql, List<Object> params);
 
-	Future<Integer> ftDelete(String sql, Object...params);
+	Future<Integer> ftDelete(String sql, List<Object> params);
 	
-	Future<Integer> ftUpdate(String sql, Object...params);
+	Future<Integer> ftUpdate(String sql, List<Object> params);
 
-	Future<T> ftGet(String sql, Class<?> clzz, Object...params);
+	Future<T> ftGet(String sql, Class<?> clzz, List<Object> params);
 
-	Future<List<T>> ftList(String sql, Class<?> clzz, Object...params);
+	Future<List<T>> ftList(String sql, Class<?> clzz, List<Object> params);
 
 
 }
