@@ -13,31 +13,45 @@ public interface Dao<T> {
 
 	T get(T t);
 
-	T get(T t, Class<?> clzz);
-
 	List<T> find(T t);
 
-	List<T> find(T t, Class<?> clzz);
+	int save(String sql, Object...params);
+
+	int delete(String sql, Object...params);
 	
-	Object get(String sql, Class<?> clzz, Object[] params);
-
-	List<Object> list(String sql, Class<?> clzz, Object[] params);
-
-	int save(String sql, Object[] params);
-
-	int update(String sql, Object[] params);
+	int update(String sql, Object...params);
 	
-	int delete(String sql, Object[] params);
-
+	T get(String sql, Object...params);
+	
+	List<T> list(String sql, Object...params);
+	
 	Future<Integer> asyncSave(T t);
 
+	Future<Integer> asyncDelete(T t);
+	
 	Future<Integer> asyncUpdate(T t);
 
 	Future<T> asyncGet(T t);
 
-	Future<T> asyncGet(T t, Class<?> clzz);
-
 	Future<List<Object>> asyncList(T t);
+	
+	Future<Integer> asyncSave(String sql, Object...params);
 
-	Future<List<Object>> asyncList(T t, Class<?> clzz);
+	Future<Integer> asyncDelete(String sql, Object...params);
+	
+	Future<Integer> asyncUpdate(String sql, Object...params);
+	
+	Future<T> asyncGet(String sql, Object...params);
+	
+	Future<List<Object>> asyncList(String sql, Object...params);
+
 }
+
+
+
+
+
+
+
+
+
