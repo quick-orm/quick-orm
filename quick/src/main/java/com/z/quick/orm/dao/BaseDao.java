@@ -7,7 +7,7 @@ import java.util.concurrent.Future;
 
 import com.z.quick.orm.session.Session;
 
-@SuppressWarnings("unchecked")
+@SuppressWarnings({ "unchecked", "unused" })
 public abstract class BaseDao<T> implements Dao<T> {
 
 	private Class<T> genericityClass;
@@ -43,8 +43,8 @@ public abstract class BaseDao<T> implements Dao<T> {
 	}
 
 	@Override
-	public int delete(Object o) {
-		return Session.getSession().delete(o);
+	public int delete(T t) {
+		return Session.getSession().delete(t);
 	}
 
 	@Override
@@ -63,13 +63,13 @@ public abstract class BaseDao<T> implements Dao<T> {
 	}
 
 	@Override
-	public T get(String sql, List<Object> params) {
-		return (T) Session.getSession().get(sql, genericityClass, params);
+	public T get(String sql, Class<?> clzz, List<Object> params) {
+		return (T) Session.getSession().get(sql, clzz, params);
 	}
 
 	@Override
-	public List<T> list(String sql, List<Object> params) {
-		return (List<T>) Session.getSession().list(sql, genericityClass, params);
+	public List<Object> list(String sql, Class<?> clzz,List<Object> params) {
+		return Session.getSession().list(sql, clzz, params);
 	}
 
 	@Override
@@ -128,13 +128,13 @@ public abstract class BaseDao<T> implements Dao<T> {
 	}
 
 	@Override
-	public Future<T> ftGet(String sql, List<Object> params) {
-		return (Future<T>) session.ftGet(sql, genericityClass, params);
+	public Future<Object> ftGet(String sql, Class<?> clzz,List<Object> params) {
+		return session.ftGet(sql, clzz, params);
 	}
 
 	@Override
-	public Future<List<Object>> ftList(String sql, List<Object> params) {
-		return session.ftList(sql, genericityClass, params);
+	public Future<List<Object>> ftList(String sql, Class<?> clzz,List<Object> params) {
+		return session.ftList(sql, clzz, params);
 	}
 
 }

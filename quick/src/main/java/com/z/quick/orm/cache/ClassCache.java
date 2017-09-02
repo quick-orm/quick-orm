@@ -11,6 +11,7 @@ import java.util.Map;
 import com.z.quick.orm.annotation.Condition;
 import com.z.quick.orm.annotation.Exclude;
 import com.z.quick.orm.annotation.NoFind;
+import com.z.quick.orm.annotation.OrderBy;
 import com.z.quick.orm.annotation.PrimaryKey;
 import com.z.quick.orm.annotation.Table;
 import com.z.quick.orm.common.Constants;
@@ -21,6 +22,7 @@ public class ClassCache {
 	private static final Map<Class<?>,String> annationTableNameCache = new HashMap<>();
 	private static final Map<Class<?>,String> annationSelectCache = new HashMap<>();
 	private static final Map<Class<?>,List<Field>> annationPKCache = new HashMap<>();
+	private static final Map<Class<?>,List<Field>> annationOrderByCache = new HashMap<>();
 	private static final Map<Class<?>,List<Field>> annationConditionCache = new HashMap<>();
 	private static final Map<Class<?>,List<Field>> insertParamCache = new HashMap<>();
 	
@@ -76,7 +78,7 @@ public class ClassCache {
 			return annationTableNameCache.get(clzz);
 		}
 		Table table = clzz.getAnnotation(Table.class);
-		if (table != null) {
+		if (table != null && !"".equals(table.tableName())) {
 			return table.tableName();
 		}
 		String tableName = clzz.getSimpleName();
@@ -112,6 +114,15 @@ public class ClassCache {
 		List<Field> fieldList = getDeclaredFields(clzz);
 		fieldList.removeIf(f -> f.getAnnotation(PrimaryKey.class)==null); 
 		annationPKCache.put(clzz, fieldList);
+		return fieldList;
+	}
+	public static List<Field> getOrderBy(Class<?> clzz){
+		if (annationOrderByCache.get(clzz) != null) {
+			return annationOrderByCache.get(clzz);
+		}
+		List<Field> fieldList = getDeclaredFields(clzz);
+		fieldList.removeIf(f -> f.getAnnotation(OrderBy.class)==null); 
+		annationOrderByCache.put(clzz, fieldList);
 		return fieldList;
 	}
 	

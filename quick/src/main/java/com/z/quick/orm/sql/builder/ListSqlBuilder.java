@@ -21,9 +21,10 @@ public class ListSqlBuilder extends AbstractSqlBuilder {
 		String select = super.getSelect(o);
 		List<Object> valueList = new ArrayList<>();
 		String condition = super.getCondition(o,valueList);
+		String orderBy = super.getOrderBy(o);
 		String sql = LIST_TEMPLATE.replace("#tableName", tableName);
 		sql = sql.replace("#select", select);
-		sql = sql.replace("#condition", condition);
+		sql = sql.replace("#condition", condition)+orderBy;
 		return new SqlInfo(sql, valueList);
 	}
 	

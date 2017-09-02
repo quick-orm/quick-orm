@@ -4,6 +4,7 @@ import java.lang.reflect.Field;
 import java.util.List;
 
 import com.z.quick.orm.annotation.Condition;
+import com.z.quick.orm.annotation.OrderBy;
 import com.z.quick.orm.cache.ClassCache;
 import com.z.quick.orm.common.Constants;
 import com.z.quick.orm.sql.convert.FieldConvertProcessor;
@@ -52,6 +53,18 @@ public class AnnotationSqlBuilderUtils {
 			valueList.add(v);
 		});
 		return condition.toString();
+	}
+	public static String getOrderBy(Object o) {
+		List<Field> fieldList =ClassCache.getOrderBy(o.getClass());
+		if (fieldList.size()==0) {
+			return "";
+		}
+		StringBuffer orderBy = new StringBuffer(Constants.ORDERBY);
+		fieldList.forEach((f) -> {
+			String sort = f.getAnnotation(OrderBy.class).value().toString();
+			orderBy.append(f.getName()).append(Constants.SPACE).append(sort).append(",");
+		});
+		return orderBy.deleteCharAt(orderBy.lastIndexOf(",")).toString();
 	}
 	
 	public static void getInsert(Object o,StringBuffer insertParam,StringBuffer insertValue,List<Object> valueList) {

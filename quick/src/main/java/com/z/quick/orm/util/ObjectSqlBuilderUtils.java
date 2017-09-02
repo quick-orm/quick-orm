@@ -50,26 +50,50 @@ public class ObjectSqlBuilderUtils {
 	}
 
 	public static String getCondition(Object o, List<Object> valueList) {
+		Class<?> clzz = o.getClass();
+		StringBuffer condition = new StringBuffer();
 		if (o instanceof Model) {
-			Class<?> clzz = o.getClass();
-			StringBuffer condition = new StringBuffer();
-			if (o instanceof Model) {
-				CONDITION_PARAM.forEach(s -> {
-					Field f = ClassCache.getField(clzz, s);
-					assemblyCondition(o, f, condition, valueList);
+			CONDITION_PARAM.forEach(s -> {
+				Field f = ClassCache.getField(clzz, s);
+				assemblyCondition(o, f, condition, valueList);
+			});
+		}
+		Field where = ClassCache.getField(clzz, "where");
+		Object v = FieldConvertProcessor.toDB(where, o);
+		if (v != null) {
+			if (condition.length() == 0) {
+				condition.append("WHERE").append(Constants.SPACE).append(v);
+			} else {
+				condition.append(Constants.SPACE).append("AND").append(Constants.SPACE).append(v);
+			}
+		}
+		return condition.length() == 0 ? null : condition.toString();
+	}
+
+	public static String getOrderBy(Object o) {
+		Class<?> clzz = o.getClass();
+		if (o instanceof Model) {
+			StringBuffer orderBy = new StringBuffer(Constants.ORDERBY);
+			Field f = ClassCache.getField(clzz, "orderByAsc");
+			Object v = FieldConvertProcessor.toDB(f, o);
+			if (v != null) {
+				List<String> orderByAsc = (List<String>) v;
+				orderByAsc.forEach(asc -> {
+					orderBy.append(asc).append(Constants.SPACE).append("asc").append(",");
 				});
 			}
-			Field where = ClassCache.getField(clzz, "where");
-			Object v = FieldConvertProcessor.toDB(where, o);
+			f = ClassCache.getField(clzz, "orderByDesc");
+			v = FieldConvertProcessor.toDB(f, o);
 			if (v != null) {
-				if (condition.length() == 0) {
-					condition.append("WHERE").append(Constants.SPACE).append(v);
-				} else {
-					condition.append(Constants.SPACE).append("AND").append(Constants.SPACE).append(v);
-				}
+				List<String> orderByDesc = (List<String>) v;
+				orderByDesc.forEach(asc -> {
+					orderBy.append(asc).append(Constants.SPACE).append("desc").append(",");
+				});
 			}
-			;
-			return condition.length() == 0 ? null : condition.toString();
+			if (Constants.ORDERBY.equals(orderBy.toString())) {
+				return null;
+			}
+			return orderBy.deleteCharAt(orderBy.lastIndexOf(",")).toString();
 		}
 		return null;
 	}

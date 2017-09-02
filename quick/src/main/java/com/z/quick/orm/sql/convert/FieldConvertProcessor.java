@@ -3,6 +3,7 @@ package com.z.quick.orm.sql.convert;
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -24,6 +25,7 @@ public class FieldConvertProcessor {
 		registerConvert(BigDecimal.class, new BigDecimalFieldConvert());
 		registerConvert(Timestamp.class, new TimestampFieldConvert());
 		registerConvert(LinkedHashMap.class, new DefaultFieldConvert());
+		registerConvert(ArrayList.class, new DefaultFieldConvert());
 	}
 	
 	public static void registerConvert(Class<?> clzz,FieldConvert ac){

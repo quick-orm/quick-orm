@@ -1,7 +1,9 @@
 package com.z.quick.orm.session;
 
 import java.sql.Connection;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -12,6 +14,8 @@ import javax.sql.DataSource;
 import com.z.quick.orm.connection.ConnectionProcessor;
 import com.z.quick.orm.connection.JDBCConfig;
 import com.z.quick.orm.connection.QuickDataSource;
+import com.z.quick.orm.exception.SqlBuilderException;
+import com.z.quick.orm.model.Page;
 import com.z.quick.orm.sql.SqlInfo;
 import com.z.quick.orm.sql.builder.SqlBuilder;
 import com.z.quick.orm.sql.builder.SqlBuilderProcessor;
@@ -78,6 +82,30 @@ public class Session implements DataBaseManipulation<Object>,FutureDataBaseManip
 	@Override
 	public List<Object> list(Object o) {
 		return this.list(o, o.getClass());
+	}
+	
+	@Override
+	public Page<?> page(Object o) {
+		return page(o,o.getClass());
+	}
+	@SuppressWarnings({"unchecked","rawtypes"})
+	public Page<?> page(Object o,Class<?> clzz) {
+		Map<String,Integer> pageInfo = Page.getPageInfo();
+		if (pageInfo == null || pageInfo.get("pageNum")==null || pageInfo.get("pageSize")==null) {
+			throw new SqlBuilderException("PageNum or pageSize is null");
+		}
+		
+		SqlInfo countSqlInfo = SqlBuilderProcessor.getSql(SqlBuilder.SBType.PAGE_COUNT, o);
+		Integer total = (Integer) ConnectionProcessor.get(getConnection(), countSqlInfo,Integer.class);
+		
+		if (total == 0) {
+			Page<?> page = new Page(pageInfo.get("pageNum"),pageInfo.get("pageSize"), total, new ArrayList<>());
+			return page;
+		}
+		
+		SqlInfo listSqlInfo = SqlBuilderProcessor.getSql(SqlBuilder.SBType.PAGE_LIST, o);
+		List<Object> list = ConnectionProcessor.list(getConnection(), listSqlInfo,clzz);
+		return new Page(pageInfo.get("pageNum"),pageInfo.get("pageSize"), total, list);
 	}
 	
 	@Override

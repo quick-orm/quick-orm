@@ -8,11 +8,12 @@ import com.z.quick.orm.util.AnnotationSqlBuilderUtils;
 import com.z.quick.orm.util.ObjectSqlBuilderUtils;
 
 public abstract class AbstractSqlBuilder implements SqlBuilder {
-	public static final String SAVE_TEMPLATE = "INSERT INTO #tableName(#insertParam) VALUES(#insertValue)";
-	public static final String DELETE_TEMPLATE = "DELETE FROM #tableName #condition";
-	public static final String UPDATE_TEMPLATE = "UPDATE #tableName SET #modif #condition";
-	public static final String GET_TEMPLATE = "SELECT #select FROM #tableName #condition";
-	public static final String LIST_TEMPLATE = "SELECT #select FROM #tableName #condition";
+	protected static final String SAVE_TEMPLATE = "insert into #tableName(#insertParam) values(#insertValue)";
+	protected static final String DELETE_TEMPLATE = "delete from #tableName #condition";
+	protected static final String UPDATE_TEMPLATE = "update #tableName set #modif #condition";
+	protected static final String GET_TEMPLATE = "select #select from #tableName #condition";
+	protected static final String LIST_TEMPLATE = "select #select from #tableName #condition";
+	protected static final String PAGE_COUNT_TEMPLATE = "select count(1) from #tableName #condition";
 	
 	/**
 	 * ********************************************
@@ -88,6 +89,13 @@ public abstract class AbstractSqlBuilder implements SqlBuilder {
 			throw new SqlBuilderException("Modif param is null");
 		}
 		return modif.substring(0,modif.lastIndexOf(","));
+	}
+	protected String getOrderBy(Object o){
+		String orderBy = ObjectSqlBuilderUtils.getOrderBy(o);
+		if (orderBy != null) {
+			return orderBy;
+		}
+		return AnnotationSqlBuilderUtils.getOrderBy(o);
 	}
 	
 }

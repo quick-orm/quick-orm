@@ -3,6 +3,7 @@ package com.z.quick.orm.session;
 import java.util.List;
 
 import com.z.quick.orm.connection.JDBCConfig;
+import com.z.quick.orm.model.Page;
 
 public interface DataBaseManipulation<T> {
 	
@@ -31,6 +32,8 @@ public interface DataBaseManipulation<T> {
 	T get(String sql, Class<?> clzz, List<Object> params);
 
 	List<T> list(String sql, Class<?> clzz, List<Object> params);
+	
+	Page<?> page(Object o);
 
 	void start();
 

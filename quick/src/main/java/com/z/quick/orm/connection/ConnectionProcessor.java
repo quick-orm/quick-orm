@@ -1,6 +1,7 @@
 package com.z.quick.orm.connection;
 
 import java.lang.reflect.Field;
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -82,27 +83,35 @@ public class ConnectionProcessor {
 	}
 
 	public static Object get(Connection conn, SqlInfo sqlInfo,Class<?> clzz) {
-		PreparedStatementWrapper stmt = null;
-		ResultSet rs = null;
-		try {
-			stmt = createPreparedStatement(conn, sqlInfo);
-			rs = stmt.executeQuery();
-			List<Object> list = parseResultSetToMap(rs,clzz);
-			if (list == null || list.size()==0) {
-				return null;
-			}
-			if (list.size()==1) {
-				return list.get(0);
-			}
-			throw new ExecuteSqlException("Query out multiple results!");
-		} catch (SQLException e) {
-			log.error(e, "execute sql error");
-			throw new ExecuteSqlException(e);
-		} finally {
-			close(stmt);
-			close(rs);
-			release(conn);
+		List<Object> list = list(conn, sqlInfo, clzz);
+		if (list == null || list.size()==0) {
+			return null;
 		}
+		if (list.size()==1) {
+			return list.get(0);
+		}
+		throw new ExecuteSqlException("Query out multiple results!");
+//		PreparedStatementWrapper stmt = null;
+//		ResultSet rs = null;
+//		try {
+//			stmt = createPreparedStatement(conn, sqlInfo);
+//			rs = stmt.executeQuery();
+//			List<Object> list = parseResultSetToObject(rs,clzz);
+//			if (list == null || list.size()==0) {
+//				return null;
+//			}
+//			if (list.size()==1) {
+//				return list.get(0);
+//			}
+//			throw new ExecuteSqlException("Query out multiple results!");
+//		} catch (SQLException e) {
+//			log.error(e, "execute sql error");
+//			throw new ExecuteSqlException(e);
+//		} finally {
+//			close(stmt);
+//			close(rs);
+//			release(conn);
+//		}
 	}
 
 	public static List<Object> list(Connection conn, SqlInfo sqlInfo,Class<?> clzz) {
@@ -111,7 +120,7 @@ public class ConnectionProcessor {
 		try {
 			stmt = createPreparedStatement(conn, sqlInfo);
 			rs = stmt.executeQuery();
-			return parseResultSetToMap(rs,clzz);
+			return parseResultSetToObject(rs,clzz);
 		} catch (Exception e) {
 			log.error(e, "execute sql error");
 			throw new ExecuteSqlException(e);
@@ -122,8 +131,7 @@ public class ConnectionProcessor {
 		}
 	}
 	
-	
-	private static List<Object> parseResultSetToMap(ResultSet rs,Class<?> clzz) {
+	private static List<Object> parseResultSetToObject(ResultSet rs,Class<?> clzz) {
 		List<Object> list = new ArrayList<>();
 		try {
 			ResultSetMetaData rsmd = rs.getMetaData();
@@ -168,9 +176,51 @@ public class ConnectionProcessor {
 				return result;
 			}
 			if (clzz.isAssignableFrom(Schema.class)) {
-				Schema s = new Schema();
+				Schema s = new Schema("");
 				s.setResult(result);
 				return s;
+			}
+			if (clzz.isAssignableFrom(Short.class)) {
+				if(result.keySet().size() != 1){
+					throw new ExecuteSqlException("Query out result is not the "+clzz.getSimpleName());
+				}
+				return Short.parseShort(result.get(result.keySet().toArray()[0]).toString());
+			}
+			if (clzz.isAssignableFrom(Float.class)) {
+				if(result.keySet().size() != 1){
+					throw new ExecuteSqlException("Query out result is not the "+clzz.getSimpleName());
+				}
+				return Float.parseFloat(result.get(result.keySet().toArray()[0]).toString());
+			}
+			if (clzz.isAssignableFrom(Integer.class)) {
+				if(result.keySet().size() != 1){
+					throw new ExecuteSqlException("Query out result is not the "+clzz.getSimpleName());
+				}
+				return Integer.parseInt(result.get(result.keySet().toArray()[0]).toString());
+			}
+			if (clzz.isAssignableFrom(Double.class)) {
+				if(result.keySet().size() != 1){
+					throw new ExecuteSqlException("Query out result is not the "+clzz.getSimpleName());
+				}
+				return Double.parseDouble(result.get(result.keySet().toArray()[0]).toString());
+			}
+			if (clzz.isAssignableFrom(Long.class)) {
+				if(result.keySet().size() != 1){
+					throw new ExecuteSqlException("Query out result is not the "+clzz.getSimpleName());
+				}
+				return Long.parseLong(result.get(result.keySet().toArray()[0]).toString());
+			}
+			if (clzz.isAssignableFrom(BigDecimal.class)) {
+				if(result.keySet().size() != 1){
+					throw new ExecuteSqlException("Query out result is not the "+clzz.getSimpleName());
+				}
+				return new BigDecimal(result.get(result.keySet().toArray()[0]).toString());
+			}
+			if (clzz.isAssignableFrom(String.class)) {
+				if(result.keySet().size() != 1){
+					throw new ExecuteSqlException("Query out result is not the "+clzz.getSimpleName());
+				}
+				return result.get(result.keySet().toArray()[0]).toString();
 			}
 			
 			Object o = clzz.newInstance();

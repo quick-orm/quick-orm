@@ -12,9 +12,9 @@ public class Schema extends Model<Schema> {
 	
 	private Map<String,Object> result;
 	
-	public Schema() {
-		super();
-	}
+//	public Schema() {
+//		super();
+//	}
 	
 	public Schema(String tableName) {
 		super();
