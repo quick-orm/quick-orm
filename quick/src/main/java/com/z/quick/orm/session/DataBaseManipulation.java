@@ -5,7 +5,7 @@ import java.util.List;
 import com.z.quick.orm.connection.JDBCConfig;
 import com.z.quick.orm.model.Page;
 
-public interface DataBaseManipulation<T> {
+public interface DataBaseManipulation {
 	
 	JDBCConfig getJdbcConfig();
 
@@ -15,13 +15,13 @@ public interface DataBaseManipulation<T> {
 
 	int update(Object o);
 
-	T get(Object o);
+	Object get(Object o);
 
-	T get(Object o, Class<?> clzz);
+	Object get(Object o, Class<?> clzz);
 
-	List<T> list(Object o);
+	List<Object> list(Object o);
 
-	List<T> list(Object o, Class<?> clzz);
+	List<Object> list(Object o, Class<?> clzz);
 
 	int save(String sql, List<Object> params);
 
@@ -29,11 +29,16 @@ public interface DataBaseManipulation<T> {
 	
 	int update(String sql, List<Object> params);
 
-	T get(String sql, Class<?> clzz, List<Object> params);
+	Object get(String sql, List<Object> params, Class<?> clzz);
 
-	List<T> list(String sql, Class<?> clzz, List<Object> params);
+	List<Object> list(String sql, List<Object> params, Class<?> clzz);
 	
-	Page<?> page(Object o);
+	Page<Object> page(Object o);
+	
+	Page<Object> page(Object o, Class<?> clzz);
+	
+	Page<Object> page(String countSql,String listSql, List<Object> params, Class<?> clzz);
+	
 
 	void start();
 

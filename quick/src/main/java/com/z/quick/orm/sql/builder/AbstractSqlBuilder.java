@@ -69,9 +69,8 @@ public abstract class AbstractSqlBuilder implements SqlBuilder {
 		condition = AnnotationSqlBuilderUtils.getCondition(o, valueList);
 		return condition;
 	}
-	protected String getModifCondition(Object o,List<Object> valueList){
-		
-		String condition = ObjectSqlBuilderUtils.getCondition(o, valueList);
+	protected String getPrimaryKey(Object o,List<Object> valueList){
+		String condition = ObjectSqlBuilderUtils.getPrimaryKey(o, valueList);
 		if (condition != null) {
 			return condition;
 		}

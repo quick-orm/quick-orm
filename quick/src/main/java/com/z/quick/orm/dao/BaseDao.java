@@ -5,6 +5,7 @@ import java.lang.reflect.Type;
 import java.util.List;
 import java.util.concurrent.Future;
 
+import com.z.quick.orm.model.Page;
 import com.z.quick.orm.session.Session;
 
 @SuppressWarnings({ "unchecked", "unused" })
@@ -63,13 +64,13 @@ public abstract class BaseDao<T> implements Dao<T> {
 	}
 
 	@Override
-	public T get(String sql, Class<?> clzz, List<Object> params) {
-		return (T) Session.getSession().get(sql, clzz, params);
+	public T get(String sql, List<Object> params, Class<?> clzz) {
+		return (T) Session.getSession().get(sql, params, clzz);
 	}
 
 	@Override
-	public List<Object> list(String sql, Class<?> clzz,List<Object> params) {
-		return Session.getSession().list(sql, clzz, params);
+	public List<Object> list(String sql,List<Object> params, Class<?> clzz) {
+		return Session.getSession().list(sql, params, clzz);
 	}
 
 	@Override
@@ -128,13 +129,33 @@ public abstract class BaseDao<T> implements Dao<T> {
 	}
 
 	@Override
-	public Future<Object> ftGet(String sql, Class<?> clzz,List<Object> params) {
-		return session.ftGet(sql, clzz, params);
+	public Future<Object> ftGet(String sql,List<Object> params, Class<?> clzz) {
+		return session.ftGet(sql, params, clzz);
 	}
 
 	@Override
-	public Future<List<Object>> ftList(String sql, Class<?> clzz,List<Object> params) {
-		return session.ftList(sql, clzz, params);
+	public Future<List<Object>> ftList(String sql,List<Object> params, Class<?> clzz) {
+		return session.ftList(sql, params, clzz);
+	}
+
+	@Override
+	public Page<T> page(Object o) {
+		return (Page<T>) session.page(o);
+	}
+
+	@Override
+	public Page<Object> page(String countSql, String listSql, List<Object> params, Class<?> clzz) {
+		return session.page(countSql, listSql, params, clzz);
+	}
+
+	@Override
+	public Future<Page<Object>> ftPage(Object o) {
+		return session.ftPage(o);
+	}
+
+	@Override
+	public Future<Page<Object>> ftPage(String countSql, String listSql, List<Object> params, Class<?> clzz) {
+		return session.ftPage(countSql, listSql, params, clzz);
 	}
 
 }

@@ -2,6 +2,8 @@ package com.z.quick.orm.dao;
 
 import java.util.List;
 import java.util.concurrent.Future;
+
+import com.z.quick.orm.model.Page;
 //TODO 增加返回结果类型参数
 public interface Dao<T> {
 	
@@ -21,9 +23,13 @@ public interface Dao<T> {
 	
 	int update(String sql, List<Object> params);
 	
-	Object get(String sql, Class<?> clzz, List<Object> params);
+	Object get(String sql, List<Object> params, Class<?> clzz);
 	
-	List<Object> list(String sql, Class<?> clzz, List<Object> params);
+	List<Object> list(String sql, List<Object> params, Class<?> clzz);
+	
+	Page<T> page(Object o);
+	
+	Page<Object> page(String countSql,String listSql, List<Object> params, Class<?> clzz);
 	
 	Future<Integer> ftSave(T t);
 
@@ -41,9 +47,13 @@ public interface Dao<T> {
 	
 	Future<Integer> ftUpdate(String sql, List<Object> params);
 	
-	Future<Object> ftGet(String sql, Class<?> clzz, List<Object> params);
+	Future<Object> ftGet(String sql, List<Object> params, Class<?> clzz);
 	
-	Future<List<Object>> ftList(String sql, Class<?> clzz, List<Object> params);
+	Future<List<Object>> ftList(String sql, List<Object> params, Class<?> clzz);
+	
+	Future<Page<Object>> ftPage(Object o);
+	
+	Future<Page<Object>> ftPage(String countSql,String listSql, List<Object> params, Class<?> clzz);
 
 }
 

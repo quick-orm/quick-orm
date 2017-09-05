@@ -8,11 +8,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.z.quick.orm.annotation.Condition;
 import com.z.quick.orm.annotation.Exclude;
 import com.z.quick.orm.annotation.NoFind;
-import com.z.quick.orm.annotation.OrderBy;
-import com.z.quick.orm.annotation.PrimaryKey;
 import com.z.quick.orm.annotation.Table;
 import com.z.quick.orm.common.Constants;
 public class ClassCache {
@@ -26,7 +23,7 @@ public class ClassCache {
 	private static final Map<Class<?>,List<Field>> annationConditionCache = new HashMap<>();
 	private static final Map<Class<?>,List<Field>> insertParamCache = new HashMap<>();
 	
-	public static Map<String,Field> getAllFieldMap(Class<?> clzz){
+	private static Map<String,Field> getAllFieldMap(Class<?> clzz){
 		Map<String,Field> fieldMap = allFieldClassCache.get(clzz);
 		if (fieldMap != null) {
 			return fieldMap;
@@ -108,43 +105,28 @@ public class ClassCache {
 	}
 	
 	public static List<Field> getPrimaryKey(Class<?> clzz){
-		if (annationPKCache.get(clzz) != null) {
-			return annationPKCache.get(clzz);
-		}
-		List<Field> fieldList = getDeclaredFields(clzz);
-		fieldList.removeIf(f -> f.getAnnotation(PrimaryKey.class)==null); 
-		annationPKCache.put(clzz, fieldList);
-		return fieldList;
+		return getAnnotationField(annationPKCache, clzz);
 	}
 	public static List<Field> getOrderBy(Class<?> clzz){
-		if (annationOrderByCache.get(clzz) != null) {
-			return annationOrderByCache.get(clzz);
-		}
-		List<Field> fieldList = getDeclaredFields(clzz);
-		fieldList.removeIf(f -> f.getAnnotation(OrderBy.class)==null); 
-		annationOrderByCache.put(clzz, fieldList);
-		return fieldList;
+		return getAnnotationField(annationOrderByCache, clzz);
 	}
 	
 	public static List<Field> getCondition(Class<?> clzz){
-		if (annationConditionCache.get(clzz) != null) {
-			return annationConditionCache.get(clzz);
-		}
-		List<Field> fieldList = getDeclaredFields(clzz);
-		fieldList.removeIf(f -> f.getAnnotation(Condition.class)==null); 
-		annationConditionCache.put(clzz, fieldList);
-		return fieldList;
+		return getAnnotationField(annationConditionCache, clzz);
 	}
 	public static List<Field> getInsert(Class<?> clzz){
-		if (insertParamCache.get(clzz) != null) {
-			return insertParamCache.get(clzz);
+		return getAnnotationField(insertParamCache, clzz);
+	}
+	
+	public static List<Field> getAnnotationField(Map<Class<?>,List<Field>> fieldCache,Class<?> clzz){
+		if (fieldCache.get(clzz) != null) {
+			return (List<Field>) fieldCache.get(clzz);
 		}
 		List<Field> fieldList = getDeclaredFields(clzz);
 		fieldList.removeIf(f -> f.getAnnotation(Exclude.class)!=null); 
-		insertParamCache.put(clzz, fieldList);
+		fieldCache.put(clzz, fieldList);
 		return fieldList;
-	}
-	
+	}	
 	
 	private static Map<String,Field> parseClass(Class<?> clzz){
 		Map<String,Field> fieldMap = new HashMap<>();

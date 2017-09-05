@@ -7,6 +7,7 @@ public final class JdbcUtils {
 	public static final String MOCK = "mock";
 	public static final String HSQL = "hsql";
 	public static final String DB2 = "db2";
+	public static final String SQLITE = "sqlite";
 	public static final String DB2_DRIVER = "COM.ibm.db2.jdbc.app.DB2Driver";
 	public static final String POSTGRESQL = "postgresql";
 	public static final String SYBASE = "sybase";
@@ -120,7 +121,7 @@ public final class JdbcUtils {
 		} else if (rawUrl.startsWith("jdbc:db2:")) {
 			return DB2;
 		} else if (rawUrl.startsWith("jdbc:sqlite:")) {
-			return "sqlite";
+			return SQLITE;
 		} else if (rawUrl.startsWith("jdbc:ingres:")) {
 			return "ingres";
 		} else if (rawUrl.startsWith("jdbc:h2:")) {

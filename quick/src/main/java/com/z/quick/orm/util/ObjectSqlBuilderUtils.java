@@ -69,6 +69,30 @@ public class ObjectSqlBuilderUtils {
 		}
 		return condition.length() == 0 ? null : condition.toString();
 	}
+	public static String getPrimaryKey(Object o, List<Object> valueList) {
+		Class<?> clzz = o.getClass();
+		StringBuffer condition = new StringBuffer();
+		if (o instanceof Model) {
+			Field pk = ClassCache.getField(clzz, "pk");
+			Object v = FieldConvertProcessor.toDB(pk, o);
+			if (v != null) {
+				Map<String, Object> pkMap = (Map<String, Object>) v;
+				if (pkMap.size() > 0) {
+					pkMap.forEach((k, pkv) -> {
+						if (condition.length() == 0) {
+							condition.append("WHERE").append(Constants.SPACE).append(k).append("=")
+									.append(Constants.PLACEHOLDER);
+						} else {
+							condition.append(Constants.SPACE).append("AND").append(Constants.SPACE).append(k)
+									.append("=").append(Constants.PLACEHOLDER);
+						}
+						valueList.add(pkv);
+					});
+				}
+			}
+		}
+		return condition.length() == 0 ? null : condition.toString();
+	}
 
 	public static String getOrderBy(Object o) {
 		Class<?> clzz = o.getClass();
@@ -146,9 +170,9 @@ public class ObjectSqlBuilderUtils {
 				Object v = FieldConvertProcessor.toDB(f, o);
 				String logicOperation = LogicConstants.LOGIC_OPERATION.get(f.getName());
 				if (v != null) {
-					Map<String, Object> pk = (Map<String, Object>) v;
-					if (pk.size() > 0) {
-						pk.forEach((k, pkv) -> {
+					Map<String, Object> comditionMap = (Map<String, Object>) v;
+					if (comditionMap.size() > 0) {
+						comditionMap.forEach((k, pkv) -> {
 							if (condition.length() == 0) {
 								condition.append("WHERE").append(Constants.SPACE).append(k).append(logicOperation)
 										.append(Constants.PLACEHOLDER);

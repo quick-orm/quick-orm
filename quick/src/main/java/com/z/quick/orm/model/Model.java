@@ -16,6 +16,7 @@ public abstract class Model<T> extends LogicOperate<T> {
 	//TODO orderby group by
 	private List<String> orderByAsc;
 	private List<String> orderByDesc;
+	private Map<String, Object> pk;
 	private Map<String, Object> insert;
 	private Map<String, Object> modif;
 	
@@ -76,16 +77,20 @@ public abstract class Model<T> extends LogicOperate<T> {
 	}
 
 	public Map<String, Object> pk() {
-		return eq();
+		return pk;
 	}
 
 	public T pk(String column, Object value) {
-		eq(column, value);
+		if (pk == null)
+			pk = createConditionMap();
+		pk.put(column, value);
 		return (T) this;
 	}
 
 	public T pk(Map<String, Object> pkAll) {
-		eq(pkAll);
+		if (pk == null)
+			pk = createConditionMap();
+		pk.putAll(pkAll);
 		return (T) this;
 	}
 
@@ -189,29 +194,48 @@ public abstract class Model<T> extends LogicOperate<T> {
 		return (List<T>) session.list(this);
 	}
 	public Object get(String sql,Class<?> clzz, List<Object> params) {
-		return session.get(sql, clzz, params);
+		return session.get(sql, params, clzz);
 	}
 	
-	public List<Object> list(String sql,Class<?> clzz, List<Object> params) {
-		return session.list(sql, clzz, params);
+	public List<?> list(String sql, List<Object> params,Class<?> clzz) {
+		return session.list(sql, params, clzz);
 	}
 	public T get(String sql, List<Object> params) {
-		return (T) session.get(sql, this.getClass(), params);
+		return (T) session.get(sql, params, this.getClass());
 	}
 	
 	public List<T> list(String sql, List<Object> params) {
-		return (List<T>) session.list(sql, this.getClass(), params);
+		return (List<T>) session.list(sql, params, this.getClass());
 	}
-	public Page<T> page(){
-		return (Page<T>) session.page(this);
-	}
+	
 	public Page<T> page(Integer pageNum,Integer pageSize){
 		Page.page(pageNum, pageSize);
-		return (Page<T>) session.page(this);
+		return (Page<T>) this.page(pageNum, pageSize, this.getClass());
 	}
+	
 	public Page<T> page(Integer pageNum,Integer pageSize,Class<?> clzz){
 		Page.page(pageNum, pageSize);
-		return (Page<T>) session.page(this);
+		return (Page<T>) session.page(this,clzz);
+	}
+	
+	public Page<T> page(Integer pageNum,Integer pageSize,String countSql,String listSql, List<Object> params, Class<?> clzz){
+		Page.page(pageNum, pageSize);
+		return (Page<T>) session.page(countSql, listSql, params, clzz);
+	}
+	
+	public Future<Page<Object>> ftPage(Integer pageNum,Integer pageSize){
+		Page.page(pageNum, pageSize);
+		return this.ftPage(pageNum, pageSize, this.getClass());
+	}
+	
+	public Future<Page<Object>> ftPage(Integer pageNum,Integer pageSize,Class<?> clzz){
+		Page.page(pageNum, pageSize);
+		return session.ftPage(this, clzz);
+	}
+	
+	public Future<Page<Object>> ftPage(Integer pageNum,Integer pageSize,String countSql,String listSql, List<Object> params, Class<?> clzz){
+		Page.page(pageNum, pageSize);
+		return session.ftPage(countSql, listSql, params, clzz);
 	}
 
 	public Future<Integer> ftSave() {
@@ -230,15 +254,15 @@ public abstract class Model<T> extends LogicOperate<T> {
 		return session.ftList(this);
 	}
 	
-	public Future<Object> ftGet(String sql,Class<?> clzz, List<Object> params) {
-		return session.ftGet(sql, clzz, params);
+	public Future<Object> ftGet(String sql, List<Object> params,Class<?> clzz) {
+		return session.ftGet(sql, params, clzz);
 	}
 
-	public Future<List<Object>> ftList(String sql,Class<?> clzz, List<Object> params) {
-		return session.ftList(sql, clzz, params);
+	public Future<List<Object>> ftList(String sql, List<Object> params,Class<?> clzz) {
+		return session.ftList(sql, params, clzz);
 	}
 	public Future<T> ftGet(String sql,List<Object> params) {
-		return (Future<T>) session.ftGet(sql, this.getClass(), params);
+		return (Future<T>) session.ftGet(sql, params, this.getClass());
 	}
 	
 }

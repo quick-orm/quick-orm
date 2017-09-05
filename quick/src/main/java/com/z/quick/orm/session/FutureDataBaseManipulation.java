@@ -3,7 +3,9 @@ package com.z.quick.orm.session;
 import java.util.List;
 import java.util.concurrent.Future;
 
-public interface FutureDataBaseManipulation<T> {
+import com.z.quick.orm.model.Page;
+
+public interface FutureDataBaseManipulation {
 
 	Future<Integer> ftSave(Object o);
 
@@ -11,13 +13,13 @@ public interface FutureDataBaseManipulation<T> {
 
 	Future<Integer> ftUpdate(Object o);
 
-	Future<T> ftGet(Object o);
+	Future<Object> ftGet(Object o);
 
-	Future<T> ftGet(Object o, Class<?> clzz);
+	Future<Object> ftGet(Object o, Class<?> clzz);
 
-	Future<List<T>> ftList(Object o);
+	Future<List<Object>> ftList(Object o);
 
-	Future<List<T>> ftList(Object o, Class<?> clzz);
+	Future<List<Object>> ftList(Object o, Class<?> clzz);
 
 	Future<Integer> ftSave(String sql, List<Object> params);
 
@@ -25,9 +27,15 @@ public interface FutureDataBaseManipulation<T> {
 	
 	Future<Integer> ftUpdate(String sql, List<Object> params);
 
-	Future<T> ftGet(String sql, Class<?> clzz, List<Object> params);
+	Future<Object> ftGet(String sql, List<Object> params, Class<?> clzz);
 
-	Future<List<T>> ftList(String sql, Class<?> clzz, List<Object> params);
+	Future<List<Object>> ftList(String sql, List<Object> params, Class<?> clzz);
+	
+	Future<Page<Object>> ftPage(Object o);
+	
+	Future<Page<Object>> ftPage(Object o, Class<?> clzz);
+	
+	Future<Page<Object>> ftPage(String countSql,String listSql, List<Object> params, Class<?> clzz);
 
 
 }

@@ -19,7 +19,7 @@ public class UpdateSqlBuilder extends AbstractSqlBuilder {
 		String select = super.getSelect(o);
 		List<Object> valueList = new ArrayList<>();
 		String modif = super.getModif(o, valueList);
-		String condition = super.getModifCondition(o,valueList);
+		String condition = super.getPrimaryKey(o,valueList);
 		if (condition == null || "".equals(condition)) {
 			throw new SqlBuilderException("No update condition,disallow full table update!");
 		}
