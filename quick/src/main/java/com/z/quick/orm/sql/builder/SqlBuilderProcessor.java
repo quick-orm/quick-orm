@@ -13,18 +13,18 @@ public class SqlBuilderProcessor {
 	private static final Log log = LogFactory.get();
 	private static final Map<SqlBuilder.SBType,SqlBuilder> sqlBuilderContainer = new HashMap<SqlBuilder.SBType,SqlBuilder>();
 	static{
-		sqlBuilderContainer.put(SqlBuilder.SBType.SAVE, new SaveSqlBuilder());
-		sqlBuilderContainer.put(SqlBuilder.SBType.DELETE, new DeleteSqlBuilder());
-		sqlBuilderContainer.put(SqlBuilder.SBType.UPDATE, new UpdateSqlBuilder());
-		sqlBuilderContainer.put(SqlBuilder.SBType.GET, new GetSqlBuilder());
-		sqlBuilderContainer.put(SqlBuilder.SBType.LIST, new ListSqlBuilder());
-		sqlBuilderContainer.put(SqlBuilder.SBType.PAGE_COUNT, new PageCountSqlBuilder());
+		registerSqlBuilder(SqlBuilder.SBType.SAVE, new SaveSqlBuilder());
+		registerSqlBuilder(SqlBuilder.SBType.DELETE, new DeleteSqlBuilder());
+		registerSqlBuilder(SqlBuilder.SBType.UPDATE, new UpdateSqlBuilder());
+		registerSqlBuilder(SqlBuilder.SBType.GET, new GetSqlBuilder());
+		registerSqlBuilder(SqlBuilder.SBType.LIST, new ListSqlBuilder());
+		registerSqlBuilder(SqlBuilder.SBType.PAGE_COUNT, new PageCountSqlBuilder());
 		if(JdbcUtils.MYSQL.equals(Session.getSession().getJdbcConfig().getDbType())){
-			sqlBuilderContainer.put(SqlBuilder.SBType.PAGE_LIST, new MySqlPageListSqlBuilder());
+			registerSqlBuilder(SqlBuilder.SBType.PAGE_LIST, new MySqlPageListSqlBuilder());
 		}else if(JdbcUtils.DB2.equals(Session.getSession().getJdbcConfig().getDbType())){
-			sqlBuilderContainer.put(SqlBuilder.SBType.PAGE_LIST, new DB2PageListSqlBuilder());
+			registerSqlBuilder(SqlBuilder.SBType.PAGE_LIST, new DB2PageListSqlBuilder());
 		}else if(JdbcUtils.SQLITE.equals(Session.getSession().getJdbcConfig().getDbType())){
-			sqlBuilderContainer.put(SqlBuilder.SBType.PAGE_LIST, new SQLitePageListSqlBuilder());
+			registerSqlBuilder(SqlBuilder.SBType.PAGE_LIST, new SQLitePageListSqlBuilder());
 		}else{
 			log.info("No {} db pagelist sql builder",Session.getSession().getJdbcConfig().getDbType());
 		}

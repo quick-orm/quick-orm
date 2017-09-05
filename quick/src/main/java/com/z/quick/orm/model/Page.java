@@ -9,7 +9,7 @@ public class Page<E> {
 	private Integer pageNum;
 	private Integer pageSize;
 	private Integer total;
-	private int pages;
+	private Integer pages;
 	private Integer nextPage;
 	private List<E> result;
 	
@@ -29,6 +29,7 @@ public class Page<E> {
 		this.pageSize = pageSize;
 		this.total = total;
 		this.result = result;
+		this.nextPage = pageNum+1;
 		pages = total%pageSize==0?total/pageSize:total/pageSize+1;
 	}
 	public Integer getPageSize() {
@@ -49,10 +50,10 @@ public class Page<E> {
 	public void setTotal(Integer total) {
 		this.total = total;
 	}
-	public int getPages() {
+	public Integer getPages() {
 		return pages;
 	}
-	public void setPages(int pages) {
+	public void setPages(Integer pages) {
 		this.pages = pages;
 	}
 	public Integer getNextPage() {
