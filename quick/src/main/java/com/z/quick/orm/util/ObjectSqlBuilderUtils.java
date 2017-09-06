@@ -17,7 +17,7 @@ import com.z.quick.orm.sql.convert.FieldConvertProcessor;
 @SuppressWarnings("unchecked")
 public class ObjectSqlBuilderUtils {
 
-	private static final List<String> CONDITION_PARAM = new ArrayList<>(Arrays.asList("lt", "gt", "le", "ge", "eq", "neq"));
+	private static final List<String> CONDITION_PARAM = new ArrayList<>(Arrays.asList("lt", "gt", "le", "ge", "eq", "neq", "like"));
 
 	public static String getTableName(Object o) {
 		if (o instanceof Model) {

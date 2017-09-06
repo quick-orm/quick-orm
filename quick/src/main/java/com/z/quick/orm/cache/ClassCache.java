@@ -8,8 +8,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.z.quick.orm.annotation.Condition;
 import com.z.quick.orm.annotation.Exclude;
 import com.z.quick.orm.annotation.NoFind;
+import com.z.quick.orm.annotation.OrderBy;
+import com.z.quick.orm.annotation.PrimaryKey;
 import com.z.quick.orm.annotation.Table;
 import com.z.quick.orm.common.Constants;
 public class ClassCache {
@@ -105,25 +108,32 @@ public class ClassCache {
 	}
 	
 	public static List<Field> getPrimaryKey(Class<?> clzz){
-		return getAnnotationField(annationPKCache, clzz);
+		return getAnnotationField(annationPKCache, clzz,PrimaryKey.class);
 	}
 	public static List<Field> getOrderBy(Class<?> clzz){
-		return getAnnotationField(annationOrderByCache, clzz);
+		return getAnnotationField(annationOrderByCache, clzz,OrderBy.class);
 	}
 	
 	public static List<Field> getCondition(Class<?> clzz){
-		return getAnnotationField(annationConditionCache, clzz);
+		return getAnnotationField(annationConditionCache, clzz,Condition.class);
 	}
 	public static List<Field> getInsert(Class<?> clzz){
-		return getAnnotationField(insertParamCache, clzz);
+		if (insertParamCache.get(clzz) != null) {
+			return insertParamCache.get(clzz);
+		}
+		List<Field> fieldList = getDeclaredFields(clzz);
+		fieldList.removeIf(f -> f.getAnnotation(Exclude.class)!=null); 
+		insertParamCache.put(clzz, fieldList);
+		return fieldList;
 	}
 	
-	public static List<Field> getAnnotationField(Map<Class<?>,List<Field>> fieldCache,Class<?> clzz){
+	@SuppressWarnings({"unchecked","rawtypes"})
+	public static List<Field> getAnnotationField(Map<Class<?>,List<Field>> fieldCache,Class<?> clzz, Class annotationClass){
 		if (fieldCache.get(clzz) != null) {
 			return (List<Field>) fieldCache.get(clzz);
 		}
 		List<Field> fieldList = getDeclaredFields(clzz);
-		fieldList.removeIf(f -> f.getAnnotation(Exclude.class)!=null); 
+		fieldList.removeIf(f -> f.getAnnotation(annotationClass)==null); 
 		fieldCache.put(clzz, fieldList);
 		return fieldList;
 	}	

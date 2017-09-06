@@ -12,5 +12,6 @@ public class LogicConstants {
 		LOGIC_OPERATION.put("ge", " >= ");
 		LOGIC_OPERATION.put("eq", " = ");
 		LOGIC_OPERATION.put("neq", " != ");
+		LOGIC_OPERATION.put("like", " like ");
 	}
 }

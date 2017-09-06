@@ -10,6 +10,7 @@ public abstract class LogicOperate<T>{
 	private Map<String,Object> ge;//>=
 	private Map<String,Object> eq;
 	private Map<String,Object> neq;
+	private Map<String,Object> like;
 	
 	
 	//private Map<String,Object> or; //or and中如何支持 > <
@@ -113,6 +114,22 @@ public abstract class LogicOperate<T>{
 		if (neq == null) 
 			neq = createConditionMap();
 		neq.putAll(ltAll);
+		return (T) this;
+	}
+	//like
+	public Map<String,Object> like() {
+		return like;
+	}
+	public T like(String column, Object value) {
+		if (like == null) 
+			like = createConditionMap();
+		like.put(column, value);
+		return (T) this;
+	}
+	public T like(Map<String,Object> ltAll) {
+		if (like == null) 
+			like = createConditionMap();
+		like.putAll(ltAll);
 		return (T) this;
 	}
 	
