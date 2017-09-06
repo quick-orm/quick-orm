@@ -12,6 +12,7 @@ import com.z.quick.orm.util.JdbcUtils;
 public class SqlBuilderProcessor {
 	private static final Log log = LogFactory.get();
 	private static final Map<SqlBuilder.SBType,SqlBuilder> sqlBuilderContainer = new HashMap<SqlBuilder.SBType,SqlBuilder>();
+	
 	static{
 		registerSqlBuilder(SqlBuilder.SBType.SAVE, new SaveSqlBuilder());
 		registerSqlBuilder(SqlBuilder.SBType.DELETE, new DeleteSqlBuilder());
@@ -37,6 +38,10 @@ public class SqlBuilderProcessor {
 	
 	public static SqlInfo getSql(SqlBuilder.SBType sBType,Object o){
 		return sqlBuilderContainer.get(sBType).builderSql(o);
+	}
+	
+	public static SqlBuilder getSqlBuilder(SqlBuilder.SBType sBType){
+		return sqlBuilderContainer.get(sBType);
 	}
 	
 	

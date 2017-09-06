@@ -5,22 +5,21 @@ import java.util.List;
 import java.util.Map;
 
 public class Page<E> {
-	private static final ThreadLocal<Map<String,Integer>> pageProps = new ThreadLocal<>();
+	private static final ThreadLocal<Map<String,Integer>> pageInfos = new ThreadLocal<>();
 	private Integer pageNum;
 	private Integer pageSize;
 	private Integer total;
 	private Integer pages;
-	private Integer nextPage;
 	private List<E> result;
 	
 	public static void page(Integer pageNum,Integer pageSize){
 		Map<String,Integer> pageInfo = new HashMap<String, Integer>();
 		pageInfo.put("pageNum", pageNum);
 		pageInfo.put("pageSize", pageSize);
-		pageProps.set(pageInfo);
+		pageInfos.set(pageInfo);
 	}
 	public static Map<String,Integer> getPageInfo(){
-		return pageProps.get();
+		return pageInfos.get();
 	}
 	
 	public Page(Integer pageNum, Integer pageSize, Integer total, List<E> result) {
@@ -29,7 +28,6 @@ public class Page<E> {
 		this.pageSize = pageSize;
 		this.total = total;
 		this.result = result;
-		this.nextPage = pageNum+1;
 		pages = total%pageSize==0?total/pageSize:total/pageSize+1;
 	}
 	public Integer getPageSize() {
@@ -56,12 +54,6 @@ public class Page<E> {
 	public void setPages(Integer pages) {
 		this.pages = pages;
 	}
-	public Integer getNextPage() {
-		return nextPage;
-	}
-	public void setNextPage(Integer nextPage) {
-		this.nextPage = nextPage;
-	}
 	public List<E> getResult() {
 		return result;
 	}
@@ -71,7 +63,7 @@ public class Page<E> {
 	@Override
 	public String toString() {
 		return "Page [pageNum=" + pageNum + ", pageSize=" + pageSize + ", total=" + total + ", pages=" + pages
-				+ ", nextPage=" + nextPage + ", result=" + result + "]";
+				+ ", result=" + result + "]";
 	}
 	
 	

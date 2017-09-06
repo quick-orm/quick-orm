@@ -2,7 +2,6 @@ package com.z.quick.orm.sql.builder;
 
 import java.util.Map;
 
-import com.z.quick.orm.exception.SqlBuilderException;
 import com.z.quick.orm.model.Page;
 import com.z.quick.orm.sql.SqlInfo;
 /**
@@ -16,13 +15,10 @@ import com.z.quick.orm.sql.SqlInfo;
  */
 public class DB2PageListSqlBuilder extends AbstractSqlBuilder {
 	private static final String PAGE_LIST_TEMPLATE = "select * from ( select row_.*, rownumber() over() as rownumber_ from (#listSql)as row_ ) as t where rownumber_ > #start and rownumber_ <= #end ";
-	private final SqlBuilder listBuilder = new ListSqlBuilder();
+	private final SqlBuilder listBuilder = SqlBuilderProcessor.getSqlBuilder(SqlBuilder.SBType.LIST);
 	@Override
 	public SqlInfo builderSql(Object o) {
 		Map<String,Integer> pageInfo = Page.getPageInfo();
-		if (pageInfo == null || pageInfo.get("pageNum")==null || pageInfo.get("pageSize")==null) {
-			throw new SqlBuilderException("PageNum or pageSize is null");
-		}
 		SqlInfo sqlInfo = listBuilder.builderSql(o);
 		String sql = sqlInfo.getSql();
 		Integer pageNum = pageInfo.get("pageNum");

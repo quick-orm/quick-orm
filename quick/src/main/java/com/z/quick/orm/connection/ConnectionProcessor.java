@@ -91,27 +91,6 @@ public class ConnectionProcessor {
 			return list.get(0);
 		}
 		throw new ExecuteSqlException("Query out multiple results!");
-//		PreparedStatementWrapper stmt = null;
-//		ResultSet rs = null;
-//		try {
-//			stmt = createPreparedStatement(conn, sqlInfo);
-//			rs = stmt.executeQuery();
-//			List<Object> list = parseResultSetToObject(rs,clzz);
-//			if (list == null || list.size()==0) {
-//				return null;
-//			}
-//			if (list.size()==1) {
-//				return list.get(0);
-//			}
-//			throw new ExecuteSqlException("Query out multiple results!");
-//		} catch (SQLException e) {
-//			log.error(e, "execute sql error");
-//			throw new ExecuteSqlException(e);
-//		} finally {
-//			close(stmt);
-//			close(rs);
-//			release(conn);
-//		}
 	}
 
 	public static List<Object> list(Connection conn, SqlInfo sqlInfo,Class<?> clzz) {

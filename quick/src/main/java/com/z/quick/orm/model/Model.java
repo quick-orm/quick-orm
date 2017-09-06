@@ -13,7 +13,6 @@ public abstract class Model<T> extends LogicOperate<T> {
 	private String tableName;
 	private String select;
 	private String where;
-	//TODO orderby group by
 	private List<String> orderByAsc;
 	private List<String> orderByDesc;
 	private Map<String, Object> pk;
@@ -209,7 +208,6 @@ public abstract class Model<T> extends LogicOperate<T> {
 	}
 	
 	public Page<T> page(Integer pageNum,Integer pageSize){
-		Page.page(pageNum, pageSize);
 		return (Page<T>) this.page(pageNum, pageSize, this.getClass());
 	}
 	
@@ -224,7 +222,6 @@ public abstract class Model<T> extends LogicOperate<T> {
 	}
 	
 	public Future<Page<Object>> ftPage(Integer pageNum,Integer pageSize){
-		Page.page(pageNum, pageSize);
 		return this.ftPage(pageNum, pageSize, this.getClass());
 	}
 	

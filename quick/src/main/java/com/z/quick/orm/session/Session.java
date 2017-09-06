@@ -30,7 +30,7 @@ public class Session implements DataBaseManipulation,FutureDataBaseManipulation 
 
 	private JDBCConfig jdbcConfig;
 	private DataSource dataSource;
-	private final ExecutorService threadPool;
+	private final ExecutorService futurePool;
 	private static final Session session = new Session();
 	/**
 	 * 暂无对象管理容器，只支持单一数据源，后期优化，配置文件默认为 jdbc.setting
@@ -39,7 +39,7 @@ public class Session implements DataBaseManipulation,FutureDataBaseManipulation 
 		super();
 		jdbcConfig = JDBCConfig.newInstance("jdbc.setting");
 		this.dataSource = new QuickDataSource(jdbcConfig);
-		threadPool = Executors.newFixedThreadPool(jdbcConfig.getAsyncPoolSize());
+		futurePool = Executors.newFixedThreadPool(jdbcConfig.getAsyncPoolSize());
 	}
 	
 	public static Session getSession(){
@@ -88,7 +88,7 @@ public class Session implements DataBaseManipulation,FutureDataBaseManipulation 
 	public Page<Object> page(Object o) {
 		return page(o,o.getClass());
 	}
-	@SuppressWarnings({"unchecked","rawtypes"})
+	
 	@Override
 	public Page<Object> page(Object o,Class<?> clzz) {
 		Map<String,Integer> pageInfo = Page.getPageInfo();
@@ -100,13 +100,13 @@ public class Session implements DataBaseManipulation,FutureDataBaseManipulation 
 		Integer total = (Integer) ConnectionProcessor.get(getConnection(), countSqlInfo,Integer.class);
 		
 		if (total == 0) {
-			Page<Object> page = new Page(pageInfo.get("pageNum"),pageInfo.get("pageSize"), total, new ArrayList<>());
+			Page<Object> page = new Page<Object>(pageInfo.get("pageNum"),pageInfo.get("pageSize"), total, new ArrayList<>());
 			return page;
 		}
 		
 		SqlInfo listSqlInfo = SqlBuilderProcessor.getSql(SqlBuilder.SBType.PAGE_LIST, o);
 		List<Object> list = ConnectionProcessor.list(getConnection(), listSqlInfo,clzz);
-		return new Page(pageInfo.get("pageNum"),pageInfo.get("pageSize"), total, list);
+		return new Page<Object>(pageInfo.get("pageNum"),pageInfo.get("pageSize"), total, list);
 	}
 	
 	@Override
@@ -192,7 +192,7 @@ public class Session implements DataBaseManipulation,FutureDataBaseManipulation 
 
 	@Override
 	public Future<Integer> ftSave(Object o) {
-		return threadPool.submit(new Callable<Integer>() {
+		return futurePool.submit(new Callable<Integer>() {
 			public Integer call() throws Exception {
 				return save(o);
 			}
@@ -201,7 +201,7 @@ public class Session implements DataBaseManipulation,FutureDataBaseManipulation 
 
 	@Override
 	public Future<Integer> ftDelete(Object o) {
-		return threadPool.submit(new Callable<Integer>() {
+		return futurePool.submit(new Callable<Integer>() {
 			public Integer call() throws Exception {
 				return delete(o);
 			}
@@ -210,7 +210,7 @@ public class Session implements DataBaseManipulation,FutureDataBaseManipulation 
 
 	@Override
 	public Future<Integer> ftUpdate(Object o) {
-		return threadPool.submit(new Callable<Integer>() {
+		return futurePool.submit(new Callable<Integer>() {
 			public Integer call() throws Exception {
 				return update(o);
 			}
@@ -219,7 +219,7 @@ public class Session implements DataBaseManipulation,FutureDataBaseManipulation 
 
 	@Override
 	public Future<Object> ftGet(Object o) {
-		return threadPool.submit(new Callable<Object>() {
+		return futurePool.submit(new Callable<Object>() {
 			public Object call() throws Exception {
 				return get(o);
 			}
@@ -228,7 +228,7 @@ public class Session implements DataBaseManipulation,FutureDataBaseManipulation 
 
 	@Override
 	public Future<Object> ftGet(Object o, Class<?> clzz) {
-		return threadPool.submit(new Callable<Object>() {
+		return futurePool.submit(new Callable<Object>() {
 			public Object call() throws Exception {
 				return get(o, clzz);
 			}
@@ -237,7 +237,7 @@ public class Session implements DataBaseManipulation,FutureDataBaseManipulation 
 
 	@Override
 	public Future<List<Object>> ftList(Object o) {
-		return threadPool.submit(new Callable<List<Object>>() {
+		return futurePool.submit(new Callable<List<Object>>() {
 			public List<Object> call() throws Exception {
 				return list(o);
 			}
@@ -246,7 +246,7 @@ public class Session implements DataBaseManipulation,FutureDataBaseManipulation 
 
 	@Override
 	public Future<List<Object>> ftList(Object o, Class<?> clzz) {
-		return threadPool.submit(new Callable<List<Object>>() {
+		return futurePool.submit(new Callable<List<Object>>() {
 			public List<Object> call() throws Exception {
 				return list(o, clzz);
 			}
@@ -255,7 +255,7 @@ public class Session implements DataBaseManipulation,FutureDataBaseManipulation 
 
 	@Override
 	public Future<Integer> ftSave(String sql, List<Object> params) {
-		return threadPool.submit(new Callable<Integer>() {
+		return futurePool.submit(new Callable<Integer>() {
 			public Integer call() throws Exception {
 				return save(sql, params);
 			}
@@ -264,7 +264,7 @@ public class Session implements DataBaseManipulation,FutureDataBaseManipulation 
 
 	@Override
 	public Future<Integer> ftDelete(String sql, List<Object> params) {
-		return threadPool.submit(new Callable<Integer>() {
+		return futurePool.submit(new Callable<Integer>() {
 			public Integer call() throws Exception {
 				return update(sql, params);
 			}
@@ -273,7 +273,7 @@ public class Session implements DataBaseManipulation,FutureDataBaseManipulation 
 
 	@Override
 	public Future<Integer> ftUpdate(String sql, List<Object> params) {
-		return threadPool.submit(new Callable<Integer>() {
+		return futurePool.submit(new Callable<Integer>() {
 			public Integer call() throws Exception {
 				return update(sql, params);
 			}
@@ -282,7 +282,7 @@ public class Session implements DataBaseManipulation,FutureDataBaseManipulation 
 
 	@Override
 	public Future<Object> ftGet(String sql, List<Object> params, Class<?> clzz) {
-		return threadPool.submit(new Callable<Object>() {
+		return futurePool.submit(new Callable<Object>() {
 			public Object call() throws Exception {
 				return get(sql, params, clzz);
 			}
@@ -291,7 +291,7 @@ public class Session implements DataBaseManipulation,FutureDataBaseManipulation 
 
 	@Override
 	public Future<List<Object>> ftList(String sql, List<Object> params, Class<?> clzz) {
-		return threadPool.submit(new Callable<List<Object>>() {
+		return futurePool.submit(new Callable<List<Object>>() {
 			public List<Object> call() throws Exception {
 				return list(sql, params, clzz);
 			}
@@ -300,7 +300,7 @@ public class Session implements DataBaseManipulation,FutureDataBaseManipulation 
 
 	@Override
 	public Future<Page<Object>> ftPage(Object o) {
-		return threadPool.submit(new Callable<Page<Object>>() {
+		return futurePool.submit(new Callable<Page<Object>>() {
 			public Page<Object> call() throws Exception {
 				return page(o);
 			}
@@ -309,7 +309,7 @@ public class Session implements DataBaseManipulation,FutureDataBaseManipulation 
 
 	@Override
 	public Future<Page<Object>> ftPage(Object o, Class<?> clzz) {
-		return threadPool.submit(new Callable<Page<Object>>() {
+		return futurePool.submit(new Callable<Page<Object>>() {
 			public Page<Object> call() throws Exception {
 				return page(o,clzz);
 			}
@@ -318,7 +318,7 @@ public class Session implements DataBaseManipulation,FutureDataBaseManipulation 
 
 	@Override
 	public Future<Page<Object>> ftPage(String countSql, String listSql, List<Object> params, Class<?> clzz) {
-		return threadPool.submit(new Callable<Page<Object>>() {
+		return futurePool.submit(new Callable<Page<Object>>() {
 			public Page<Object> call() throws Exception {
 				return page(countSql, listSql, params, clzz);
 			}
