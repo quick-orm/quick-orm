@@ -7,7 +7,6 @@ import java.sql.SQLException;
 import com.xiaoleilu.hutool.date.DateUtil;
 import com.xiaoleilu.hutool.date.TimeInterval;
 import com.z.quick.monitor.MonitorSql;
-import com.z.quick.orm.session.Session;
 import com.z.quick.orm.sql.SqlInfo;
 
 /**
@@ -21,32 +20,37 @@ public class PreparedStatementWrapper {
 
 	private PreparedStatement stmt;
 	private SqlInfo sqlInfo;
-
-	public PreparedStatementWrapper(PreparedStatement stmt, SqlInfo sqlInfo) {
+	private boolean executeTimeMonitor;
+	private long maxExecuteTime;
+	
+	public PreparedStatementWrapper(PreparedStatement stmt, SqlInfo sqlInfo, boolean executeTimeMonitor,
+			long maxExecuteTime) {
 		super();
 		this.stmt = stmt;
 		this.sqlInfo = sqlInfo;
+		this.executeTimeMonitor = executeTimeMonitor;
+		this.maxExecuteTime = maxExecuteTime;
 	}
 
 	public int executeUpdate() throws SQLException {
-		if (!Session.getSession().getJdbcConfig().getExecuteTimeMonitor())
+		if (!executeTimeMonitor)
 			return stmt.executeUpdate();
 
 		TimeInterval timer = DateUtil.timer();
 		int result = stmt.executeUpdate();
-		if (timer.interval() > Session.getSession().getJdbcConfig().getMaxExecuteTime()) {
+		if (timer.interval() > maxExecuteTime) {
 			MonitorSql.record(sqlInfo.getSql(),timer.interval());
 		}
 		return result;
 	}
 
 	public ResultSet executeQuery() throws SQLException {
-		if (!Session.getSession().getJdbcConfig().getExecuteTimeMonitor())
+		if (!executeTimeMonitor)
 			return stmt.executeQuery();
 
 		TimeInterval timer = DateUtil.timer();
 		ResultSet result = stmt.executeQuery();
-		if (timer.interval() > Session.getSession().getJdbcConfig().getMaxExecuteTime()) {
+		if (timer.interval() > maxExecuteTime) {
 			MonitorSql.record(sqlInfo.getSql(),timer.interval());
 		}
 		return result;

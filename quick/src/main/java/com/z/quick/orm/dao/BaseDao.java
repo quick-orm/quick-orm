@@ -13,11 +13,11 @@ public abstract class BaseDao<T> implements Dao<T> {
 
 	private Class<T> genericityClass;
 	
-	private Session session;
+	protected Session session;
 
 	public BaseDao() {
 		this.genericityClass = (Class<T>) getSuperClassGenricType(getClass(), 0);
-		session = Session.getSession();
+		session = Session.getDefaultSession();
 	}
 
 	private static Class<?> getSuperClassGenricType(Class<?> clazz, int index) {
@@ -40,52 +40,52 @@ public abstract class BaseDao<T> implements Dao<T> {
 
 	@Override
 	public int save(T t) {
-		return Session.getSession().save(t);
+		return session.save(t);
 	}
 
 	@Override
 	public int delete(T t) {
-		return Session.getSession().delete(t);
+		return session.delete(t);
 	}
 
 	@Override
 	public int update(T t) {
-		return Session.getSession().update(t);
+		return session.update(t);
 	}
 
 	@Override
 	public T get(T t) {
-		return (T) Session.getSession().get(t);
+		return (T) session.get(t);
 	}
 
 	@Override
 	public List<T> find(T t) {
-		return (List<T>) Session.getSession().list(t);
+		return (List<T>) session.list(t);
 	}
 
 	@Override
 	public T get(String sql, List<Object> params, Class<?> clzz) {
-		return (T) Session.getSession().get(sql, params, clzz);
+		return (T) session.get(sql, params, clzz);
 	}
 
 	@Override
 	public List<Object> list(String sql,List<Object> params, Class<?> clzz) {
-		return Session.getSession().list(sql, params, clzz);
+		return session.list(sql, params, clzz);
 	}
 
 	@Override
 	public int save(String sql, List<Object> params) {
-		return Session.getSession().save(sql, params);
+		return session.save(sql, params);
 	}
 
 	@Override
 	public int update(String sql, List<Object> params) {
-		return Session.getSession().update(sql, params);
+		return session.update(sql, params);
 	}
 
 	@Override
 	public int delete(String sql, List<Object> params) {
-		return Session.getSession().delete(sql, params);
+		return session.delete(sql, params);
 	}
 
 	@Override

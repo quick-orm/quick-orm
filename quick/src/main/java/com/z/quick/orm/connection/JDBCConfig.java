@@ -38,6 +38,8 @@ public class JDBCConfig implements DefaultConfig {
 	private int idleConnectionTestPeriod = DEFAULT_IDLE_CONNECTION_TEST_PERIOD;
 	/**异步执行sql线程池，默认8*/
 	private int asyncPoolSize = DEFAULT_ASYNC_POOL_SIZE;
+	/**po所在包路径，创建表时使用*/
+	private String packagePath;
 	
 	public static JDBCConfig newInstance(String jdbcConfigPath){
 		return new JDBCConfig(new Setting(jdbcConfigPath, true));
@@ -95,6 +97,9 @@ public class JDBCConfig implements DefaultConfig {
 		}
 		if (jdbcSetting.get("jdbc.asyncPoolSize") != null) {
 			asyncPoolSize = jdbcSetting.getInt("jdbc.asyncPoolSize");
+		}
+		if (jdbcSetting.get("jdbc.packagePath") != null) {
+			packagePath = jdbcSetting.getStr("jdbc.packagePath");
 		}
 
 	}
@@ -157,6 +162,10 @@ public class JDBCConfig implements DefaultConfig {
 
 	public int getAsyncPoolSize() {
 		return asyncPoolSize;
+	}
+
+	public String getPackagePath() {
+		return packagePath;
 	}
 	
 	

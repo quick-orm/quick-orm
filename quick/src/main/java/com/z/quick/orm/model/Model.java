@@ -19,10 +19,17 @@ public abstract class Model<T> extends LogicOperate<T> {
 	private Map<String, Object> insert;
 	private Map<String, Object> modif;
 	
-	private Session session;
+	protected Session session;
 	
 	public Model(){
-		session = Session.getSession();
+		session = Session.getDefaultSession();
+	}
+	
+	public void setSession(Session session){
+		this.session = session;
+	}
+	public void setSession(String jdbcName){
+		this.session = Session.getSession(jdbcName);
 	}
 
 	public String tableName() {

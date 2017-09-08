@@ -20,7 +20,8 @@ public interface SqlBuilder {
 		GET,
 		LIST,
 		PAGE_COUNT,
-		PAGE_LIST
+		PAGE_LIST,
+		CREATE_TABLE
 	}
 	
 	SqlInfo builderSql(Object o);

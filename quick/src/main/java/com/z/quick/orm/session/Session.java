@@ -2,6 +2,7 @@ package com.z.quick.orm.session;
 
 import java.sql.Connection;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -9,16 +10,14 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import javax.sql.DataSource;
-
 import com.z.quick.orm.connection.ConnectionProcessor;
 import com.z.quick.orm.connection.JDBCConfig;
-import com.z.quick.orm.connection.QuickDataSource;
 import com.z.quick.orm.exception.SqlBuilderException;
 import com.z.quick.orm.model.Page;
 import com.z.quick.orm.sql.SqlInfo;
 import com.z.quick.orm.sql.builder.SqlBuilder;
 import com.z.quick.orm.sql.builder.SqlBuilderProcessor;
+import com.z.quick.orm.table.CreateTable;
 /**
  * class       :  Session
  * @author     :  zhukaipeng
@@ -27,45 +26,52 @@ import com.z.quick.orm.sql.builder.SqlBuilderProcessor;
  * @see        :  *
  */
 public class Session implements DataBaseManipulation,FutureDataBaseManipulation {
+	private static final Map<String,Session> sessionContainer = new HashMap<String, Session>();
+	private ConnectionProcessor connectionProcessor;
+	private ExecutorService futurePool;
+	private SqlBuilderProcessor sqlBuilderProcessor;
 
-	private JDBCConfig jdbcConfig;
-	private DataSource dataSource;
-	private final ExecutorService futurePool;
-	private static final Session session = new Session();
-	/**
-	 * 暂无对象管理容器，只支持单一数据源，后期优化，配置文件默认为 jdbc.setting
-	 */
-	private Session() {
+	private Session(String jdbcName) {
 		super();
-		jdbcConfig = JDBCConfig.newInstance("jdbc.setting");
-		this.dataSource = new QuickDataSource(jdbcConfig);
+		JDBCConfig jdbcConfig = JDBCConfig.newInstance(jdbcName);
+		connectionProcessor = new ConnectionProcessor(jdbcConfig);
+		sqlBuilderProcessor = new SqlBuilderProcessor(jdbcConfig.getDbType());
 		futurePool = Executors.newFixedThreadPool(jdbcConfig.getAsyncPoolSize());
+		if (jdbcConfig.getPackagePath()!=null) {
+			CreateTable createTable = new CreateTable(this,sqlBuilderProcessor,jdbcConfig.getPackagePath());
+			createTable.start();
+		}
 	}
 	
-	public static Session getSession(){
+	public static Session getDefaultSession(){
+		return getSession("jdbc.setting");
+	}
+	
+	public static Session getSession(String jdbcName){
+		Session session = sessionContainer.get(jdbcName);
+		if (session == null) {
+			session = new Session(jdbcName);
+			sessionContainer.put(jdbcName, session);
+		}
 		return session;
-	}
-	
-	public JDBCConfig getJdbcConfig() {
-		return jdbcConfig;
 	}
 	
 	@Override
 	public int save(Object o) {
-		SqlInfo sqlInfo = SqlBuilderProcessor.getSql(SqlBuilder.SBType.SAVE, o);
-		return ConnectionProcessor.update(getConnection(), sqlInfo);
+		SqlInfo sqlInfo = sqlBuilderProcessor.getSql(SqlBuilder.SBType.SAVE, o);
+		return connectionProcessor.update(getConnection(), sqlInfo);
 	}
 	
 	@Override
 	public int delete(Object o) {
-		SqlInfo sqlInfo = SqlBuilderProcessor.getSql(SqlBuilder.SBType.DELETE, o);
-		return ConnectionProcessor.update(getConnection(), sqlInfo);
+		SqlInfo sqlInfo = sqlBuilderProcessor.getSql(SqlBuilder.SBType.DELETE, o);
+		return connectionProcessor.update(getConnection(), sqlInfo);
 	}
 	
 	@Override
 	public int update(Object o) {
-		SqlInfo sqlInfo = SqlBuilderProcessor.getSql(SqlBuilder.SBType.UPDATE, o);
-		return ConnectionProcessor.update(getConnection(), sqlInfo);
+		SqlInfo sqlInfo = sqlBuilderProcessor.getSql(SqlBuilder.SBType.UPDATE, o);
+		return connectionProcessor.update(getConnection(), sqlInfo);
 	}
 	
 	@Override
@@ -75,8 +81,8 @@ public class Session implements DataBaseManipulation,FutureDataBaseManipulation 
 	
 	@Override
 	public Object get(Object o,Class<?> clzz) {
-		SqlInfo sqlInfo = SqlBuilderProcessor.getSql(SqlBuilder.SBType.GET, o);
-		return ConnectionProcessor.get(getConnection(), sqlInfo,clzz);
+		SqlInfo sqlInfo = sqlBuilderProcessor.getSql(SqlBuilder.SBType.GET, o);
+		return connectionProcessor.get(getConnection(), sqlInfo,clzz);
 	}
 
 	@Override
@@ -96,16 +102,16 @@ public class Session implements DataBaseManipulation,FutureDataBaseManipulation 
 			throw new SqlBuilderException("PageNum or pageSize is null");
 		}
 		
-		SqlInfo countSqlInfo = SqlBuilderProcessor.getSql(SqlBuilder.SBType.PAGE_COUNT, o);
-		Integer total = (Integer) ConnectionProcessor.get(getConnection(), countSqlInfo,Integer.class);
+		SqlInfo countSqlInfo = sqlBuilderProcessor.getSql(SqlBuilder.SBType.PAGE_COUNT, o);
+		Integer total = (Integer) connectionProcessor.get(getConnection(), countSqlInfo,Integer.class);
 		
 		if (total == 0) {
 			Page<Object> page = new Page<Object>(pageInfo.get("pageNum"),pageInfo.get("pageSize"), total, new ArrayList<>());
 			return page;
 		}
 		
-		SqlInfo listSqlInfo = SqlBuilderProcessor.getSql(SqlBuilder.SBType.PAGE_LIST, o);
-		List<Object> list = ConnectionProcessor.list(getConnection(), listSqlInfo,clzz);
+		SqlInfo listSqlInfo = sqlBuilderProcessor.getSql(SqlBuilder.SBType.PAGE_LIST, o);
+		List<Object> list = connectionProcessor.list(getConnection(), listSqlInfo,clzz);
 		return new Page<Object>(pageInfo.get("pageNum"),pageInfo.get("pageSize"), total, list);
 	}
 	
@@ -117,7 +123,7 @@ public class Session implements DataBaseManipulation,FutureDataBaseManipulation 
 		}
 		
 		SqlInfo countSqlInfo = new SqlInfo(countSql, params);
-		Integer total = (Integer) ConnectionProcessor.get(getConnection(), countSqlInfo,Integer.class);
+		Integer total = (Integer) connectionProcessor.get(getConnection(), countSqlInfo,Integer.class);
 		
 		if (total == 0) {
 			Page<Object> page = new Page<Object>(pageInfo.get("pageNum"),pageInfo.get("pageSize"), total, new ArrayList<Object>());
@@ -125,68 +131,68 @@ public class Session implements DataBaseManipulation,FutureDataBaseManipulation 
 		}
 		
 		SqlInfo listSqlInfo = new SqlInfo(listSql, params);
-		List<Object> list = ConnectionProcessor.list(getConnection(), listSqlInfo,clzz);
+		List<Object> list = connectionProcessor.list(getConnection(), listSqlInfo,clzz);
 		return new Page<Object>(pageInfo.get("pageNum"),pageInfo.get("pageSize"), total, list);
 	}
 	
 	@Override
 	public List<Object> list(Object o,Class<?> clzz) {
-		SqlInfo sqlInfo = SqlBuilderProcessor.getSql(SqlBuilder.SBType.LIST, o);
-		return ConnectionProcessor.list(getConnection(), sqlInfo,clzz);
+		SqlInfo sqlInfo = sqlBuilderProcessor.getSql(SqlBuilder.SBType.LIST, o);
+		return connectionProcessor.list(getConnection(), sqlInfo,clzz);
 	}
 	
 	@Override
 	public int save(String sql,List<Object> params) {
 		SqlInfo sqlInfo = new SqlInfo(sql, params);
-		return ConnectionProcessor.update(getConnection(), sqlInfo);
+		return connectionProcessor.update(getConnection(), sqlInfo);
 	}
 	
 	@Override
 	public int delete(String sql, List<Object> params) {
 		SqlInfo sqlInfo = new SqlInfo(sql, params);
-		return ConnectionProcessor.update(getConnection(), sqlInfo);
+		return connectionProcessor.update(getConnection(), sqlInfo);
 	}
 	
 	@Override
 	public int update(String sql,List<Object> params) {
 		SqlInfo sqlInfo = new SqlInfo(sql, params);
-		return ConnectionProcessor.update(getConnection(), sqlInfo);
+		return connectionProcessor.update(getConnection(), sqlInfo);
 	}
 	
 	@Override
 	public Object get(String sql,List<Object> params,Class<?> clzz) {
 		SqlInfo sqlInfo = new SqlInfo(sql, params);
-		return ConnectionProcessor.get(getConnection(), sqlInfo, clzz);
+		return connectionProcessor.get(getConnection(), sqlInfo, clzz);
 	}
 	
 	@Override
 	public List<Object> list(String sql,List<Object> params,Class<?> clzz) {
 		SqlInfo sqlInfo = new SqlInfo(sql, params);
-		return ConnectionProcessor.list(getConnection(), sqlInfo, clzz);
+		return connectionProcessor.list(getConnection(), sqlInfo, clzz);
 	}
 	
 	private Connection getConnection(){
-		return ConnectionProcessor.getConnection(dataSource);
+		return connectionProcessor.getConnection();
 	}
 	
 	@Override
 	public void start(){
-		ConnectionProcessor.setAutoCommit(getConnection(), false);
+		connectionProcessor.setAutoCommit(getConnection(), false);
 	}
 	
 	@Override
 	public void rollback(){
-		ConnectionProcessor.rollback(getConnection());
+		connectionProcessor.rollback(getConnection());
 	}
 	
 	@Override
 	public void commit(){
-		ConnectionProcessor.commit(getConnection());
+		connectionProcessor.commit(getConnection());
 	}
 	
 	@Override
 	public void close(){
-		ConnectionProcessor.close(getConnection());
+		connectionProcessor.close(getConnection());
 	}
 	
 

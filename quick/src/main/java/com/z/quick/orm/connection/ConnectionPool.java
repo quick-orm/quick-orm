@@ -18,7 +18,7 @@ import com.z.quick.orm.exception.ConnectionException;
 
 public class ConnectionPool {
 	private static final Log log = LogFactory.get();
-	private static final Long CONNECTION_SURVIVE_TIME = 30*60*1000L;
+	private final Long CONNECTION_SURVIVE_TIME = 30*60*1000L;
 	private JDBCConfig jdbcConfig;
 	private final ReentrantLock lock = new ReentrantLock(true);
 	private final List<Connection> unUsedConn = new LinkedList<Connection>();
@@ -32,7 +32,7 @@ public class ConnectionPool {
 		this.jdbcConfig = jdbcConfig;
 		initConnectionPool(jdbcConfig.getInitialPoolSize());
 		if (jdbcConfig.getExecuteTimeMonitor()) {//开启sql执行耗时监控
-			MonitorSql.start();
+			MonitorSql.start(jdbcConfig.getMaxExecuteTimeFilePath());
 		}
 	}
 	/**

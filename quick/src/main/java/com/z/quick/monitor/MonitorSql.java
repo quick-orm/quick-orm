@@ -8,7 +8,6 @@ import com.xiaoleilu.hutool.date.DateUtil;
 import com.xiaoleilu.hutool.io.FileUtil;
 import com.xiaoleilu.hutool.log.Log;
 import com.xiaoleilu.hutool.log.LogFactory;
-import com.z.quick.orm.session.Session;
 
 /**
  * ******************  类说明  *********************
@@ -33,7 +32,7 @@ public class MonitorSql {
 		}
 	}
 	
-	public static void start(){
+	public static void start(String maxExecuteTimeFilePath){
 		queue = new LinkedBlockingQueue<String>(128);
 		new Thread(()->{
 			long size = 0;
@@ -49,8 +48,7 @@ public class MonitorSql {
 							writer.close();
 						}
 						fileName = today;
-						String filePath = Session.getSession().getJdbcConfig().getMaxExecuteTimeFilePath();
-						writer = FileUtil.getPrintWriter(filePath + fileName + fileSuffix, StandardCharsets.UTF_8.name(), true);
+						writer = FileUtil.getPrintWriter(maxExecuteTimeFilePath + fileName + fileSuffix, StandardCharsets.UTF_8.name(), true);
 					}
 					String sql = queue.take();
 					writer.println(sql);

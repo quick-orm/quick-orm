@@ -26,8 +26,16 @@ import com.z.quick.orm.sql.convert.FieldConvertProcessor;
 
 public class ConnectionProcessor {
 	private static final Log log = LogFactory.get();
+	private DataSource dataSource;
+	private JDBCConfig jdbcConfig;
+	
+	public ConnectionProcessor(JDBCConfig jdbcConfig) {
+		super();
+		this.jdbcConfig = jdbcConfig;
+		this.dataSource = new QuickDataSource(jdbcConfig);
+	}
 
-	public static Connection getConnection(DataSource dataSource){
+	public Connection getConnection(){
 		try {
 			return SingleThreadConnectionHolder.getConnection(dataSource);
 		} catch (SQLException e) {
@@ -35,7 +43,7 @@ public class ConnectionProcessor {
 		}
 	}
 	
-	public static void setAutoCommit(Connection conn,boolean commit){
+	public void setAutoCommit(Connection conn,boolean commit){
 		try {
 			conn.setAutoCommit(commit);
 		} catch (SQLException e) {
@@ -43,7 +51,7 @@ public class ConnectionProcessor {
 		}
 	}
 	
-	public static void rollback(Connection conn){
+	public void rollback(Connection conn){
 		try {
 			conn.rollback();
 		} catch (SQLException e) {
@@ -51,14 +59,14 @@ public class ConnectionProcessor {
 		}
 	}
 	
-	public static void commit(Connection conn){
+	public void commit(Connection conn){
 		try {
 			conn.commit();
 		} catch (SQLException e) {
 			throw new TransactionException("Commit transaction error",e);
 		}
 	}
-	public static void close(Connection conn){
+	public void close(Connection conn){
 		try {
 			conn.setAutoCommit(true);
 			conn.close();
@@ -68,13 +76,13 @@ public class ConnectionProcessor {
 		}
 	}
 	
-	public static int update(Connection conn, SqlInfo sqlInfo) {
+	public int update(Connection conn, SqlInfo sqlInfo) {
 		PreparedStatementWrapper stmt = null;
 		try {
 			stmt = createPreparedStatement(conn, sqlInfo);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
-			log.error(e, "execute sql error");
+//			log.error(e, "execute sql error");
 			throw new ExecuteSqlException(e);
 		} finally {
 			close(stmt);
@@ -82,7 +90,7 @@ public class ConnectionProcessor {
 		}
 	}
 
-	public static Object get(Connection conn, SqlInfo sqlInfo,Class<?> clzz) {
+	public Object get(Connection conn, SqlInfo sqlInfo,Class<?> clzz) {
 		List<Object> list = list(conn, sqlInfo, clzz);
 		if (list == null || list.size()==0) {
 			return null;
@@ -93,7 +101,7 @@ public class ConnectionProcessor {
 		throw new ExecuteSqlException("Query out multiple results!");
 	}
 
-	public static List<Object> list(Connection conn, SqlInfo sqlInfo,Class<?> clzz) {
+	public List<Object> list(Connection conn, SqlInfo sqlInfo,Class<?> clzz) {
 		PreparedStatementWrapper stmt = null;
 		ResultSet rs = null;
 		try {
@@ -101,7 +109,7 @@ public class ConnectionProcessor {
 			rs = stmt.executeQuery();
 			return parseResultSetToObject(rs,clzz);
 		} catch (Exception e) {
-			log.error(e, "execute sql error");
+//			log.error(e, "execute sql error");
 			throw new ExecuteSqlException(e);
 		} finally {
 			close(stmt);
@@ -110,7 +118,7 @@ public class ConnectionProcessor {
 		}
 	}
 	
-	private static List<Object> parseResultSetToObject(ResultSet rs,Class<?> clzz) {
+	private List<Object> parseResultSetToObject(ResultSet rs,Class<?> clzz) {
 		List<Object> list = new ArrayList<>();
 		try {
 			ResultSetMetaData rsmd = rs.getMetaData();
@@ -127,12 +135,12 @@ public class ConnectionProcessor {
 			}
 			return list;
 		} catch (SQLException e) {
-			log.error(e, "parse query result error");
+//			log.error(e, "parse query result error");
 			throw new ExecuteSqlException(e);
 		}
 	}
 	
-	private static PreparedStatementWrapper createPreparedStatement(Connection conn, SqlInfo sqlInfo) throws SQLException {
+	private PreparedStatementWrapper createPreparedStatement(Connection conn, SqlInfo sqlInfo) throws SQLException {
 		log.info("execute sql:{}", sqlInfo.getSql());
 		log.info("params:{}", sqlInfo.getParam());
 		PreparedStatement stmt;
@@ -146,10 +154,10 @@ public class ConnectionProcessor {
 				throw new ExecuteSqlException("Setting sql param error",e);
 			}
 		}
-		return new PreparedStatementWrapper(stmt, sqlInfo);
+		return new PreparedStatementWrapper(stmt, sqlInfo,jdbcConfig.getExecuteTimeMonitor(),jdbcConfig.getMaxExecuteTime());
 	}
 	
-	private static Object toJavaObject(Map<String,Object> result,Class<?> clzz){
+	private Object toJavaObject(Map<String,Object> result,Class<?> clzz){
 		try {
 			if (clzz.isAssignableFrom(Map.class)) {
 				return result;
@@ -225,7 +233,7 @@ public class ConnectionProcessor {
 		
 	}
 	
-	private final static void release(Connection x) {
+	private final void release(Connection x) {
 		if (x != null) {
 			try {
 				if (x.getAutoCommit()) {
@@ -238,7 +246,7 @@ public class ConnectionProcessor {
 		}
 	}
 
-	private final static void close(PreparedStatementWrapper x) {
+	private final void close(PreparedStatementWrapper x) {
 		if (x != null) {
 			try {
 				x.close();
@@ -248,7 +256,7 @@ public class ConnectionProcessor {
 		}
 	}
 
-	private final static void close(ResultSet x) {
+	private final void close(ResultSet x) {
 		if (x != null) {
 			try {
 				x.close();

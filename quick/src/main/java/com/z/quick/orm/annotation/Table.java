@@ -17,4 +17,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Table {
 	String tableName();
+	boolean create() default false;
 }
+

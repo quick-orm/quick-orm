@@ -15,7 +15,13 @@ import com.z.quick.orm.sql.SqlInfo;
  */
 public class MySqlPageListSqlBuilder extends AbstractSqlBuilder {
 	private static final String PAGE_LIST_TEMPLATE = "#listSql limit #start,#end";
-	private final SqlBuilder listBuilder = SqlBuilderProcessor.getSqlBuilder(SqlBuilder.SBType.LIST);
+	private SqlBuilder listBuilder;
+	
+	public MySqlPageListSqlBuilder(SqlBuilder listBuilder) {
+		super();
+		this.listBuilder = listBuilder;
+	}
+
 	@Override
 	public SqlInfo builderSql(Object o) {
 		Map<String,Integer> pageInfo = Page.getPageInfo();

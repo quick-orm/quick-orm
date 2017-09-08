@@ -15,7 +15,15 @@ import com.z.quick.orm.sql.SqlInfo;
  */
 public class DB2PageListSqlBuilder extends AbstractSqlBuilder {
 	private static final String PAGE_LIST_TEMPLATE = "select * from ( select row_.*, rownumber() over() as rownumber_ from (#listSql)as row_ ) as t where rownumber_ > #start and rownumber_ <= #end ";
-	private final SqlBuilder listBuilder = SqlBuilderProcessor.getSqlBuilder(SqlBuilder.SBType.LIST);
+	private SqlBuilder listBuilder;
+	
+	public DB2PageListSqlBuilder(SqlBuilder listBuilder) {
+		super();
+		this.listBuilder = listBuilder;
+	}
+
+
+
 	@Override
 	public SqlInfo builderSql(Object o) {
 		Map<String,Integer> pageInfo = Page.getPageInfo();

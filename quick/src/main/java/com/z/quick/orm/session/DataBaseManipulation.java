@@ -2,13 +2,10 @@ package com.z.quick.orm.session;
 
 import java.util.List;
 
-import com.z.quick.orm.connection.JDBCConfig;
 import com.z.quick.orm.model.Page;
 
 public interface DataBaseManipulation {
 	
-	JDBCConfig getJdbcConfig();
-
 	int save(Object o);
 
 	int delete(Object o);
