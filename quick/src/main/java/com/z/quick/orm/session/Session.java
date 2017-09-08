@@ -22,7 +22,7 @@ import com.z.quick.orm.table.CreateTable;
  * class       :  Session
  * @author     :  zhukaipeng
  * @version    :  1.0  
- * description :  如何抽象？支持数据库、redis等操作
+ * description :  
  * @see        :  *
  */
 public class Session implements DataBaseManipulation,FutureDataBaseManipulation {

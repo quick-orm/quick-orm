@@ -209,7 +209,7 @@ public class ConnectionPool {
 	/**
 	 * ********************************************
 	 * method name   : timerClearUsedConnection 
-	 * description   : 清理已使用但未归还连接，每五分钟执行一次，若获取连接后，过了15分钟还未归还，则关闭此连接。
+	 * description   : 清理已使用但未归还连接，每五分钟执行一次，若获取连接后，过了30分钟还未归还，则关闭此连接。
 	 *                 规避连接泄露风险
 	 * @return       : void
 	 * @param        : 
@@ -219,7 +219,7 @@ public class ConnectionPool {
 	 */
 	public void timerClearUsedConnection(){
 		int interval = 5*60*1000;
-		int idle = 15*60*1000;
+		int idle = 30*60*1000;
 				
 		clearService.scheduleAtFixedRate(new Runnable() {
 			@Override
