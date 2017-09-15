@@ -9,7 +9,7 @@ import java.util.Map;
 import com.z.quick.orm.cache.ClassCache;
 import com.z.quick.orm.common.Constants;
 import com.z.quick.orm.exception.SqlBuilderException;
-import com.z.quick.orm.model.LogicConstants;
+import com.z.quick.orm.model.ConditionConstants;
 import com.z.quick.orm.model.Model;
 import com.z.quick.orm.model.Schema;
 import com.z.quick.orm.sql.convert.FieldConvertProcessor;
@@ -62,9 +62,9 @@ public class ObjectSqlBuilderUtils {
 		Object v = FieldConvertProcessor.toDB(where, o);
 		if (v != null) {
 			if (condition.length() == 0) {
-				condition.append("WHERE").append(Constants.SPACE).append(v);
+				condition.append("where").append(Constants.SPACE).append(v);
 			} else {
-				condition.append(Constants.SPACE).append("AND").append(Constants.SPACE).append(v);
+				condition.append(Constants.SPACE).append("and").append(Constants.SPACE).append(v);
 			}
 		}
 		return condition.length() == 0 ? null : condition.toString();
@@ -80,10 +80,10 @@ public class ObjectSqlBuilderUtils {
 				if (pkMap.size() > 0) {
 					pkMap.forEach((k, pkv) -> {
 						if (condition.length() == 0) {
-							condition.append("WHERE").append(Constants.SPACE).append(k).append("=")
+							condition.append("where").append(Constants.SPACE).append(k).append("=")
 									.append(Constants.PLACEHOLDER);
 						} else {
-							condition.append(Constants.SPACE).append("AND").append(Constants.SPACE).append(k)
+							condition.append(Constants.SPACE).append("and").append(Constants.SPACE).append(k)
 									.append("=").append(Constants.PLACEHOLDER);
 						}
 						valueList.add(pkv);
@@ -168,16 +168,16 @@ public class ObjectSqlBuilderUtils {
 		if (o instanceof Model) {
 			try {
 				Object v = FieldConvertProcessor.toDB(f, o);
-				String logicOperation = LogicConstants.LOGIC_OPERATION.get(f.getName());
+				String logicOperation = ConditionConstants.LOGIC_OPERATION.get(f.getName());
 				if (v != null) {
 					Map<String, Object> comditionMap = (Map<String, Object>) v;
 					if (comditionMap.size() > 0) {
 						comditionMap.forEach((k, pkv) -> {
 							if (condition.length() == 0) {
-								condition.append("WHERE").append(Constants.SPACE).append(k).append(logicOperation)
+								condition.append("where").append(Constants.SPACE).append(k).append(logicOperation)
 										.append(Constants.PLACEHOLDER);
 							} else {
-								condition.append(Constants.SPACE).append("AND").append(Constants.SPACE).append(k)
+								condition.append(Constants.SPACE).append("and").append(Constants.SPACE).append(k)
 										.append(logicOperation).append(Constants.PLACEHOLDER);
 							}
 							valueList.add(pkv);

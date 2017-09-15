@@ -10,13 +10,14 @@ import java.lang.annotation.Target;
  * class       :  OrderBy
  * @author     :  zhukaipeng
  * @version    :  1.0  
- * description :  
+ * description :  在po字段上添加该注解，则该字段会出现在order by语句中
  * @see        :                        
  * ***********************************************
  */
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface OrderBy {
+	/**排序方式，升序/降序，默认降序*/
 	OrderByType value() default OrderByType.desc;
 }
 

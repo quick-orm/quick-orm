@@ -141,8 +141,10 @@ public class ConnectionProcessor {
 	}
 	
 	private PreparedStatementWrapper createPreparedStatement(Connection conn, SqlInfo sqlInfo) throws SQLException {
-		log.info("execute sql:{}", sqlInfo.getSql());
-		log.info("params:{}", sqlInfo.getParam());
+		if (jdbcConfig.getPrintSql()) {
+			log.info("execute sql:{}", sqlInfo.getSql());
+			log.info("params:{}", sqlInfo.getParam());
+		}
 		PreparedStatement stmt;
 		stmt = conn.prepareStatement(sqlInfo.getSql());
 		List<Object> params = sqlInfo.getParam();

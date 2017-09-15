@@ -17,6 +17,7 @@ import java.lang.annotation.Target;
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Condition {
+	/**条件类型，默认等于*/
 	ConditionType value() default ConditionType.EQ;
 }
 

@@ -9,14 +9,16 @@ import java.lang.annotation.Target;
  * class       :  Table
  * @author     :  zhukaipeng
  * @version    :  1.0  
- * description :  
+ * description :  Table注解用于在po类名与表名不一致时指定表名
  * @see        :                        
  * ***********************************************
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Table {
+	/**表名*/
 	String tableName();
+	/**是否创建表 true:创建 默认false*/
 	boolean create() default false;
 }
 

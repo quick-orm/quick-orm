@@ -22,10 +22,10 @@ import com.z.quick.orm.table.CreateTable;
  * class       :  Session
  * @author     :  zhukaipeng
  * @version    :  1.0  
- * description :  
+ * description :  Session类似数据源，且提供了一套操作数据库的API
  * @see        :  *
  */
-public class Session implements DataBaseManipulation,FutureDataBaseManipulation {
+public class Session implements DataBaseManipulation,FutureDataBaseManipulation,Transaction {
 	private static final Map<String,Session> sessionContainer = new HashMap<String, Session>();
 	private ConnectionProcessor connectionProcessor;
 	private ExecutorService futurePool;
@@ -42,11 +42,26 @@ public class Session implements DataBaseManipulation,FutureDataBaseManipulation 
 			createTable.start();
 		}
 	}
-	
+	/**
+	 * method name   : getDefaultSession 
+	 * description   : 获取jdbc.setting文件配置的Session
+	 * @return       : Session
+	 * @param        : @return
+	 * modified      : zhukaipeng ,  2017年9月15日
+	 * @see          : *
+	 */
 	public static Session getDefaultSession(){
 		return getSession("jdbc.setting");
 	}
-	
+	/**
+	 * method name   : getSession 
+	 * description   : 获取Session
+	 * @return       : Session
+	 * @param        : @param jdbcName setting配置文件名
+	 * @param        : @return
+	 * modified      : zhukaipeng ,  2017年9月15日
+	 * @see          : *
+	 */
 	public static Session getSession(String jdbcName){
 		Session session = sessionContainer.get(jdbcName);
 		if (session == null) {
@@ -55,13 +70,11 @@ public class Session implements DataBaseManipulation,FutureDataBaseManipulation 
 		}
 		return session;
 	}
-	
 	@Override
 	public int save(Object o) {
 		SqlInfo sqlInfo = sqlBuilderProcessor.getSql(SqlBuilder.SBType.SAVE, o);
 		return connectionProcessor.update(getConnection(), sqlInfo);
 	}
-	
 	@Override
 	public int delete(Object o) {
 		SqlInfo sqlInfo = sqlBuilderProcessor.getSql(SqlBuilder.SBType.DELETE, o);
@@ -174,22 +187,18 @@ public class Session implements DataBaseManipulation,FutureDataBaseManipulation 
 	private Connection getConnection(){
 		return connectionProcessor.getConnection();
 	}
-	
 	@Override
 	public void start(){
 		connectionProcessor.setAutoCommit(getConnection(), false);
 	}
-	
 	@Override
 	public void rollback(){
 		connectionProcessor.rollback(getConnection());
 	}
-	
 	@Override
 	public void commit(){
 		connectionProcessor.commit(getConnection());
 	}
-	
 	@Override
 	public void close(){
 		connectionProcessor.close(getConnection());

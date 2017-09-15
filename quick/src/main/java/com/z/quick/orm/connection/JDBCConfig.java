@@ -31,7 +31,9 @@ public class JDBCConfig implements DefaultConfig {
 	/**最大耗时sql保存文件路径 默认classes目录下*/
 	private String maxExecuteTimeFilePath = DEFAULT_MAX_EXECUTE_TIME_FILE_PATH;
 	/**单位毫秒 当连接池连接耗尽时，客户端调用getConnection()后等待获取新连接的时间，超时后将抛出ConnectionException。单位毫秒。默认: 10000*/
-	private int maxWait = DEFAULT_MAX_IDLE_TIME;
+	private int maxWaitTime = DEFAULT_MAX_WAIT_TIME;
+	/**当连接池连接耗尽时，每次轮询获取连接的间隔时间，默认50毫秒*/
+	private int oncePollTime= DEFAULT_ONCE_POLL_TIME;
 	/**最大空闲时间*/
 	private int maxIdleTime = DEFAULT_MAX_IDLE_TIME;
 	/**每X毫秒检查所有连接池中的空闲连接。默认值: 0，不检查*/
@@ -40,6 +42,8 @@ public class JDBCConfig implements DefaultConfig {
 	private int asyncPoolSize = DEFAULT_ASYNC_POOL_SIZE;
 	/**po所在包路径，创建表时使用*/
 	private String packagePath;
+	/**是否打印SQL*/
+	private boolean printSql = DEFAULT_PRINT_SQL;
 	
 	public static JDBCConfig newInstance(String jdbcConfigPath){
 		return new JDBCConfig(new Setting(jdbcConfigPath, true));
@@ -86,8 +90,8 @@ public class JDBCConfig implements DefaultConfig {
 		}else{
 			maxExecuteTimeFilePath = Thread.currentThread().getContextClassLoader().getResource("").getPath(); 
 		}
-		if (jdbcSetting.get("jdbc.maxWait") != null) {
-			maxWait = jdbcSetting.getInt("jdbc.maxWait");
+		if (jdbcSetting.get("jdbc.maxWaitTime") != null) {
+			maxWaitTime = jdbcSetting.getInt("jdbc.maxWaitTime");
 		}
 		if (jdbcSetting.get("jdbc.maxIdleTime") != null) {
 			maxIdleTime = jdbcSetting.getInt("jdbc.maxIdleTime");
@@ -100,6 +104,12 @@ public class JDBCConfig implements DefaultConfig {
 		}
 		if (jdbcSetting.get("jdbc.packagePath") != null) {
 			packagePath = jdbcSetting.getStr("jdbc.packagePath");
+		}
+		if (jdbcSetting.get("jdbc.printSql") != null) {
+			printSql = jdbcSetting.getBool("jdbc.printSql");
+		}
+		if (jdbcSetting.get("jdbc.oncePollTime") != null) {
+			oncePollTime = jdbcSetting.getInt("jdbc.oncePollTime");
 		}
 
 	}
@@ -136,8 +146,8 @@ public class JDBCConfig implements DefaultConfig {
 		return dbType;
 	}
 
-	public int getMaxWait() {
-		return maxWait;
+	public int getMaxWaitTime() {
+		return maxWaitTime;
 	}
 
 	public int getMaxIdleTime() {
@@ -166,6 +176,14 @@ public class JDBCConfig implements DefaultConfig {
 
 	public String getPackagePath() {
 		return packagePath;
+	}
+
+	public boolean getPrintSql() {
+		return printSql;
+	}
+
+	public int getOncePollTime() {
+		return oncePollTime;
 	}
 	
 	

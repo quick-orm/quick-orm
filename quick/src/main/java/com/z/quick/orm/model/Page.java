@@ -11,13 +11,29 @@ public class Page<E> {
 	private Integer total;
 	private Integer pages;
 	private List<E> result;
-	
+	/**
+	 * method name   : page 
+	 * description   : 设置分页查询的当前页及每页条数
+	 * @return       : void
+	 * @param        : @param pageNum
+	 * @param        : @param pageSize
+	 * modified      : zhukaipeng ,  2017年9月15日
+	 * @see          : *
+	 */
 	public static void page(Integer pageNum,Integer pageSize){
 		Map<String,Integer> pageInfo = new HashMap<String, Integer>();
 		pageInfo.put("pageNum", pageNum);
 		pageInfo.put("pageSize", pageSize);
 		pageInfos.set(pageInfo);
 	}
+	/**
+	 * method name   : getPageInfo 
+	 * description   : 获取当前分页的信息
+	 * @return       : Map<String,Integer>
+	 * @param        : @return
+	 * modified      : zhukaipeng ,  2017年9月15日
+	 * @see          : *
+	 */
 	public static Map<String,Integer> getPageInfo(){
 		return pageInfos.get();
 	}
@@ -30,30 +46,70 @@ public class Page<E> {
 		this.result = result;
 		pages = total%pageSize==0?total/pageSize:total/pageSize+1;
 	}
+	/**
+	 * method name   : getPageSize 
+	 * description   : 获取每页条数
+	 * @return       : Integer
+	 * @param        : @return
+	 * modified      : zhukaipeng ,  2017年9月15日
+	 * @see          : *
+	 */
 	public Integer getPageSize() {
 		return pageSize;
 	}
 	public void setPageSize(Integer pageSize) {
 		this.pageSize = pageSize;
 	}
+	/**
+	 * method name   : getPageNum 
+	 * description   : 获取当前页
+	 * @return       : Integer
+	 * @param        : @return
+	 * modified      : zhukaipeng ,  2017年9月15日
+	 * @see          : *
+	 */
 	public Integer getPageNum() {
 		return pageNum;
 	}
 	public void setPageNum(Integer pageNum) {
 		this.pageNum = pageNum;
 	}
+	/**
+	 * method name   : getTotal 
+	 * description   : 获取总条数
+	 * @return       : Integer
+	 * @param        : @return
+	 * modified      : zhukaipeng ,  2017年9月15日
+	 * @see          : *
+	 */
 	public Integer getTotal() {
 		return total;
 	}
 	public void setTotal(Integer total) {
 		this.total = total;
 	}
+	/**
+	 * method name   : getPages 
+	 * description   : 获取总页数
+	 * @return       : Integer
+	 * @param        : @return
+	 * modified      : zhukaipeng ,  2017年9月15日
+	 * @see          : *
+	 */
 	public Integer getPages() {
 		return pages;
 	}
 	public void setPages(Integer pages) {
 		this.pages = pages;
 	}
+	/**
+	 * method name   : getResult 
+	 * description   : 获取查询结果
+	 * @return       : List<E>
+	 * @param        : @return
+	 * modified      : zhukaipeng ,  2017年9月15日
+	 * @see          : *
+	 */
 	public List<E> getResult() {
 		return result;
 	}

@@ -10,7 +10,7 @@ import java.lang.annotation.Target;
  * class       :  NoFind
  * @author     :  zhukaipeng
  * @version    :  1.0  
- * description :  在po属性上添加此标签，该属性不会在查询 sql中生成
+ * description :  在po属性上添加此标签，该属性不会在select 语句中生成
  * @see        :                        
  * ***********************************************
  */

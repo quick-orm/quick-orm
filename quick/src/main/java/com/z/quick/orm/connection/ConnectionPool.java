@@ -115,12 +115,12 @@ public class ConnectionPool {
 				if (waitTime.get() == null) {
 					waitTime.set(0L);
 				}
-				if (waitTime.get() > jdbcConfig.getMaxWait()) {
+				if (waitTime.get() > jdbcConfig.getMaxWaitTime()) {
 					waitTime.set(0L);
 					throw new ConnectionException("当前数据库连接已达上线，无法再创建连接");
 				}
-				waitTime.set(waitTime.get()+2000);
-				wait(2000);
+				waitTime.set(waitTime.get()+jdbcConfig.getOncePollTime());
+				wait(jdbcConfig.getOncePollTime());
 				return getConnection();
 			}
 			

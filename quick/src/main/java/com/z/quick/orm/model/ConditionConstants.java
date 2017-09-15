@@ -3,7 +3,7 @@ package com.z.quick.orm.model;
 import java.util.HashMap;
 import java.util.Map;
 
-public class LogicConstants {
+public class ConditionConstants {
 	public static final Map<String,String> LOGIC_OPERATION = new HashMap<String, String>();
 	static{
 		LOGIC_OPERATION.put("lt", " < ");

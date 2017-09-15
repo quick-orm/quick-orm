@@ -1,5 +1,6 @@
 package com.z.quick.monitor;
 
+import java.io.File;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -35,6 +36,10 @@ public class MonitorSql {
 	public static void start(String maxExecuteTimeFilePath){
 		queue = new LinkedBlockingQueue<String>(128);
 		new Thread(()->{
+			String path = maxExecuteTimeFilePath;
+			if (!maxExecuteTimeFilePath.endsWith(File.separator)) {
+				path += File.separator;
+			}
 			long size = 0;
 			PrintWriter writer = null;
 			String fileName = null;
@@ -48,7 +53,7 @@ public class MonitorSql {
 							writer.close();
 						}
 						fileName = today;
-						writer = FileUtil.getPrintWriter(maxExecuteTimeFilePath + fileName + fileSuffix, StandardCharsets.UTF_8.name(), true);
+						writer = FileUtil.getPrintWriter(path + fileName + fileSuffix, StandardCharsets.UTF_8.name(), true);
 					}
 					String sql = queue.take();
 					writer.println(sql);

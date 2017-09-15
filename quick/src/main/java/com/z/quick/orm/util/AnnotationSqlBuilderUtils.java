@@ -19,17 +19,21 @@ public class AnnotationSqlBuilderUtils {
 
 	public static String getCondition(Object o, List<Object> valueList) {
 		StringBuffer condition = new StringBuffer();
-		List<Field> fieldList =ClassCache.getCondition(o.getClass());
+		List<Field> fieldList = ClassCache.getAllDeclaredFields(o.getClass());
+//		List<Field> fieldList = ClassCache.getCondition(o.getClass());
 		fieldList.forEach((f) -> {
 			Object v = FieldConvertProcessor.toDB(f, o);
 			if (v == null) {
 				return;
 			}
-			String operation = f.getAnnotation(Condition.class).value().getOperation();
+			String operation = " = ";
+			if ( f.getAnnotation(Condition.class) != null) {
+				operation = f.getAnnotation(Condition.class).value().getOperation();
+			}
 			if (condition.length() == 0) {
-				condition.append("WHERE").append(Constants.SPACE).append(f.getName()).append(operation).append(Constants.PLACEHOLDER);
+				condition.append("where").append(Constants.SPACE).append(f.getName()).append(operation).append(Constants.PLACEHOLDER);
 			} else {
-				condition.append(Constants.SPACE).append("AND").append(Constants.SPACE).append(f.getName())
+				condition.append(Constants.SPACE).append("and").append(Constants.SPACE).append(f.getName())
 				.append(operation).append(Constants.PLACEHOLDER);
 			}
 			valueList.add(v);
@@ -45,9 +49,9 @@ public class AnnotationSqlBuilderUtils {
 				return;
 			}
 			if (condition.length() == 0) {
-				condition.append("WHERE").append(Constants.SPACE).append(f.getName()).append("=").append(Constants.PLACEHOLDER);
+				condition.append("where").append(Constants.SPACE).append(f.getName()).append("=").append(Constants.PLACEHOLDER);
 			} else {
-				condition.append(Constants.SPACE).append("AND").append(Constants.SPACE).append(f.getName())
+				condition.append(Constants.SPACE).append("and").append(Constants.SPACE).append(f.getName())
 				.append("=").append(Constants.PLACEHOLDER);
 			}
 			valueList.add(v);

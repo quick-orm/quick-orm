@@ -10,7 +10,7 @@ import java.lang.annotation.Target;
  * class       :  NoFind
  * @author     :  zhukaipeng
  * @version    :  1.0  
- * description :  在po属性上添加此标签，表示该属性为数据库主键，在调用get方法时，会将该属性作为查询条件
+ * description :  PrimaryKey主要用于po更新时指定更新条件用(可指定多个)，如果在字段上添加该注解，则在更新语句中，此字段会出现在where语句后
  * @see        :                        
  * ***********************************************
  */

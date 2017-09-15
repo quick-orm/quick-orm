@@ -9,7 +9,13 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
-
+/**
+ * class       :  Identity
+ * @author     :  zhukaipeng
+ * @version    :  1.0  
+ * description :  主键生成器
+ * @see        :  *
+ */
 public class Identity {
 
 	private static Map<String, Identity> identityCache = new HashMap<String, Identity>();
@@ -65,7 +71,15 @@ public class Identity {
 		}
 		return defaultIpAddress;
 	}
-
+	/**
+	 * method name   : nextId 
+	 * description   : 获取主键 
+	 * @return       : String
+	 * @param        : @param key 主键标识
+	 * @param        : @return 返回值格式:yyyyMMddHHmm+3位主机号+7位递增序列
+	 * modified      : zhukaipeng ,  2017年9月15日
+	 * @see          : *
+	 */
 	public static String nextId(String key) {
 		Identity i = identityCache.get(key);
 		if (i == null) {
@@ -74,7 +88,14 @@ public class Identity {
 		}
 		return i.get();
 	}
-	
+	/**
+	 * method name   : nextId 
+	 * description   : 获取主键，默认标识为default
+	 * @return       : String
+	 * @param        : @return 返回值格式:yyyyMMddHHmm+3位主机号+7位递增序列
+	 * modified      : zhukaipeng ,  2017年9月15日
+	 * @see          : *
+	 */
 	public static String nextId() {
 		return nextId("default");
 	}
