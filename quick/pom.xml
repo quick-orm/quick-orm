@@ -7,12 +7,39 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
-	<name>quick</name>
+	<name>quick-orm</name>
 	<url>http://maven.apache.org</url>
-
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
+
+	<parent>
+		<groupId>org.sonatype.oss</groupId>
+		<artifactId>oss-parent</artifactId>
+		<version>7</version>
+	</parent>
+
+	<licenses>
+		<license>
+			<name>The Apache Software License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+	
+	<scm>
+		<url>https://github.com/wujie999/quick-orm</url>
+		<connection>git@github.com:wujie999/quick-orm.git</connection>
+		<developerConnection>http://www.zkp.kim</developerConnection>
+	</scm>
+
+	<developers>
+		<developer>
+			<name>wujie</name>
+			<email>2076528290@qq.com</email>
+			<url>http://www.zkp.kim</url>
+		</developer>
+	</developers>
 
 	<dependencies>
 		<dependency>
