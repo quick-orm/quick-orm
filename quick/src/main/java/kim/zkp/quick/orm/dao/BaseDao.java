@@ -20,7 +20,7 @@ public abstract class BaseDao<T> implements Dao<T> {
 		session = Session.getDefaultSession();
 	}
 
-	private static Class<?> getSuperClassGenricType(Class<?> clazz, int index) {
+	private Class<?> getSuperClassGenricType(Class<?> clazz, int index) {
 
 		Type genType = clazz.getGenericSuperclass();
 

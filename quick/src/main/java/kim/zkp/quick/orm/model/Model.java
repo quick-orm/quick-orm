@@ -50,8 +50,8 @@ public abstract class Model<T> extends ConditionSetting<T> {
 	 * modified      : zhukaipeng ,  2017年9月15日
 	 * @see          : *
 	 */
-	public void setSession(String jdbcName){
-		this.session = Session.getSession(jdbcName);
+	public void setSession(String jdbcConfigName){
+		this.session = Session.getSession(jdbcConfigName);
 	}
 	/**
 	 * method name   : tableName 

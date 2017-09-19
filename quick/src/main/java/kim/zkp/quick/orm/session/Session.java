@@ -62,11 +62,11 @@ public class Session implements DataBaseManipulation,FutureDataBaseManipulation,
 	 * modified      : zhukaipeng ,  2017年9月15日
 	 * @see          : *
 	 */
-	public static Session getSession(String jdbcName){
-		Session session = sessionContainer.get(jdbcName);
+	public static Session getSession(String jdbcConfigName){
+		Session session = sessionContainer.get(jdbcConfigName);
 		if (session == null) {
-			session = new Session(jdbcName);
-			sessionContainer.put(jdbcName, session);
+			session = new Session(jdbcConfigName);
+			sessionContainer.put(jdbcConfigName, session);
 		}
 		return session;
 	}

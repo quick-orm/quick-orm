@@ -166,7 +166,7 @@ public class ConnectionProcessor {
 				return result;
 			}
 			if (clzz.isAssignableFrom(Schema.class)) {
-				Schema s = new Schema("");
+				Schema s = Schema.open("");
 				s.setResult(result);
 				return s;
 			}

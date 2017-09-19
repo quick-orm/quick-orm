@@ -9,6 +9,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
 import com.xiaoleilu.hutool.log.Log;
@@ -22,10 +23,12 @@ public class ConnectionPool {
 	private final Long CONNECTION_SURVIVE_TIME = 30*60*1000L;
 	private JDBCConfig jdbcConfig;
 	private final ReentrantLock lock = new ReentrantLock(true);
+	private Condition get = lock.newCondition();
+//	private Condition recycle = lock.newCondition();
 	private final List<Connection> unUsedConn = new LinkedList<Connection>();
 	private final List<Connection> usedConn = new LinkedList<Connection>();
 	private volatile AtomicInteger connSize = new AtomicInteger(0);
-	private volatile ThreadLocal<Long> waitTime = new ThreadLocal<>();
+//	private volatile ThreadLocal<Long> waitTime = new ThreadLocal<Long>();
 	/**用于处理空闲、过期连接*/
 	private final ScheduledExecutorService clearService = Executors.newSingleThreadScheduledExecutor();
 	
@@ -89,7 +92,6 @@ public class ConnectionPool {
 	}
 	public Connection getConnection(){
 		lock.lock();
-		boolean isReleaseLock= true;
 		try {
 			if (unUsedConn.size() > 0) {
 				Connection conn = unUsedConn.get(0);
@@ -110,28 +112,35 @@ public class ConnectionPool {
 				usedConn.add(conn);
 				return conn;
 			}
-			isReleaseLock = false;
-			lock.unlock(); //等待连接期间释放锁
-			while(true){
-				if (waitTime.get() == null) {
-					waitTime.set(0L);
-				}
-				if (waitTime.get() > jdbcConfig.getMaxWaitTime()) {
-					waitTime.set(0L);
-					throw new ConnectionException("当前数据库连接已达上线，无法再创建连接");
-				}
-				waitTime.set(waitTime.get()+jdbcConfig.getOncePollTime());
-				wait(jdbcConfig.getOncePollTime());
+			boolean isSignal = get.await(jdbcConfig.getMaxWaitTime(), TimeUnit.MILLISECONDS);
+			if (isSignal) {
 				return getConnection();
 			}
+			throw new ConnectionException("当前数据库连接已达上限，无法再创建连接");
+//			boolean isReleaseLock= true;
+//			isReleaseLock = false;
+//			lock.unlock(); //等待连接期间释放锁
+//			while(true){
+//				if (waitTime.get() == null) {
+//					waitTime.set(0L);
+//				}
+//				if (waitTime.get() > jdbcConfig.getMaxWaitTime()) {
+//					waitTime.set(0L);
+//					throw new ConnectionException("当前数据库连接已达上线，无法再创建连接");
+//				}
+//				waitTime.set(waitTime.get()+jdbcConfig.getOncePollTime());
+//				wait(jdbcConfig.getOncePollTime());
+//				return getConnection();
+//			}
 			
 		} catch (Exception e) {
 			log.error("Get connection error",e);
 			throw new ConnectionException("Get connection error",e);
 		}finally {
-			if (isReleaseLock) {
-				lock.unlock();
-			}
+			lock.unlock();
+//			if (isReleaseLock) {
+//				lock.unlock();
+//			}
 		}
 	}
 	public Connection getConnection(String username, String password) throws SQLException {
@@ -140,12 +149,12 @@ public class ConnectionPool {
 		}
 		throw new ConnectionException("Username or password error");
 	}
-	private void wait(int mSeconds) {  
-        try {  
-            Thread.sleep(mSeconds);  
-        } catch (InterruptedException e) {  
-        }  
-    }  
+//	private void wait(int mSeconds) {  
+//        try {  
+//            Thread.sleep(mSeconds);  
+//        } catch (InterruptedException e) {  
+//        }  
+//    }  
 	/**
 	 * ********************************************
 	 * method name   : timerClearAllLeisureConnection 
@@ -194,6 +203,7 @@ public class ConnectionPool {
 							log.error("关闭连接出现异常", e);
 						}
 						connSize.decrementAndGet();
+						get.signal();
 						log.debug("销毁连接：{}成功",qcw);
 						return true;
 						
@@ -239,6 +249,7 @@ public class ConnectionPool {
 							log.error("关闭连接出现异常", e);
 						}
 						connSize.decrementAndGet();
+						get.signal();
 						log.debug("销毁连接：{}成功", qcw);
 						return true;
 					}); 
@@ -261,6 +272,7 @@ public class ConnectionPool {
 		try {
 			usedConn.remove(conn);
 			unUsedConn.add(conn);
+			get.signal();
 //			log.debug("回收连接：{}成功",conn);
 //			log.debug("当前连接情况【已创建：{}，已使用：{}，空闲：{}】",connSize.get(),usedConn.size(),unUsedConn.size());
 		} catch (Exception e) {

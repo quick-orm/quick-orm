@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Set;
 
 import kim.zkp.quick.orm.cache.ClassCache;
+import kim.zkp.quick.orm.session.Session;
 import kim.zkp.quick.orm.sql.convert.FieldConvertProcessor;
 
 public class Schema extends Model<Schema> {
@@ -13,10 +14,53 @@ public class Schema extends Model<Schema> {
 	private Map<String,Object> result;
 	
 	/**
+	 * method name   : open 
+	 * description   : 打开表
+	 * @return       : Schema
+	 * @param        : @param tableName 表名
+	 * @param        : @return
+	 * modified      : zhukaipeng ,  2017年9月19日
+	 * @see          : *
+	 */
+	public static Schema open(String tableName){
+		return new Schema(tableName);
+	}
+	/**
+	 * method name   : open 
+	 * description   : 打开表
+	 * @return       : Schema
+	 * @param        : @param tableName 表名
+	 * @param        : @param session 数据源对象
+	 * @param        : @return
+	 * modified      : zhukaipeng ,  2017年9月19日
+	 * @see          : *
+	 */
+	public static Schema open(String tableName,Session session){
+		Schema s = open(tableName);
+		s.setSession(session);
+		return s;
+	}
+	/**
+	 * method name   : open 
+	 * description   : 打开表
+	 * @return       : Schema
+	 * @param        : @param tableName 表名
+	 * @param        : @param jdbcConfigName 数据源配置文件名
+	 * @param        : @return
+	 * modified      : zhukaipeng ,  2017年9月19日
+	 * @see          : *
+	 */
+	public static Schema open(String tableName,String jdbcConfigName){
+		Schema s = open(tableName);
+		s.setSession(jdbcConfigName);
+		return s;
+	}
+	
+	/**
 	 * 创建Schema对象，需指定数据库表名
 	 * @param tableName
 	 */
-	public Schema(String tableName) {
+	protected Schema(String tableName) {
 		super();
 		super.tableName(tableName);
 	}
