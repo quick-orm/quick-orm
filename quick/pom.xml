@@ -1,23 +1,18 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-
 	<groupId>kim.zkp</groupId>
 	<artifactId>quick-orm</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0.0</version>
 	<packaging>jar</packaging>
-
 	<name>quick-orm</name>
+	<description>数据库层快速开发框架，完全面向对象操作，简单高效，30秒快速上手</description>
 	<url>http://maven.apache.org</url>
+	
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<maven.compiler.encoding>UTF-8</maven.compiler.encoding>
 	</properties>
-
-	<parent>
-		<groupId>org.sonatype.oss</groupId>
-		<artifactId>oss-parent</artifactId>
-		<version>7</version>
-	</parent>
 
 	<licenses>
 		<license>
@@ -26,13 +21,6 @@
 			<distribution>repo</distribution>
 		</license>
 	</licenses>
-	
-	<scm>
-		<url>https://github.com/wujie999/quick-orm</url>
-		<connection>git@github.com:wujie999/quick-orm.git</connection>
-		<developerConnection>http://www.zkp.kim</developerConnection>
-	</scm>
-
 	<developers>
 		<developer>
 			<name>wujie</name>
@@ -40,6 +28,13 @@
 			<url>http://www.zkp.kim</url>
 		</developer>
 	</developers>
+	
+	<scm>
+		<url>https://github.com/wujie999/quick-orm</url>
+		<connection>git@github.com:wujie999/quick-orm.git</connection>
+		<developerConnection>http://www.zkp.kim</developerConnection>
+	</scm>
+
 
 	<dependencies>
 		<dependency>
@@ -53,4 +48,76 @@
 			<version>3.0.9</version>
 		</dependency>
 	</dependencies>
+	
+	<profiles>
+        <profile>
+            <id>release</id>
+            <build>
+                <plugins>
+                    <!-- Source -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <version>2.2.1</version>
+                        <executions>
+                            <execution>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>jar-no-fork</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+				            <serverId>ossrh</serverId>
+				            <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+				            <autoReleaseAfterClose>false</autoReleaseAfterClose>
+				        </configuration>
+                    </plugin>
+                    <!-- Javadoc -->
+                 	<plugin>  
+					    <groupId>org.apache.maven.plugins</groupId>  
+					    <artifactId>maven-javadoc-plugin</artifactId>  
+					    <version>2.9.1</version>  
+					    <executions>  
+					        <execution>  
+					            <phase>package</phase>  
+					            <goals>  
+					                <goal>jar</goal>  
+					            </goals>  
+					            <configuration>  
+					                <additionalparam>-Xdoclint:none</additionalparam>  
+					            </configuration>  
+					        </execution>  
+					    </executions>  
+					</plugin>  
+					
+                    <!-- GPG -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>1.5</version>
+                        <executions>
+                            <execution>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+            
+            <distributionManagement>
+                <snapshotRepository>
+                    <id>sonatype-nexus-snapshots</id>
+                    <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+                </snapshotRepository>
+                <repository>
+                    <id>sonatype-nexus-staging</id>
+                    <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+                </repository>
+            </distributionManagement>
+        </profile>
+    </profiles>
 </project>
