@@ -39,6 +39,7 @@ import java.util.Properties;
 import java.util.concurrent.Executor;
 
 import kim.zkp.quick.orm.exception.ConnectionException;
+import kim.zkp.quick.orm.exception.ConnectionExceptionCount;
 /**
  * class       :  QuickConnectionWrapper
  * @author     :  zhukaipeng
@@ -47,7 +48,7 @@ import kim.zkp.quick.orm.exception.ConnectionException;
  * @see        :  *
  */
 public class ConnectionWrapper implements Connection{
-	
+	private final Long CONNECTION_SURVIVE_TIME = 2*60*60*1000L;//每一个连接从创建到销毁的时间为两个小时
 	private Connection connection;
 	private Long lastUsedTime;
 	private Long createTime;
@@ -112,15 +113,15 @@ public class ConnectionWrapper implements Connection{
 	}
 
 	@Override
-	public void close() throws SQLException {
-		//this.connection.close();		
+	public void close() throws SQLException {//线程级
+		SingleThreadConnectionHolder.removeConnection(this);
 		this.pool.recycleConnection(this);
 	}
-	public void destroy(){
+	public void destroy(){//全局
 		try {
+			ConnectionExceptionCount.remove(this);
 			this.connection.close();
 		} catch (SQLException e) {
-			e.printStackTrace();
 			throw new ConnectionException("关闭连接出现异常",e);
 		}	
 	}
@@ -352,9 +353,11 @@ public class ConnectionWrapper implements Connection{
 		this.lastUsedTime = lastUsedTime;
 	}
 
-	public Long getSurviveTime() {
+	private Long getSurviveTime() {
 		return System.currentTimeMillis() - createTime;
 	}
-	
+	public boolean isSurvive(){
+		return getSurviveTime() > CONNECTION_SURVIVE_TIME;
+	}
 	
 }

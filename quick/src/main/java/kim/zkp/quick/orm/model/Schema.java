@@ -20,6 +20,7 @@
 package kim.zkp.quick.orm.model;
 
 import java.lang.reflect.Field;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -43,6 +44,9 @@ public class Schema extends Model<Schema> {
 	 */
 	public static Schema open(String tableName){
 		return new Schema(tableName);
+	}
+	public static Schema open(){
+		return new Schema();
 	}
 	/**
 	 * method name   : open 
@@ -82,6 +86,13 @@ public class Schema extends Model<Schema> {
 	protected Schema(String tableName) {
 		super();
 		super.tableName(tableName);
+	}
+	/**
+	 * 创建Schema对象，无需指定数据库表名
+	 * @param tableName
+	 */
+	protected Schema() {
+		super();
 	}
 	/**
 	 * method name   : get 查询
@@ -194,6 +205,19 @@ public class Schema extends Model<Schema> {
 		if (!this.isResult()) 
 			return null;
 		return result.get(column)==null?null:result.get(column).toString();
+	}
+	/**
+	 * method name   : getBigDecimal 
+	 * description   : 根据列名获取值，返回值为BigDecimal
+	 * @return       : String
+	 * @param        : @param column
+	 * @param        : @return
+	 * modified      : zhukaipeng ,  2017年9月22日
+	 */
+	public BigDecimal getBigDecimal(String column){
+		if (!this.isResult()) 
+			return null;
+		return result.get(column)==null?null:new BigDecimal(result.get(column).toString());
 	}
 	/**
 	 * method name   : isResult 

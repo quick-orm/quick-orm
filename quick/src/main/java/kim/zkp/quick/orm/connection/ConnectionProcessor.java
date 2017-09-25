@@ -38,6 +38,7 @@ import com.xiaoleilu.hutool.log.LogFactory;
 
 import kim.zkp.quick.orm.cache.ClassCache;
 import kim.zkp.quick.orm.exception.ConnectionException;
+import kim.zkp.quick.orm.exception.ConnectionExceptionCount;
 import kim.zkp.quick.orm.exception.ExecuteSqlException;
 import kim.zkp.quick.orm.exception.TransactionException;
 import kim.zkp.quick.orm.model.Schema;
@@ -67,6 +68,7 @@ public class ConnectionProcessor {
 		try {
 			conn.setAutoCommit(commit);
 		} catch (SQLException e) {
+			ConnectionExceptionCount.add(conn);
 			throw new TransactionException("Open transaction error",e);
 		}
 	}
@@ -89,11 +91,32 @@ public class ConnectionProcessor {
 	public void close(Connection conn){
 		try {
 			conn.setAutoCommit(true);
-			conn.close();
-			SingleThreadConnectionHolder.removeConnection(conn);
+			release(conn);
 		} catch (SQLException e) {
+			ConnectionExceptionCount.destroy(conn);//有事务的连接关闭出现异常直接废弃
+			log.error(e, "Close connection error");
+			try {
+				conn.close();
+			} catch (SQLException e1) {
+				throw new TransactionException("Close transaction error",e1);
+			}
 			throw new TransactionException("Close transaction error",e);
 		}
+		
+		
+//		try {
+//			SingleThreadConnectionHolder.removeConnection(conn);
+//			conn.setAutoCommit(true);
+//			conn.close();
+//		} catch (SQLException e) {
+//			log.error(e, "Close connection error");
+//			try {
+//				conn.close();
+//			} catch (SQLException e1) {
+//				throw new TransactionException("Close2 transaction error",e1);
+//			}
+//			throw new TransactionException("Close transaction error",e);
+//		}
 	}
 	
 	public int update(Connection conn, SqlInfo sqlInfo) {
@@ -129,7 +152,6 @@ public class ConnectionProcessor {
 			rs = stmt.executeQuery();
 			return parseResultSetToObject(rs,clzz);
 		} catch (Exception e) {
-//			log.error(e, "execute sql error");
 			throw new ExecuteSqlException(e);
 		} finally {
 			close(stmt);
@@ -155,7 +177,6 @@ public class ConnectionProcessor {
 			}
 			return list;
 		} catch (SQLException e) {
-//			log.error(e, "parse query result error");
 			throw new ExecuteSqlException(e);
 		}
 	}
@@ -166,7 +187,12 @@ public class ConnectionProcessor {
 			log.info("params:{}", sqlInfo.getParam());
 		}
 		PreparedStatement stmt;
-		stmt = conn.prepareStatement(sqlInfo.getSql());
+		try {
+			stmt = conn.prepareStatement(sqlInfo.getSql());
+		} catch (SQLException e) {
+			ConnectionExceptionCount.add(conn);
+			throw new ExecuteSqlException(e);
+		}
 		List<Object> params = sqlInfo.getParam();
 		for (int i = 0; i < params.size(); i++) {
 			try {
@@ -260,10 +286,14 @@ public class ConnectionProcessor {
 			try {
 				if (x.getAutoCommit()) {
 					x.close();
-					SingleThreadConnectionHolder.removeConnection(x);
 				}
-			} catch (Exception e) {
+			} catch (Exception e) {//此处若获取事务状态异常，直接移除连接，防止连接占用
 				log.error("close connection error", e);
+				try {
+					x.close();
+				} catch (SQLException e1) {
+					log.error("close2 connection error", e1);
+				}
 			}
 		}
 	}

@@ -34,20 +34,18 @@ import java.util.concurrent.locks.ReentrantLock;
 import com.xiaoleilu.hutool.log.Log;
 import com.xiaoleilu.hutool.log.LogFactory;
 
-import kim.zkp.quick.monitor.MonitorSql;
 import kim.zkp.quick.orm.exception.ConnectionException;
+import kim.zkp.quick.orm.exception.ConnectionExceptionCount;
+import kim.zkp.quick.orm.monitor.MonitorSql;
 
 public class ConnectionPool {
 	private static final Log log = LogFactory.get();
-	private final Long CONNECTION_SURVIVE_TIME = 30*60*1000L;
 	private JDBCConfig jdbcConfig;
 	private final ReentrantLock lock = new ReentrantLock(true);
 	private Condition get = lock.newCondition();
-//	private Condition recycle = lock.newCondition();
 	private final List<Connection> unUsedConn = new LinkedList<Connection>();
 	private final List<Connection> usedConn = new LinkedList<Connection>();
 	private volatile AtomicInteger connSize = new AtomicInteger(0);
-//	private volatile ThreadLocal<Long> waitTime = new ThreadLocal<Long>();
 	/**用于处理空闲、过期连接*/
 	private final ScheduledExecutorService clearService = Executors.newSingleThreadScheduledExecutor();
 	
@@ -115,7 +113,7 @@ public class ConnectionPool {
 			if (unUsedConn.size() > 0) {
 				Connection conn = unUsedConn.get(0);
 				ConnectionWrapper qcw = (ConnectionWrapper) conn;
-				if(qcw.getSurviveTime() > CONNECTION_SURVIVE_TIME){
+				if(qcw.isSurvive() || ConnectionExceptionCount.isClose(qcw)){
 					qcw.destroy();
 					unUsedConn.remove(conn);
 					connSize.decrementAndGet();
@@ -136,30 +134,12 @@ public class ConnectionPool {
 				return getConnection();
 			}
 			throw new ConnectionException("当前数据库连接已达上限，无法再创建连接");
-//			boolean isReleaseLock= true;
-//			isReleaseLock = false;
-//			lock.unlock(); //等待连接期间释放锁
-//			while(true){
-//				if (waitTime.get() == null) {
-//					waitTime.set(0L);
-//				}
-//				if (waitTime.get() > jdbcConfig.getMaxWaitTime()) {
-//					waitTime.set(0L);
-//					throw new ConnectionException("当前数据库连接已达上线，无法再创建连接");
-//				}
-//				waitTime.set(waitTime.get()+jdbcConfig.getOncePollTime());
-//				wait(jdbcConfig.getOncePollTime());
-//				return getConnection();
-//			}
 			
 		} catch (Exception e) {
 			log.error("Get connection error",e);
 			throw new ConnectionException("Get connection error",e);
 		}finally {
 			lock.unlock();
-//			if (isReleaseLock) {
-//				lock.unlock();
-//			}
 		}
 	}
 	public Connection getConnection(String username, String password) throws SQLException {
@@ -168,12 +148,6 @@ public class ConnectionPool {
 		}
 		throw new ConnectionException("Username or password error");
 	}
-//	private void wait(int mSeconds) {  
-//        try {  
-//            Thread.sleep(mSeconds);  
-//        } catch (InterruptedException e) {  
-//        }  
-//    }  
 	/**
 	 * ********************************************
 	 * method name   : timerClearAllLeisureConnection 
@@ -289,9 +263,11 @@ public class ConnectionPool {
 	public void recycleConnection(Connection conn){
 		lock.lock();
 		try {
-			usedConn.remove(conn);
-			unUsedConn.add(conn);
-			get.signal();
+			boolean isRemove = usedConn.remove(conn);
+			if (isRemove) {
+				unUsedConn.add(conn);
+				get.signal();
+			}
 //			log.debug("回收连接：{}成功",conn);
 //			log.debug("当前连接情况【已创建：{}，已使用：{}，空闲：{}】",connSize.get(),usedConn.size(),unUsedConn.size());
 		} catch (Exception e) {

@@ -17,7 +17,7 @@
  * limitations under the License.
  */
 
-package kim.zkp.quick.monitor;
+package kim.zkp.quick.orm.monitor;
 
 import java.io.File;
 import java.io.PrintWriter;

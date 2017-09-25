@@ -26,7 +26,7 @@ import java.sql.SQLException;
 import com.xiaoleilu.hutool.date.DateUtil;
 import com.xiaoleilu.hutool.date.TimeInterval;
 
-import kim.zkp.quick.monitor.MonitorSql;
+import kim.zkp.quick.orm.monitor.MonitorSql;
 import kim.zkp.quick.orm.sql.SqlInfo;
 
 /**
