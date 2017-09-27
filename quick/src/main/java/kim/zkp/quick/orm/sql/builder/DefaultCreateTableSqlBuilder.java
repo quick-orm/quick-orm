@@ -54,7 +54,7 @@ public class DefaultCreateTableSqlBuilder extends AbstractSqlBuilder {
 		StringBuffer columns = new StringBuffer();
 		fieldList.forEach(f->{
 			if (typeConvert(f) == null) {
-				log.info("未找到{}类型对应的数据库类型",f.getType());
+				log.warn("未找到{}类型对应的数据库类型",f.getType());
 				return;
 			}
 			columns.append(f.getName()).append(Constants.SPACE).append(typeConvert(f)).append(",");
@@ -62,7 +62,7 @@ public class DefaultCreateTableSqlBuilder extends AbstractSqlBuilder {
 		fieldList = ClassCache.getPrimaryKey(clzz);
 		StringBuffer primaryKey = new StringBuffer();
 		if (fieldList.size() == 0) {
-			throw new SqlBuilderException("No primaryKey");
+			throw new SqlBuilderException("No primaryKey,Please configure it in Po.");
 		}
 		fieldList.forEach(f->{
 			primaryKey.append(f.getName()).append(",");
@@ -82,8 +82,10 @@ public class DefaultCreateTableSqlBuilder extends AbstractSqlBuilder {
 			value = "varchar(64)";
 		}else if(Boolean.class == type){
 			value = "smallint";
-		}else if(Integer.class == type || Short.class == type){
+		}else if(Integer.class == type){
 			value = "integer";
+		}else if(Short.class == type){
+			value = "smallint";
 		}else if(Double.class == type || Float.class == type){
 			value = "double";
 		}else if(BigDecimal.class == type){

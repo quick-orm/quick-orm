@@ -21,7 +21,9 @@ package kim.zkp.quick.orm.table;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -56,7 +58,7 @@ public class CreateTable {
 	public void start(){
 		File root = new File(System.getProperty("user.dir"));
 		List<String> allFileNames = getAllFileNames(root, "");
-		List<String> fileNames = filterFile(allFileNames,packagePath);
+		Set<String> fileNames = filterFile(allFileNames,packagePath);
 		List<Class<?>> clzzs = loadClass(fileNames);
 		createTable(clzzs);
 	}
@@ -71,15 +73,20 @@ public class CreateTable {
 			try {
 				SqlInfo sqlInfo = sqlBuilderProcessor.getSql(SqlBuilder.SBType.CREATE_TABLE, clzz);
 				log.info("建表SQL:{}",sqlInfo.getSql());
-				session.update(sqlInfo.getSql(),sqlInfo.getParam());
-				log.info("创建成功:{}",table.tableName());
+				try {
+					session.update(sqlInfo.getSql(),sqlInfo.getParam());
+					log.info("创建成功:{}",table.tableName());
+				} catch (Exception e) {
+					log.info("该表已存在:{}",table.tableName());
+				}
 			} catch (Exception e) {
-				log.info("该表已存在:{}",table.tableName());
+				e.printStackTrace();
+				log.error(e, "建表出现异常");
 			}
 		});
 	}
 	
-	private List<Class<?>> loadClass(List<String> fileNames){
+	private List<Class<?>> loadClass(Set<String> fileNames){
 		List<Class<?>> clzzs = new ArrayList<>();
 		fileNames.forEach(fileName->{
 			try {
@@ -91,8 +98,8 @@ public class CreateTable {
 		return clzzs;
 	}
 	
-	private List<String> filterFile(List<String> allFileNames,String packagePath){
-		List<String> fileNames = new ArrayList<String>();
+	private Set<String> filterFile(List<String> allFileNames,String packagePath){
+		Set<String> fileNames = new HashSet<String>();
 		Pattern p = Pattern.compile("("+packagePath+".*).class");
 		allFileNames.forEach(fileName->{
 			Matcher m = p.matcher(fileName);
