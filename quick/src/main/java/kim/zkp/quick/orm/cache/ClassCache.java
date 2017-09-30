@@ -20,12 +20,14 @@
 package kim.zkp.quick.orm.cache;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 
 import kim.zkp.quick.orm.annotation.Condition;
 import kim.zkp.quick.orm.annotation.Exclude;
@@ -44,6 +46,7 @@ public class ClassCache {
 	private static final Map<Class<?>,List<Field>> annationOrderByCache = new HashMap<>();
 	private static final Map<Class<?>,List<Field>> annationConditionCache = new HashMap<>();
 	private static final Map<Class<?>,List<Field>> insertParamCache = new HashMap<>();
+	private static final Map<Class<?>,Method> strategyMethodCache = new HashMap<>();
 	
 	private static Map<String,Field> getAllFieldMap(Class<?> clzz){
 		Map<String,Field> fieldMap = allFieldClassCache.get(clzz);
@@ -168,6 +171,17 @@ public class ClassCache {
 		}
 		return fieldMap;
 	}
-	
+	public static Method getStrategyMethod(Class<?> clzz){
+		Method m = strategyMethodCache.get(clzz);
+		if (m == null) {
+			try {
+				m = clzz.getMethod("strategy");
+				strategyMethodCache.put(clzz, m);
+			} catch (NoSuchMethodException | SecurityException e) {
+				return null;
+			}
+		}
+		return m;
+	}
 	
 }

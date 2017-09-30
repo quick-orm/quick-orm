@@ -20,6 +20,8 @@
 package kim.zkp.quick.orm.util;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -31,6 +33,7 @@ import kim.zkp.quick.orm.exception.SqlBuilderException;
 import kim.zkp.quick.orm.model.ConditionConstants;
 import kim.zkp.quick.orm.model.Model;
 import kim.zkp.quick.orm.model.Schema;
+import kim.zkp.quick.orm.sharding.Sharding;
 import kim.zkp.quick.orm.sql.convert.FieldConvertProcessor;
 
 @SuppressWarnings("unchecked")
@@ -39,6 +42,19 @@ public class ObjectSqlBuilderUtils {
 	private static final List<String> CONDITION_PARAM = new ArrayList<>(Arrays.asList("lt", "gt", "le", "ge", "eq", "neq", "like"));
 
 	public static String getTableName(Object o) {
+		if (o instanceof Sharding) {
+			Method m = ClassCache.getStrategyMethod(o.getClass());
+			try {
+				Object tableName = m.invoke(o);
+				if (tableName == null) {
+					throw new SqlBuilderException("Strategy is wrong，Ungenerated tableName.");
+				}
+				return (String) tableName;
+			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+				throw new SqlBuilderException("Strategy is wrong，Ungenerated tableName.",e);
+			}
+		}
+		
 		if (o instanceof Model) {
 			Field f = ClassCache.getField(o.getClass(), "tableName");
 			Object v = FieldConvertProcessor.toDB(f, o);
