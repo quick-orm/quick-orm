@@ -52,8 +52,6 @@ public class JDBCConfig implements DefaultConfig {
 	private String maxExecuteTimeFilePath = DEFAULT_MAX_EXECUTE_TIME_FILE_PATH;
 	/**单位毫秒 当连接池连接耗尽时，客户端调用getConnection()后等待获取新连接的时间，超时后将抛出ConnectionException。单位毫秒。默认: 10000*/
 	private int maxWaitTime = DEFAULT_MAX_WAIT_TIME;
-	/**当连接池连接耗尽时，每次轮询获取连接的间隔时间，默认50毫秒*/
-	private int oncePollTime= DEFAULT_ONCE_POLL_TIME;
 	/**最大空闲时间*/
 	private int maxIdleTime = DEFAULT_MAX_IDLE_TIME;
 	/**每X毫秒检查所有连接池中的空闲连接。默认值: 0，不检查*/
@@ -128,9 +126,6 @@ public class JDBCConfig implements DefaultConfig {
 		if (jdbcSetting.get("jdbc.printSql") != null) {
 			printSql = jdbcSetting.getBool("jdbc.printSql");
 		}
-		if (jdbcSetting.get("jdbc.oncePollTime") != null) {
-			oncePollTime = jdbcSetting.getInt("jdbc.oncePollTime");
-		}
 
 	}
 
@@ -201,11 +196,4 @@ public class JDBCConfig implements DefaultConfig {
 	public boolean getPrintSql() {
 		return printSql;
 	}
-
-	public int getOncePollTime() {
-		return oncePollTime;
-	}
-	
-	
-
 }

@@ -28,8 +28,6 @@ public interface DefaultConfig {
 	public final static int DEFAULT_MAX_WAIT_TIME = 10*1000;
 	/**最大空闲时间,单位毫秒，默认30分钟*/
 	public final static int DEFAULT_MAX_IDLE_TIME = 30*60*1000;
-	/**当连接池连接耗尽时，每次轮询获取连接的间隔时间，默认50毫秒*/
-	public final static int DEFAULT_ONCE_POLL_TIME = 50;
 	/**单位毫秒，间隔多少时间检查所有连接池中的空闲连接。默认值: 10分钟检查一次，为0不检查*/
 	public final static int DEFAULT_IDLE_CONNECTION_TEST_PERIOD = 10*60*1000;
 	/**是否启用sql执行时间监控*/
