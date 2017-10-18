@@ -48,6 +48,11 @@ public class Schema extends Model<Schema> {
 	public static Schema open(){
 		return new Schema();
 	}
+	public static Schema open(Session session){
+		Schema s = open();
+		s.setSession(session);
+		return s;
+	}
 	/**
 	 * method name   : open 
 	 * description   : 打开表
