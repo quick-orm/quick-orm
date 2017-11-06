@@ -232,7 +232,7 @@ public class Schema extends Model<Schema> {
 	 * modified      : zhukaipeng ,  2017年9月15日
 	 * @see          : *
 	 */
-	private boolean isResult(){
+	public boolean isResult(){
 		return result!=null;
 	}
 	
