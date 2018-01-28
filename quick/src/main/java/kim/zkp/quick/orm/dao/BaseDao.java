@@ -83,27 +83,27 @@ public abstract class BaseDao<T> implements Dao<T> {
 	}
 
 	@Override
-	public T get(String sql, List<Object> params, Class<?> clzz) {
-		return (T) session.get(sql, params, clzz);
+	public T get(String sql, Class<?> clzz, Object ... params) {
+		return (T) session.get(sql, clzz, params);
 	}
 
 	@Override
-	public List<Object> list(String sql,List<Object> params, Class<?> clzz) {
-		return session.list(sql, params, clzz);
+	public List<Object> list(String sql, Class<?> clzz,Object ... params) {
+		return session.list(sql, clzz, params);
 	}
 
 	@Override
-	public int save(String sql, List<Object> params) {
+	public int save(String sql, Object ... params) {
 		return session.save(sql, params);
 	}
 
 	@Override
-	public int update(String sql, List<Object> params) {
+	public int update(String sql, Object ... params) {
 		return session.update(sql, params);
 	}
 
 	@Override
-	public int delete(String sql, List<Object> params) {
+	public int delete(String sql, Object ... params) {
 		return session.delete(sql, params);
 	}
 
@@ -133,28 +133,28 @@ public abstract class BaseDao<T> implements Dao<T> {
 	}
 
 	@Override
-	public Future<Integer> ftSave(String sql, List<Object> params) {
+	public Future<Integer> ftSave(String sql, Object ... params) {
 		return session.ftSave(sql, params);
 	}
 
 	@Override
-	public Future<Integer> ftDelete(String sql, List<Object> params) {
+	public Future<Integer> ftDelete(String sql, Object ... params) {
 		return session.ftDelete(sql, params);
 	}
 
 	@Override
-	public Future<Integer> ftUpdate(String sql, List<Object> params) {
+	public Future<Integer> ftUpdate(String sql, Object ... params) {
 		return session.ftUpdate(sql, params);
 	}
 
 	@Override
-	public Future<Object> ftGet(String sql,List<Object> params, Class<?> clzz) {
-		return session.ftGet(sql, params, clzz);
+	public Future<Object> ftGet(String sql, Class<?> clzz,Object ... params) {
+		return session.ftGet(sql, clzz, params);
 	}
 
 	@Override
-	public Future<List<Object>> ftList(String sql,List<Object> params, Class<?> clzz) {
-		return session.ftList(sql, params, clzz);
+	public Future<List<Object>> ftList(String sql, Class<?> clzz,Object ... params) {
+		return session.ftList(sql, clzz, params);
 	}
 
 	@Override
@@ -163,8 +163,8 @@ public abstract class BaseDao<T> implements Dao<T> {
 	}
 
 	@Override
-	public Page<Object> page(String countSql, String listSql, List<Object> params, Class<?> clzz) {
-		return session.page(countSql, listSql, params, clzz);
+	public Page<Object> page(String countSql, String listSql, Class<?> clzz, Object ... params) {
+		return session.page(countSql, listSql, clzz, params);
 	}
 
 	@Override
@@ -173,8 +173,8 @@ public abstract class BaseDao<T> implements Dao<T> {
 	}
 
 	@Override
-	public Future<Page<Object>> ftPage(String countSql, String listSql, List<Object> params, Class<?> clzz) {
-		return session.ftPage(countSql, listSql, params, clzz);
+	public Future<Page<Object>> ftPage(String countSql, String listSql, Class<?> clzz, Object ... params) {
+		return session.ftPage(countSql, listSql, clzz, params);
 	}
 
 }

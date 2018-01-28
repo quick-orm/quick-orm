@@ -39,7 +39,6 @@ public class AnnotationSqlBuilderUtils {
 	public static String getCondition(Object o, List<Object> valueList) {
 		StringBuffer condition = new StringBuffer();
 		List<Field> fieldList = ClassCache.getAllDeclaredFields(o.getClass());
-//		List<Field> fieldList = ClassCache.getCondition(o.getClass());
 		fieldList.forEach((f) -> {
 			Object v = FieldConvertProcessor.toDB(f, o);
 			if (v == null) {

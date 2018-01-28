@@ -477,14 +477,14 @@ public abstract class Model<T> extends ConditionSetting<T> {
 	 * description   : 执行sql查询
 	 * @return       : Object
 	 * @param        : @param sql sql
-	 * @param        : @param params 参数
 	 * @param        : @param clzz 返回值类型
+	 * @param        : @param params 参数
 	 * @param        : @return
 	 * modified      : zhukaipeng ,  2017年9月15日
 	 * @see          : *
 	 */
-	public Object get(String sql, List<Object> params,Class<?> clzz) {
-		return session.get(sql, params, clzz);
+	public Object get(String sql,Class<?> clzz, Object ... params) {
+		return session.get(sql, clzz, params);
 	}
 	/**
 	 * method name   : list 
@@ -497,8 +497,8 @@ public abstract class Model<T> extends ConditionSetting<T> {
 	 * modified      : zhukaipeng ,  2017年9月15日
 	 * @see          : *
 	 */
-	public List<Object> list(String sql, List<Object> params,Class<?> clzz) {
-		return session.list(sql, params, clzz);
+	public List<Object> list(String sql,Class<?> clzz, Object ... params) {
+		return session.list(sql, clzz, params);
 	}
 	/**
 	 * method name   : get 
@@ -510,8 +510,8 @@ public abstract class Model<T> extends ConditionSetting<T> {
 	 * modified      : zhukaipeng ,  2017年9月15日
 	 * @see          : *
 	 */
-	public T get(String sql, List<Object> params) {
-		return (T) session.get(sql, params, this.getClass());
+	public T get(String sql, Object ... params) {
+		return (T) session.get(sql, this.getClass(), params);
 	}
 	/**
 	 * method name   : list 
@@ -523,8 +523,8 @@ public abstract class Model<T> extends ConditionSetting<T> {
 	 * modified      : zhukaipeng ,  2017年9月15日
 	 * @see          : *
 	 */
-	public List<T> list(String sql, List<Object> params) {
-		return (List<T>) session.list(sql, params, this.getClass());
+	public List<T> list(String sql, Object ... params) {
+		return (List<T>) session.list(sql, this.getClass(), params);
 	}
 	/**
 	 * method name   : page 
@@ -568,9 +568,9 @@ public abstract class Model<T> extends ConditionSetting<T> {
 	 * modified      : zhukaipeng ,  2017年9月15日
 	 * @see          : *
 	 */
-	public Page<Object> page(Integer pageNum,Integer pageSize,String countSql,String listSql, List<Object> params, Class<?> clzz){
+	public Page<Object> page(Integer pageNum,Integer pageSize,String countSql,String listSql, Class<?> clzz, Object ... params){
 		Page.page(pageNum, pageSize);
-		return session.page(countSql, listSql, params, clzz);
+		return session.page(countSql, listSql, clzz, params);
 	}
 	/**
 	 * method name   : ftPage 
@@ -614,9 +614,9 @@ public abstract class Model<T> extends ConditionSetting<T> {
 	 * modified      : zhukaipeng ,  2017年9月15日
 	 * @see          : *
 	 */
-	public Future<Page<Object>> ftPage(Integer pageNum,Integer pageSize,String countSql,String listSql, List<Object> params, Class<?> clzz){
+	public Future<Page<Object>> ftPage(Integer pageNum,Integer pageSize,String countSql,String listSql, Class<?> clzz, Object ... params){
 		Page.page(pageNum, pageSize);
-		return session.ftPage(countSql, listSql, params, clzz);
+		return session.ftPage(countSql, listSql, clzz, params);
 	}
 	/**
 	 * method name   : ftSave 
@@ -781,8 +781,8 @@ public abstract class Model<T> extends ConditionSetting<T> {
 	 * modified      : zhukaipeng ,  2017年9月15日
 	 * @see          : *
 	 */
-	public Future<Object> ftGet(String sql, List<Object> params,Class<?> clzz) {
-		return session.ftGet(sql, params, clzz);
+	public Future<Object> ftGet(String sql, Class<?> clzz, Object ... params) {
+		return session.ftGet(sql, clzz, params);
 	}
 	
 	/**
@@ -796,8 +796,8 @@ public abstract class Model<T> extends ConditionSetting<T> {
 	 * modified      : zhukaipeng ,  2017年9月15日
 	 * @see          : *
 	 */
-	public Future<List<Object>> ftList(String sql, List<Object> params,Class<?> clzz) {
-		return session.ftList(sql, params, clzz);
+	public Future<List<Object>> ftList(String sql, Class<?> clzz, Object ... params) {
+		return session.ftList(sql, clzz, params);
 	}
 	/**
 	 * method name   : ftGet 
@@ -809,8 +809,8 @@ public abstract class Model<T> extends ConditionSetting<T> {
 	 * modified      : zhukaipeng ,  2017年9月15日
 	 * @see          : *
 	 */
-	public Future<T> ftGet(String sql,List<Object> params) {
-		return (Future<T>) session.ftGet(sql, params, this.getClass());
+	public Future<T> ftGet(String sql, Object ... params) {
+		return (Future<T>) session.ftGet(sql, this.getClass(), params);
 	}
 	
 }

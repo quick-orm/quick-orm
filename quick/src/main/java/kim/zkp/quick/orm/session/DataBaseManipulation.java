@@ -101,7 +101,7 @@ public interface DataBaseManipulation {
 	 * modified      : zhukaipeng ,  2017年9月15日
 	 * @see          : *
 	 */
-	List<Object> list(Object o, Class<?> clzz);
+	List<Object> list(Object o,Class<?> clzz);
 	/**
 	 * method name   : save 
 	 * description   : 保存
@@ -112,7 +112,7 @@ public interface DataBaseManipulation {
 	 * modified      : zhukaipeng ,  2017年9月15日
 	 * @see          : *
 	 */
-	int save(String sql, List<Object> params);
+	int save(String sql, Object ... params);
 	/**
 	 * method name   : delete 
 	 * description   : 删除
@@ -123,7 +123,7 @@ public interface DataBaseManipulation {
 	 * modified      : zhukaipeng ,  2017年9月15日
 	 * @see          : *
 	 */
-	int delete(String sql, List<Object> params);
+	int delete(String sql, Object ... params);
 	/**
 	 * method name   : update 
 	 * description   : 更新
@@ -134,7 +134,7 @@ public interface DataBaseManipulation {
 	 * modified      : zhukaipeng ,  2017年9月15日
 	 * @see          : *
 	 */
-	int update(String sql, List<Object> params);
+	int update(String sql, Object ... params);
 	/**
 	 * method name   : get 
 	 * description   : 查询
@@ -146,7 +146,7 @@ public interface DataBaseManipulation {
 	 * modified      : zhukaipeng ,  2017年9月15日
 	 * @see          : *
 	 */
-	Object get(String sql, List<Object> params, Class<?> clzz);
+	Object get(String sql, Class<?> clzz, Object ... params);
 	/**
 	 * method name   : list 
 	 * description   : 列表查询
@@ -158,7 +158,7 @@ public interface DataBaseManipulation {
 	 * modified      : zhukaipeng ,  2017年9月15日
 	 * @see          : *
 	 */
-	List<Object> list(String sql, List<Object> params, Class<?> clzz);
+	List<Object> list(String sql, Class<?> clzz, Object ... params);
 	/**
 	 * method name   : page 
 	 * description   : 分页查询
@@ -192,7 +192,7 @@ public interface DataBaseManipulation {
 	 * modified      : zhukaipeng ,  2017年9月15日
 	 * @see          : *
 	 */
-	Page<Object> page(String countSql,String listSql, List<Object> params, Class<?> clzz);
+	Page<Object> page(String countSql,String listSql, Class<?> clzz, Object ... params);
 	
 
 }

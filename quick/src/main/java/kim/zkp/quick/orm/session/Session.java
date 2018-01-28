@@ -21,6 +21,7 @@ package kim.zkp.quick.orm.session;
 
 import java.sql.Connection;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -148,13 +149,13 @@ public class Session implements DataBaseManipulation,FutureDataBaseManipulation,
 	}
 	
 	@Override
-	public Page<Object> page(String countSql,String listSql, List<Object> params, Class<?> clzz) {
+	public Page<Object> page(String countSql,String listSql, Class<?> clzz, Object ... params) {
 		Map<String,Integer> pageInfo = Page.getPageInfo();
 		if (pageInfo == null || pageInfo.get("pageNum")==null || pageInfo.get("pageSize")==null) {
 			throw new SqlBuilderException("PageNum or pageSize is null");
 		}
-		
-		SqlInfo countSqlInfo = new SqlInfo(countSql, params);
+		List<Object> paramList = Arrays.asList(params);
+		SqlInfo countSqlInfo = new SqlInfo(countSql, paramList);
 		Integer total = (Integer) connectionProcessor.get(getConnection(), countSqlInfo,Integer.class);
 		
 		if (total == 0) {
@@ -162,7 +163,7 @@ public class Session implements DataBaseManipulation,FutureDataBaseManipulation,
 			return page;
 		}
 		
-		SqlInfo listSqlInfo = new SqlInfo(listSql, params);
+		SqlInfo listSqlInfo = new SqlInfo(listSql, paramList);
 		List<Object> list = connectionProcessor.list(getConnection(), listSqlInfo,clzz);
 		return new Page<Object>(pageInfo.get("pageNum"),pageInfo.get("pageSize"), total, list);
 	}
@@ -174,32 +175,37 @@ public class Session implements DataBaseManipulation,FutureDataBaseManipulation,
 	}
 	
 	@Override
-	public int save(String sql,List<Object> params) {
-		SqlInfo sqlInfo = new SqlInfo(sql, params);
+	public int save(String sql, Object ... params) {
+		List<Object> paramList = Arrays.asList(params);
+		SqlInfo sqlInfo = new SqlInfo(sql, paramList);
 		return connectionProcessor.update(getConnection(), sqlInfo);
 	}
 	
 	@Override
-	public int delete(String sql, List<Object> params) {
-		SqlInfo sqlInfo = new SqlInfo(sql, params);
+	public int delete(String sql, Object ... params) {
+		List<Object> paramList = Arrays.asList(params);
+		SqlInfo sqlInfo = new SqlInfo(sql, paramList);
 		return connectionProcessor.update(getConnection(), sqlInfo);
 	}
 	
 	@Override
-	public int update(String sql,List<Object> params) {
-		SqlInfo sqlInfo = new SqlInfo(sql, params);
+	public int update(String sql, Object ... params) {
+		List<Object> paramList = Arrays.asList(params);
+		SqlInfo sqlInfo = new SqlInfo(sql, paramList);
 		return connectionProcessor.update(getConnection(), sqlInfo);
 	}
 	
 	@Override
-	public Object get(String sql,List<Object> params,Class<?> clzz) {
-		SqlInfo sqlInfo = new SqlInfo(sql, params);
+	public Object get(String sql,Class<?> clzz, Object ... params) {
+		List<Object> paramList = Arrays.asList(params);
+		SqlInfo sqlInfo = new SqlInfo(sql, paramList);
 		return connectionProcessor.get(getConnection(), sqlInfo, clzz);
 	}
 	
 	@Override
-	public List<Object> list(String sql,List<Object> params,Class<?> clzz) {
-		SqlInfo sqlInfo = new SqlInfo(sql, params);
+	public List<Object> list(String sql,Class<?> clzz, Object ... params) {
+		List<Object> paramList = Arrays.asList(params);
+		SqlInfo sqlInfo = new SqlInfo(sql, paramList);
 		return connectionProcessor.list(getConnection(), sqlInfo, clzz);
 	}
 	
@@ -288,7 +294,7 @@ public class Session implements DataBaseManipulation,FutureDataBaseManipulation,
 	}
 
 	@Override
-	public Future<Integer> ftSave(String sql, List<Object> params) {
+	public Future<Integer> ftSave(String sql, Object ... params) {
 		return futurePool.submit(new Callable<Integer>() {
 			public Integer call() throws Exception {
 				return save(sql, params);
@@ -297,7 +303,7 @@ public class Session implements DataBaseManipulation,FutureDataBaseManipulation,
 	}
 
 	@Override
-	public Future<Integer> ftDelete(String sql, List<Object> params) {
+	public Future<Integer> ftDelete(String sql, Object ... params) {
 		return futurePool.submit(new Callable<Integer>() {
 			public Integer call() throws Exception {
 				return update(sql, params);
@@ -306,7 +312,7 @@ public class Session implements DataBaseManipulation,FutureDataBaseManipulation,
 	}
 
 	@Override
-	public Future<Integer> ftUpdate(String sql, List<Object> params) {
+	public Future<Integer> ftUpdate(String sql, Object ... params) {
 		return futurePool.submit(new Callable<Integer>() {
 			public Integer call() throws Exception {
 				return update(sql, params);
@@ -315,19 +321,19 @@ public class Session implements DataBaseManipulation,FutureDataBaseManipulation,
 	}
 
 	@Override
-	public Future<Object> ftGet(String sql, List<Object> params, Class<?> clzz) {
+	public Future<Object> ftGet(String sql, Class<?> clzz, Object ... params) {
 		return futurePool.submit(new Callable<Object>() {
 			public Object call() throws Exception {
-				return get(sql, params, clzz);
+				return get(sql, clzz, params);
 			}
 		});
 	}
 
 	@Override
-	public Future<List<Object>> ftList(String sql, List<Object> params, Class<?> clzz) {
+	public Future<List<Object>> ftList(String sql, Class<?> clzz, Object ... params) {
 		return futurePool.submit(new Callable<List<Object>>() {
 			public List<Object> call() throws Exception {
-				return list(sql, params, clzz);
+				return list(sql, clzz, params);
 			}
 		});
 	}
@@ -351,10 +357,10 @@ public class Session implements DataBaseManipulation,FutureDataBaseManipulation,
 	}
 
 	@Override
-	public Future<Page<Object>> ftPage(String countSql, String listSql, List<Object> params, Class<?> clzz) {
+	public Future<Page<Object>> ftPage(String countSql, String listSql, Class<?> clzz, Object ... params) {
 		return futurePool.submit(new Callable<Page<Object>>() {
 			public Page<Object> call() throws Exception {
-				return page(countSql, listSql, params, clzz);
+				return page(countSql, listSql, clzz, params);
 			}
 		});
 	}

@@ -113,7 +113,7 @@ public interface FutureDataBaseManipulation {
 	 * modified      : zhukaipeng ,  2017年9月15日
 	 * @see          : *
 	 */
-	Future<Integer> ftSave(String sql, List<Object> params);
+	Future<Integer> ftSave(String sql, Object ... params);
 	/**
 	 * method name   : ftDelete 
 	 * description   : 异步删除
@@ -124,7 +124,7 @@ public interface FutureDataBaseManipulation {
 	 * modified      : zhukaipeng ,  2017年9月15日
 	 * @see          : *
 	 */
-	Future<Integer> ftDelete(String sql, List<Object> params);
+	Future<Integer> ftDelete(String sql, Object ... params);
 	/**
 	 * method name   : ftUpdate 
 	 * description   : 异步更新
@@ -135,7 +135,7 @@ public interface FutureDataBaseManipulation {
 	 * modified      : zhukaipeng ,  2017年9月15日
 	 * @see          : *
 	 */
-	Future<Integer> ftUpdate(String sql, List<Object> params);
+	Future<Integer> ftUpdate(String sql, Object ... params);
 	/**
 	 * method name   : ftGet 
 	 * description   : 异步查询
@@ -147,7 +147,7 @@ public interface FutureDataBaseManipulation {
 	 * modified      : zhukaipeng ,  2017年9月15日
 	 * @see          : *
 	 */
-	Future<Object> ftGet(String sql, List<Object> params, Class<?> clzz);
+	Future<Object> ftGet(String sql, Class<?> clzz, Object ... params);
 	/**
 	 * method name   : ftList 
 	 * description   : 异步列表查询
@@ -159,7 +159,7 @@ public interface FutureDataBaseManipulation {
 	 * modified      : zhukaipeng ,  2017年9月15日
 	 * @see          : *
 	 */
-	Future<List<Object>> ftList(String sql, List<Object> params, Class<?> clzz);
+	Future<List<Object>> ftList(String sql, Class<?> clzz, Object ... params);
 	/**
 	 * method name   : ftPage 
 	 * description   : 异步分页查询
@@ -193,7 +193,7 @@ public interface FutureDataBaseManipulation {
 	 * modified      : zhukaipeng ,  2017年9月15日
 	 * @see          : *
 	 */
-	Future<Page<Object>> ftPage(String countSql,String listSql, List<Object> params, Class<?> clzz);
+	Future<Page<Object>> ftPage(String countSql,String listSql, Class<?> clzz, Object ... params);
 
 
 }

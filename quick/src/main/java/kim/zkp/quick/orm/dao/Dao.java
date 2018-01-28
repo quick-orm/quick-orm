@@ -36,19 +36,19 @@ public interface Dao<T> {
 
 	List<T> find(T t);
 
-	int save(String sql, List<Object> params);
+	int save(String sql, Object ... params);
 
-	int delete(String sql, List<Object> params);
+	int delete(String sql, Object ... params);
 	
-	int update(String sql, List<Object> params);
+	int update(String sql, Object ... params);
 	
-	Object get(String sql, List<Object> params, Class<?> clzz);
+	Object get(String sql, Class<?> clzz, Object ... params);
 	
-	List<Object> list(String sql, List<Object> params, Class<?> clzz);
+	List<Object> list(String sql, Class<?> clzz, Object ... params);
 	
 	Page<T> page(Object o);
 	
-	Page<Object> page(String countSql,String listSql, List<Object> params, Class<?> clzz);
+	Page<Object> page(String countSql,String listSql, Class<?> clzz, Object ... params);
 	
 	Future<Integer> ftSave(T t);
 
@@ -60,18 +60,18 @@ public interface Dao<T> {
 
 	Future<List<Object>> ftList(T t);
 	
-	Future<Integer> ftSave(String sql, List<Object> params);
+	Future<Integer> ftSave(String sql, Object ... params);
 
-	Future<Integer> ftDelete(String sql, List<Object> params);
+	Future<Integer> ftDelete(String sql, Object ... params);
 	
-	Future<Integer> ftUpdate(String sql, List<Object> params);
+	Future<Integer> ftUpdate(String sql, Object ... params);
 	
-	Future<Object> ftGet(String sql, List<Object> params, Class<?> clzz);
+	Future<Object> ftGet(String sql, Class<?> clzz, Object ... params);
 	
-	Future<List<Object>> ftList(String sql, List<Object> params, Class<?> clzz);
+	Future<List<Object>> ftList(String sql, Class<?> clzz, Object ... params);
 	
 	Future<Page<Object>> ftPage(Object o);
 	
-	Future<Page<Object>> ftPage(String countSql,String listSql, List<Object> params, Class<?> clzz);
+	Future<Page<Object>> ftPage(String countSql,String listSql, Class<?> clzz, Object ... params);
 
 }

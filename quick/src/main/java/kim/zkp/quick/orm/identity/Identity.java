@@ -28,39 +28,33 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import com.xiaoleilu.hutool.util.RandomUtil;
 /**
  * class       :  Identity
  * @author     :  zhukaipeng
  * @version    :  1.0  
- * description :  主键生成器
+ * description :  主键生成器 ip标识+yyyyMMddHH+7位自增序列
  * @see        :  *
  */
 public class Identity {
 
 	private static Map<String, Identity> identityCache = new HashMap<String, Identity>();
 	private final AtomicInteger count = new AtomicInteger(0);
-	private String prefix = "000000000000";
 	private String ipAddress;
-
+	private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHH");
 	private Identity() {
 		ipAddress = getIpAddress();
 	}
 
-	private synchronized String get() {
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmm");
-		String hours = sdf.format(System.currentTimeMillis());
-		int value = 0;
-		if (!prefix.equals(hours)) {
-			prefix = hours;
-			count.set(0);
-		} else {
-			value = count.incrementAndGet();
-		}
-		return prefix + ipAddress + String.format("%07d", value);
+	private String get() {
+		String day = sdf.format(System.currentTimeMillis());
+		count.compareAndSet(Integer.MAX_VALUE-1000, 0);
+		return String.format("%s%s%07d", day,ipAddress,count.incrementAndGet());
 	}
-
+	
 	private String getIpAddress() {
-		String defaultIpAddress = "128";
+		String defaultIpAddress = RandomUtil.randomNumbers(4);
 		Enumeration<NetworkInterface> allNetInterfaces = null;
 		try {
 			allNetInterfaces = NetworkInterface.getNetworkInterfaces();
@@ -76,12 +70,7 @@ public class Identity {
 				if (ip != null && ip instanceof Inet4Address) {
 					try {
 						String ipAddress = ip.getHostAddress();
-						String[] nums = ipAddress.split("\\.");
-						int ipIdentity = 0;
-						for (String string : nums) {
-							ipIdentity += Integer.parseInt(string);
-						}
-						return String .valueOf(ipIdentity);
+						return ipAddress.replaceAll("\\.", "");
 					} catch (Exception e) {
 						return defaultIpAddress;
 					}
@@ -119,9 +108,6 @@ public class Identity {
 		return nextId("default");
 	}
 	public static void main(String[] args) {
-		for (int i = 0; i < 1000; i++) {
-			System.out.println(nextId());
-		}
 	}
 	
 }
