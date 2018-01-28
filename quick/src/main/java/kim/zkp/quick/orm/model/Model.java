@@ -351,6 +351,29 @@ public abstract class Model<T> extends ConditionSetting<T> {
 		return update();
 	}
 	/**
+	 * method name   : sqlUpdate 
+	 * description   : sql更新
+	 * @return       : int
+	 * @param        : @param sql
+	 * @param        : @return
+	 * modified      : zhukaipeng ,  2018年1月28日
+	 */
+	public int sqlUpdate(String sql) {
+		return session.sqlUpdate(sql);
+	}
+	/**
+	 * method name   : sqlUpdate 
+	 * description   : sql更新，带参数
+	 * @return       : int
+	 * @param        : @param sql
+	 * @param        : @param param
+	 * @param        : @return
+	 * modified      : zhukaipeng ,  2018年1月28日
+	 */
+	public int sqlUpdate(String sql,Object ... param) {
+		return session.sqlUpdate(sql,param);
+	}
+	/**
 	 * method name   : update 
 	 * description   : 更新多列
 	 * @return       : int
@@ -428,6 +451,9 @@ public abstract class Model<T> extends ConditionSetting<T> {
 	public int save() {
 		return session.save(this);
 	}
+//	public int batchSave(List<T> list) {
+//		return session.batchSave(list);
+//	}
 	/**
 	 * method name   : delete 
 	 * description   : 删除
@@ -439,6 +465,30 @@ public abstract class Model<T> extends ConditionSetting<T> {
 	public int delete() {
 		return session.delete(this);
 	}
+	/**
+	 * method name   : sqlDelete 
+	 * description   : sql删除
+	 * @return       : int
+	 * @param        : @param sql
+	 * @param        : @return
+	 * modified      : zhukaipeng ,  2018年1月28日
+	 */
+	public int sqlDelete(String sql) {
+		return session.sqlDelete(sql);
+	}
+	/**
+	 * method name   : sqlDelete 
+	 * description   : sql删除，带参数
+	 * @return       : int
+	 * @param        : @param sql
+	 * @param        : @param params
+	 * @param        : @return
+	 * modified      : zhukaipeng ,  2018年1月28日
+	 */
+	public int sqlDelete(String sql,Object ... params) {
+		return session.sqlDelete(sql,params);
+	}
+	
 	/**
 	 * method name   : update 
 	 * description   : 更新
@@ -483,8 +533,20 @@ public abstract class Model<T> extends ConditionSetting<T> {
 	 * modified      : zhukaipeng ,  2017年9月15日
 	 * @see          : *
 	 */
-	public Object get(String sql,Class<?> clzz, Object ... params) {
-		return session.get(sql, clzz, params);
+	public Object sqlGet(String sql,Class<?> clzz, Object ... params) {
+		return session.sqlGet(sql, clzz, params);
+	}
+	/**
+	 * method name   : sqlGet 
+	 * description   : 执行sql查询
+	 * @return       : Object
+	 * @param        : @param sql
+	 * @param        : @param clzz
+	 * @param        : @return
+	 * modified      : zhukaipeng ,  2018年1月28日
+	 */
+	public Object sqlGet(String sql,Class<?> clzz) {
+		return session.sqlGet(sql, clzz);
 	}
 	/**
 	 * method name   : list 
@@ -497,8 +559,20 @@ public abstract class Model<T> extends ConditionSetting<T> {
 	 * modified      : zhukaipeng ,  2017年9月15日
 	 * @see          : *
 	 */
-	public List<Object> list(String sql,Class<?> clzz, Object ... params) {
-		return session.list(sql, clzz, params);
+	public List<Object> sqlList(String sql,Class<?> clzz, Object ... params) {
+		return session.sqlList(sql, clzz, params);
+	}
+	/**
+	 * method name   : sqlList 
+	 * description   : 执行sql查询列表
+	 * @return       : List<Object>
+	 * @param        : @param sql
+	 * @param        : @param clzz
+	 * @param        : @return
+	 * modified      : zhukaipeng ,  2018年1月28日
+	 */
+	public List<Object> sqlList(String sql,Class<?> clzz) {
+		return session.sqlList(sql, clzz);
 	}
 	/**
 	 * method name   : get 
@@ -510,8 +584,19 @@ public abstract class Model<T> extends ConditionSetting<T> {
 	 * modified      : zhukaipeng ,  2017年9月15日
 	 * @see          : *
 	 */
-	public T get(String sql, Object ... params) {
-		return (T) session.get(sql, this.getClass(), params);
+	public T sqlGet(String sql, Object ... params) {
+		return (T) session.sqlGet(sql, this.getClass(), params);
+	}
+	/**
+	 * method name   : sqlGet 
+	 * description   : 执行sql查询
+	 * @return       : T
+	 * @param        : @param sql
+	 * @param        : @return
+	 * modified      : zhukaipeng ,  2018年1月28日
+	 */
+	public T sqlGet(String sql) {
+		return (T) session.sqlGet(sql, this.getClass());
 	}
 	/**
 	 * method name   : list 
@@ -523,8 +608,19 @@ public abstract class Model<T> extends ConditionSetting<T> {
 	 * modified      : zhukaipeng ,  2017年9月15日
 	 * @see          : *
 	 */
-	public List<T> list(String sql, Object ... params) {
-		return (List<T>) session.list(sql, this.getClass(), params);
+	public List<T> sqlList(String sql, Object ... params) {
+		return (List<T>) session.sqlList(sql, this.getClass(), params);
+	}
+	/**
+	 * method name   : sqlList 
+	 * description   : 执行sql查询列表
+	 * @return       : List<T>
+	 * @param        : @param sql
+	 * @param        : @return
+	 * modified      : zhukaipeng ,  2018年1月28日
+	 */
+	public List<T> sqlList(String sql) {
+		return (List<T>) session.sqlList(sql, this.getClass());
 	}
 	/**
 	 * method name   : page 
@@ -568,9 +664,25 @@ public abstract class Model<T> extends ConditionSetting<T> {
 	 * modified      : zhukaipeng ,  2017年9月15日
 	 * @see          : *
 	 */
-	public Page<Object> page(Integer pageNum,Integer pageSize,String countSql,String listSql, Class<?> clzz, Object ... params){
+	public Page<Object> sqlPage(Integer pageNum,Integer pageSize,String countSql,String listSql, Class<?> clzz, Object ... params){
 		Page.page(pageNum, pageSize);
-		return session.page(countSql, listSql, clzz, params);
+		return session.sqlPage(countSql, listSql, clzz, params);
+	}
+	/**
+	 * method name   : sqlPage 
+	 * description   : 执行SQL分页查询
+	 * @return       : Page<Object>
+	 * @param        : @param pageNum
+	 * @param        : @param pageSize
+	 * @param        : @param countSql
+	 * @param        : @param listSql
+	 * @param        : @param clzz
+	 * @param        : @return
+	 * modified      : zhukaipeng ,  2018年1月28日
+	 */
+	public Page<Object> sqlPage(Integer pageNum,Integer pageSize,String countSql,String listSql, Class<?> clzz){
+		Page.page(pageNum, pageSize);
+		return session.sqlPage(countSql, listSql, clzz);
 	}
 	/**
 	 * method name   : ftPage 
@@ -614,9 +726,25 @@ public abstract class Model<T> extends ConditionSetting<T> {
 	 * modified      : zhukaipeng ,  2017年9月15日
 	 * @see          : *
 	 */
-	public Future<Page<Object>> ftPage(Integer pageNum,Integer pageSize,String countSql,String listSql, Class<?> clzz, Object ... params){
+	public Future<Page<Object>> ftSqlPage(Integer pageNum,Integer pageSize,String countSql,String listSql, Class<?> clzz, Object ... params){
 		Page.page(pageNum, pageSize);
-		return session.ftPage(countSql, listSql, clzz, params);
+		return session.ftSqlPage(countSql, listSql, clzz, params);
+	}
+	/**
+	 * method name   : ftSqlPage 
+	 * description   : 异步分页查询
+	 * @return       : Future<Page<Object>>
+	 * @param        : @param pageNum
+	 * @param        : @param pageSize
+	 * @param        : @param countSql
+	 * @param        : @param listSql
+	 * @param        : @param clzz
+	 * @param        : @return
+	 * modified      : zhukaipeng ,  2018年1月28日
+	 */
+	public Future<Page<Object>> ftSqlPage(Integer pageNum,Integer pageSize,String countSql,String listSql, Class<?> clzz){
+		Page.page(pageNum, pageSize);
+		return session.ftSqlPage(countSql, listSql, clzz);
 	}
 	/**
 	 * method name   : ftSave 
@@ -781,8 +909,20 @@ public abstract class Model<T> extends ConditionSetting<T> {
 	 * modified      : zhukaipeng ,  2017年9月15日
 	 * @see          : *
 	 */
-	public Future<Object> ftGet(String sql, Class<?> clzz, Object ... params) {
-		return session.ftGet(sql, clzz, params);
+	public Future<Object> ftSqlGet(String sql, Class<?> clzz, Object ... params) {
+		return session.ftSqlGet(sql, clzz, params);
+	}
+	/**
+	 * method name   : ftSqlGet 
+	 * description   : 异步SQL查询
+	 * @return       : Future<Object>
+	 * @param        : @param sql
+	 * @param        : @param clzz
+	 * @param        : @return
+	 * modified      : zhukaipeng ,  2018年1月28日
+	 */
+	public Future<Object> ftSqlGet(String sql, Class<?> clzz) {
+		return session.ftSqlGet(sql, clzz);
 	}
 	
 	/**
@@ -796,8 +936,31 @@ public abstract class Model<T> extends ConditionSetting<T> {
 	 * modified      : zhukaipeng ,  2017年9月15日
 	 * @see          : *
 	 */
-	public Future<List<Object>> ftList(String sql, Class<?> clzz, Object ... params) {
-		return session.ftList(sql, clzz, params);
+	public Future<List<Object>> ftSqlList(String sql, Class<?> clzz, Object ... params) {
+		return session.ftSqlList(sql, clzz, params);
+	}
+	/**
+	 * method name   : ftSqlList 
+	 * description   : 异步执行SQL查询列表
+	 * @return       : Future<List<Object>>
+	 * @param        : @param sql
+	 * @param        : @param clzz
+	 * @param        : @return
+	 * modified      : zhukaipeng ,  2018年1月28日
+	 */
+	public Future<List<Object>> ftSqlList(String sql, Class<?> clzz) {
+		return session.ftSqlList(sql, clzz);
+	}
+	/**
+	 * method name   : ftSqlList 
+	 * description   : 异步执行SQL查询列表
+	 * @return       : Future<List<Object>>
+	 * @param        : @param sql
+	 * @param        : @return
+	 * modified      : zhukaipeng ,  2018年1月28日
+	 */
+	public Future<List<Object>> ftSqlList(String sql) {
+		return session.ftSqlList(sql, this.getClass());
 	}
 	/**
 	 * method name   : ftGet 
@@ -809,8 +972,64 @@ public abstract class Model<T> extends ConditionSetting<T> {
 	 * modified      : zhukaipeng ,  2017年9月15日
 	 * @see          : *
 	 */
-	public Future<T> ftGet(String sql, Object ... params) {
-		return (Future<T>) session.ftGet(sql, this.getClass(), params);
+	public Future<T> ftSqlGet(String sql, Object ... params) {
+		return (Future<T>) session.ftSqlGet(sql, this.getClass(), params);
 	}
-	
+	/**
+	 * method name   : ftSqlGet 
+	 * description   : 异步执行SQL查询
+	 * @return       : Future<T>
+	 * @param        : @param sql
+	 * @param        : @return
+	 * modified      : zhukaipeng ,  2018年1月28日
+	 */
+	public Future<T> ftSqlGet(String sql) {
+		return (Future<T>) session.ftSqlGet(sql, this.getClass());
+	}
+	/**
+	 * method name   : ftSqlUpdate 
+	 * description   : 异步SQL更新，带参数
+	 * @return       : Future<T>
+	 * @param        : @param sql
+	 * @param        : @param params
+	 * @param        : @return
+	 * modified      : zhukaipeng ,  2018年1月28日
+	 */
+	public Future<T> ftSqlUpdate(String sql, Object ... params) {
+		return (Future<T>) session.ftSqlUpdate(sql, params);
+	}
+	/**
+	 * method name   : ftSqlUpdate 
+	 * description   : 异步sql更新
+	 * @return       : Future<T>
+	 * @param        : @param sql
+	 * @param        : @return
+	 * modified      : zhukaipeng ,  2018年1月28日
+	 */
+	public Future<T> ftSqlUpdate(String sql) {
+		return (Future<T>) session.ftSqlUpdate(sql);
+	}
+	/**
+	 * method name   : ftSqlDelete 
+	 * description   : 异步sql删除，带参数 
+	 * @return       : Future<T>
+	 * @param        : @param sql
+	 * @param        : @param params
+	 * @param        : @return
+	 * modified      : zhukaipeng ,  2018年1月28日
+	 */
+	public Future<T> ftSqlDelete(String sql, Object ... params) {
+		return (Future<T>) session.ftSqlDelete(sql, params);
+	}
+	/**
+	 * method name   : ftSqlDelete 
+	 * description   : 异步sql删除
+	 * @return       : Future<T>
+	 * @param        : @param sql
+	 * @param        : @return
+	 * modified      : zhukaipeng ,  2018年1月28日
+	 */
+	public Future<T> ftSqlDelete(String sql) {
+		return (Future<T>) session.ftSqlDelete(sql);
+	}
 }

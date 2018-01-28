@@ -34,6 +34,7 @@ public class SqlBuilderProcessor {
 	
 	public SqlBuilderProcessor(String dbType){
 		sqlBuilderContainer.put(SqlBuilder.SBType.SAVE, new SaveSqlBuilder());
+//		sqlBuilderContainer.put(SqlBuilder.SBType.BATCH_SAVE, new BatchSaveSqlBuilder());
 		sqlBuilderContainer.put(SqlBuilder.SBType.DELETE, new DeleteSqlBuilder());
 		sqlBuilderContainer.put(SqlBuilder.SBType.UPDATE, new UpdateSqlBuilder());
 		sqlBuilderContainer.put(SqlBuilder.SBType.GET, new GetSqlBuilder());

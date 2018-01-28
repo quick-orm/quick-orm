@@ -34,6 +34,7 @@ public interface SqlBuilder {
 	
 	enum SBType{
 		SAVE,
+		BATCH_SAVE,
 		DELETE,
 		UPDATE,
 		GET,

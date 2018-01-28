@@ -74,7 +74,7 @@ public class CreateTable {
 				SqlInfo sqlInfo = sqlBuilderProcessor.getSql(SqlBuilder.SBType.CREATE_TABLE, clzz);
 				log.info("建表SQL:{}",sqlInfo.getSql());
 				try {
-					session.update(sqlInfo.getSql());
+					session.sqlUpdate(sqlInfo.getSql());
 					log.info("创建成功:{}",table.tableName());
 				} catch (Exception e) {
 					log.info("该表已存在:{}",table.tableName());

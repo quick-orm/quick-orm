@@ -84,27 +84,27 @@ public abstract class BaseDao<T> implements Dao<T> {
 
 	@Override
 	public T get(String sql, Class<?> clzz, Object ... params) {
-		return (T) session.get(sql, clzz, params);
+		return (T) session.sqlGet(sql, clzz, params);
 	}
 
 	@Override
 	public List<Object> list(String sql, Class<?> clzz,Object ... params) {
-		return session.list(sql, clzz, params);
+		return session.sqlList(sql, clzz, params);
 	}
 
 	@Override
 	public int save(String sql, Object ... params) {
-		return session.save(sql, params);
+		return session.sqlSave(sql, params);
 	}
 
 	@Override
 	public int update(String sql, Object ... params) {
-		return session.update(sql, params);
+		return session.sqlUpdate(sql, params);
 	}
 
 	@Override
 	public int delete(String sql, Object ... params) {
-		return session.delete(sql, params);
+		return session.sqlDelete(sql, params);
 	}
 
 	@Override
@@ -134,27 +134,27 @@ public abstract class BaseDao<T> implements Dao<T> {
 
 	@Override
 	public Future<Integer> ftSave(String sql, Object ... params) {
-		return session.ftSave(sql, params);
+		return session.ftSqlSave(sql, params);
 	}
 
 	@Override
 	public Future<Integer> ftDelete(String sql, Object ... params) {
-		return session.ftDelete(sql, params);
+		return session.ftSqlDelete(sql, params);
 	}
 
 	@Override
 	public Future<Integer> ftUpdate(String sql, Object ... params) {
-		return session.ftUpdate(sql, params);
+		return session.ftSqlUpdate(sql, params);
 	}
 
 	@Override
 	public Future<Object> ftGet(String sql, Class<?> clzz,Object ... params) {
-		return session.ftGet(sql, clzz, params);
+		return session.ftSqlGet(sql, clzz, params);
 	}
 
 	@Override
 	public Future<List<Object>> ftList(String sql, Class<?> clzz,Object ... params) {
-		return session.ftList(sql, clzz, params);
+		return session.ftSqlList(sql, clzz, params);
 	}
 
 	@Override
@@ -164,7 +164,7 @@ public abstract class BaseDao<T> implements Dao<T> {
 
 	@Override
 	public Page<Object> page(String countSql, String listSql, Class<?> clzz, Object ... params) {
-		return session.page(countSql, listSql, clzz, params);
+		return session.sqlPage(countSql, listSql, clzz, params);
 	}
 
 	@Override
@@ -174,7 +174,7 @@ public abstract class BaseDao<T> implements Dao<T> {
 
 	@Override
 	public Future<Page<Object>> ftPage(String countSql, String listSql, Class<?> clzz, Object ... params) {
-		return session.ftPage(countSql, listSql, clzz, params);
+		return session.ftSqlPage(countSql, listSql, clzz, params);
 	}
 
 }

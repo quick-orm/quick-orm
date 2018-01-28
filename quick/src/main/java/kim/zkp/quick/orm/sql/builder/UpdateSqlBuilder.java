@@ -35,7 +35,6 @@ public class UpdateSqlBuilder extends AbstractSqlBuilder {
 	@Override
 	public SqlInfo builderSql(Object o) {
 		String tableName = super.getTableName(o);
-		String select = super.getSelect(o);
 		List<Object> valueList = new ArrayList<>();
 		String modif = super.getModif(o, valueList);
 		String condition = super.getPrimaryKey(o,valueList);
@@ -43,7 +42,6 @@ public class UpdateSqlBuilder extends AbstractSqlBuilder {
 			throw new SqlBuilderException("No update condition,disallow full table update!");
 		}
 		String sql = UPDATE_TEMPLATE.replace("#tableName", tableName);
-		sql = sql.replace("#select", select);
 		sql = sql.replace("#modif", modif);
 		sql = sql.replace("#condition", condition);
 		return new SqlInfo(sql, valueList);

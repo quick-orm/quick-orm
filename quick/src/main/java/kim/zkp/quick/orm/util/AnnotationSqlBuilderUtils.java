@@ -89,7 +89,7 @@ public class AnnotationSqlBuilderUtils {
 		return orderBy.deleteCharAt(orderBy.lastIndexOf(",")).toString();
 	}
 	
-	public static void getInsert(Object o,StringBuffer insertParam,StringBuffer insertValue,List<Object> valueList) {
+	public static List<Field> getInsert(Object o,StringBuffer insertParam,StringBuffer insertValue,List<Object> valueList) {
 		List<Field> fieldList =ClassCache.getInsert(o.getClass());
 		fieldList.forEach((f) -> {
 			Object v = FieldConvertProcessor.toDB(f, o);
@@ -100,6 +100,7 @@ public class AnnotationSqlBuilderUtils {
 			insertValue.append(Constants.PLACEHOLDER).append(",");
 			valueList.add(v);
 		});
+		return fieldList;
 	}
 	public static String getModif(Object o,List<Object> valueList) {
 		List<Field> fieldList =ClassCache.getInsert(o.getClass());

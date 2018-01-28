@@ -45,7 +45,7 @@ import kim.zkp.quick.orm.table.CreateTable;
  * description :  Session类似数据源，且提供了一套操作数据库的API
  * @see        :  *
  */
-public class Session implements DataBaseManipulation,FutureDataBaseManipulation,Transaction {
+public class Session implements DataBaseManipulation,SqlDataBaseManipulation,FutureDataBaseManipulation,SqlFutureDataBaseManipulation,Transaction {
 	private static final Map<String,Session> sessionContainer = new HashMap<String, Session>();
 	private ConnectionProcessor connectionProcessor;
 	private ExecutorService futurePool;
@@ -149,12 +149,31 @@ public class Session implements DataBaseManipulation,FutureDataBaseManipulation,
 	}
 	
 	@Override
-	public Page<Object> page(String countSql,String listSql, Class<?> clzz, Object ... params) {
+	public Page<Object> sqlPage(String countSql,String listSql, Class<?> clzz, Object ... params) {
 		Map<String,Integer> pageInfo = Page.getPageInfo();
 		if (pageInfo == null || pageInfo.get("pageNum")==null || pageInfo.get("pageSize")==null) {
 			throw new SqlBuilderException("PageNum or pageSize is null");
 		}
 		List<Object> paramList = Arrays.asList(params);
+		SqlInfo countSqlInfo = new SqlInfo(countSql, paramList);
+		Integer total = (Integer) connectionProcessor.get(getConnection(), countSqlInfo,Integer.class);
+		
+		if (total == 0) {
+			Page<Object> page = new Page<Object>(pageInfo.get("pageNum"),pageInfo.get("pageSize"), total, new ArrayList<Object>());
+			return page;
+		}
+		
+		SqlInfo listSqlInfo = new SqlInfo(listSql, paramList);
+		List<Object> list = connectionProcessor.list(getConnection(), listSqlInfo,clzz);
+		return new Page<Object>(pageInfo.get("pageNum"),pageInfo.get("pageSize"), total, list);
+	}
+	@Override
+	public Page<Object> sqlPage(String countSql,String listSql, Class<?> clzz) {
+		Map<String,Integer> pageInfo = Page.getPageInfo();
+		if (pageInfo == null || pageInfo.get("pageNum")==null || pageInfo.get("pageSize")==null) {
+			throw new SqlBuilderException("PageNum or pageSize is null");
+		}
+		List<Object> paramList = new ArrayList<>();
 		SqlInfo countSqlInfo = new SqlInfo(countSql, paramList);
 		Integer total = (Integer) connectionProcessor.get(getConnection(), countSqlInfo,Integer.class);
 		
@@ -175,36 +194,66 @@ public class Session implements DataBaseManipulation,FutureDataBaseManipulation,
 	}
 	
 	@Override
-	public int save(String sql, Object ... params) {
+	public int sqlSave(String sql, Object ... params) {
 		List<Object> paramList = Arrays.asList(params);
+		SqlInfo sqlInfo = new SqlInfo(sql, paramList);
+		return connectionProcessor.update(getConnection(), sqlInfo);
+	}
+	@Override
+	public int sqlSave(String sql) {
+		List<Object> paramList = new ArrayList<>();
 		SqlInfo sqlInfo = new SqlInfo(sql, paramList);
 		return connectionProcessor.update(getConnection(), sqlInfo);
 	}
 	
 	@Override
-	public int delete(String sql, Object ... params) {
+	public int sqlDelete(String sql, Object ... params) {
 		List<Object> paramList = Arrays.asList(params);
+		SqlInfo sqlInfo = new SqlInfo(sql, paramList);
+		return connectionProcessor.update(getConnection(), sqlInfo);
+	}
+	@Override
+	public int sqlDelete(String sql) {
+		List<Object> paramList = new ArrayList<>();
 		SqlInfo sqlInfo = new SqlInfo(sql, paramList);
 		return connectionProcessor.update(getConnection(), sqlInfo);
 	}
 	
 	@Override
-	public int update(String sql, Object ... params) {
+	public int sqlUpdate(String sql, Object ... params) {
 		List<Object> paramList = Arrays.asList(params);
+		SqlInfo sqlInfo = new SqlInfo(sql, paramList);
+		return connectionProcessor.update(getConnection(), sqlInfo);
+	}
+	@Override
+	public int sqlUpdate(String sql) {
+		List<Object> paramList = new ArrayList<>();
 		SqlInfo sqlInfo = new SqlInfo(sql, paramList);
 		return connectionProcessor.update(getConnection(), sqlInfo);
 	}
 	
 	@Override
-	public Object get(String sql,Class<?> clzz, Object ... params) {
+	public Object sqlGet(String sql,Class<?> clzz, Object ... params) {
 		List<Object> paramList = Arrays.asList(params);
+		SqlInfo sqlInfo = new SqlInfo(sql, paramList);
+		return connectionProcessor.get(getConnection(), sqlInfo, clzz);
+	}
+	@Override
+	public Object sqlGet(String sql,Class<?> clzz) {
+		List<Object> paramList = new ArrayList<>();
 		SqlInfo sqlInfo = new SqlInfo(sql, paramList);
 		return connectionProcessor.get(getConnection(), sqlInfo, clzz);
 	}
 	
 	@Override
-	public List<Object> list(String sql,Class<?> clzz, Object ... params) {
+	public List<Object> sqlList(String sql,Class<?> clzz, Object ... params) {
 		List<Object> paramList = Arrays.asList(params);
+		SqlInfo sqlInfo = new SqlInfo(sql, paramList);
+		return connectionProcessor.list(getConnection(), sqlInfo, clzz);
+	}
+	@Override
+	public List<Object> sqlList(String sql,Class<?> clzz) {
+		List<Object> paramList = new ArrayList<>();
 		SqlInfo sqlInfo = new SqlInfo(sql, paramList);
 		return connectionProcessor.list(getConnection(), sqlInfo, clzz);
 	}
@@ -294,46 +343,86 @@ public class Session implements DataBaseManipulation,FutureDataBaseManipulation,
 	}
 
 	@Override
-	public Future<Integer> ftSave(String sql, Object ... params) {
+	public Future<Integer> ftSqlSave(String sql, Object ... params) {
 		return futurePool.submit(new Callable<Integer>() {
 			public Integer call() throws Exception {
-				return save(sql, params);
+				return sqlSave(sql, params);
+			}
+		});
+	}
+	@Override
+	public Future<Integer> ftSqlSave(String sql) {
+		return futurePool.submit(new Callable<Integer>() {
+			public Integer call() throws Exception {
+				return sqlSave(sql);
 			}
 		});
 	}
 
 	@Override
-	public Future<Integer> ftDelete(String sql, Object ... params) {
+	public Future<Integer> ftSqlDelete(String sql, Object ... params) {
 		return futurePool.submit(new Callable<Integer>() {
 			public Integer call() throws Exception {
-				return update(sql, params);
+				return sqlUpdate(sql, params);
+			}
+		});
+	}
+	@Override
+	public Future<Integer> ftSqlDelete(String sql) {
+		return futurePool.submit(new Callable<Integer>() {
+			public Integer call() throws Exception {
+				return sqlUpdate(sql);
 			}
 		});
 	}
 
 	@Override
-	public Future<Integer> ftUpdate(String sql, Object ... params) {
+	public Future<Integer> ftSqlUpdate(String sql, Object ... params) {
 		return futurePool.submit(new Callable<Integer>() {
 			public Integer call() throws Exception {
-				return update(sql, params);
+				return sqlUpdate(sql, params);
+			}
+		});
+	}
+	@Override
+	public Future<Integer> ftSqlUpdate(String sql) {
+		return futurePool.submit(new Callable<Integer>() {
+			public Integer call() throws Exception {
+				return sqlUpdate(sql);
 			}
 		});
 	}
 
 	@Override
-	public Future<Object> ftGet(String sql, Class<?> clzz, Object ... params) {
+	public Future<Object> ftSqlGet(String sql, Class<?> clzz, Object ... params) {
 		return futurePool.submit(new Callable<Object>() {
 			public Object call() throws Exception {
-				return get(sql, clzz, params);
+				return sqlGet(sql, clzz, params);
+			}
+		});
+	}
+	@Override
+	public Future<Object> ftSqlGet(String sql, Class<?> clzz) {
+		return futurePool.submit(new Callable<Object>() {
+			public Object call() throws Exception {
+				return sqlGet(sql, clzz);
 			}
 		});
 	}
 
 	@Override
-	public Future<List<Object>> ftList(String sql, Class<?> clzz, Object ... params) {
+	public Future<List<Object>> ftSqlList(String sql, Class<?> clzz, Object ... params) {
 		return futurePool.submit(new Callable<List<Object>>() {
 			public List<Object> call() throws Exception {
-				return list(sql, clzz, params);
+				return sqlList(sql, clzz, params);
+			}
+		});
+	}
+	@Override
+	public Future<List<Object>> ftSqlList(String sql, Class<?> clzz) {
+		return futurePool.submit(new Callable<List<Object>>() {
+			public List<Object> call() throws Exception {
+				return sqlList(sql, clzz);
 			}
 		});
 	}
@@ -357,13 +446,26 @@ public class Session implements DataBaseManipulation,FutureDataBaseManipulation,
 	}
 
 	@Override
-	public Future<Page<Object>> ftPage(String countSql, String listSql, Class<?> clzz, Object ... params) {
+	public Future<Page<Object>> ftSqlPage(String countSql, String listSql, Class<?> clzz, Object ... params) {
 		return futurePool.submit(new Callable<Page<Object>>() {
 			public Page<Object> call() throws Exception {
-				return page(countSql, listSql, clzz, params);
+				return sqlPage(countSql, listSql, clzz, params);
 			}
 		});
 	}
+	@Override
+	public Future<Page<Object>> ftSqlPage(String countSql, String listSql, Class<?> clzz) {
+		return futurePool.submit(new Callable<Page<Object>>() {
+			public Page<Object> call() throws Exception {
+				return sqlPage(countSql, listSql, clzz);
+			}
+		});
+	}
+//	@Override
+//	public int batchSave(List<?> list) {
+//		SqlInfo sqlInfo = sqlBuilderProcessor.getSql(SqlBuilder.SBType.BATCH_SAVE, list);
+//		return connectionProcessor.update(getConnection(), sqlInfo);
+//	}
 
 	
 	
