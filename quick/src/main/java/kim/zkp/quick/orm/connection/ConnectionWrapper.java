@@ -48,7 +48,7 @@ import kim.zkp.quick.orm.exception.ConnectionExceptionCount;
  * @see        :  *
  */
 public class ConnectionWrapper implements Connection{
-	private final Long CONNECTION_SURVIVE_TIME = 2*60*60*1000L;//每一个连接从创建到销毁的时间为两个小时
+	private final Long CONNECTION_SURVIVE_TIME = 6*60*60*1000L;//每一个连接从创建到销毁的时间为六个小时
 	private Connection connection;
 	private Long lastUsedTime;
 	private Long createTime;
@@ -114,7 +114,7 @@ public class ConnectionWrapper implements Connection{
 
 	@Override
 	public void close() throws SQLException {//线程级
-		SingleThreadConnectionHolder.removeConnection(this);
+//		SingleThreadConnectionHolder.removeConnection(this);
 		this.pool.recycleConnection(this);
 	}
 	public void destroy(){//全局

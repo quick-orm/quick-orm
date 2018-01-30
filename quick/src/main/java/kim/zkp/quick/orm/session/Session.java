@@ -30,6 +30,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import javax.sql.DataSource;
+
 import kim.zkp.quick.orm.connection.ConnectionProcessor;
 import kim.zkp.quick.orm.connection.JDBCConfig;
 import kim.zkp.quick.orm.exception.SqlBuilderException;
@@ -51,9 +53,9 @@ public class Session implements DataBaseManipulation,SqlDataBaseManipulation,Fut
 	private ExecutorService futurePool;
 	private SqlBuilderProcessor sqlBuilderProcessor;
 
-	private Session(String jdbcName) {
+	private Session(String jdbcConfigName) {
 		super();
-		JDBCConfig jdbcConfig = JDBCConfig.newInstance(jdbcName);
+		JDBCConfig jdbcConfig = JDBCConfig.newInstance(jdbcConfigName);
 		connectionProcessor = new ConnectionProcessor(jdbcConfig);
 		sqlBuilderProcessor = new SqlBuilderProcessor(jdbcConfig.getDbType());
 		futurePool = Executors.newFixedThreadPool(jdbcConfig.getAsyncPoolSize());
@@ -61,6 +63,14 @@ public class Session implements DataBaseManipulation,SqlDataBaseManipulation,Fut
 			CreateTable createTable = new CreateTable(this,sqlBuilderProcessor,jdbcConfig.getPackagePath());
 			createTable.start();
 		}
+	}
+	
+	private DataSource getDataSource(){
+		return connectionProcessor.getDataSource();
+	}
+	
+	public static DataSource getDataSource(String jdbcConfigName){
+		return getSession(jdbcConfigName).getDataSource();
 	}
 	/**
 	 * method name   : getDefaultSession 

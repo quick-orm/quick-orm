@@ -55,10 +55,21 @@ public class ConnectionProcessor {
 		this.jdbcConfig = jdbcConfig;
 		this.dataSource = new QuickDataSource(jdbcConfig);
 	}
-
+	
+	public DataSource getDataSource(){
+		return dataSource;
+	}
+	
 	public Connection getConnection(){
 		try {
-			return SingleThreadConnectionHolder.getConnection(dataSource);
+//			Connection conn = SingleThreadConnectionHolder.getConnection(dataSource);
+//			if (conn == null || conn.isClosed()) {
+//				conn = dataSource.getConnection();
+//				SingleThreadConnectionHolder.setConnection(dataSource, conn);
+//			}
+//			return conn;
+			
+			return dataSource.getConnection();
 		} catch (SQLException e) {
 			throw new ConnectionException("Get db connection error",e);
 		}
@@ -286,13 +297,15 @@ public class ConnectionProcessor {
 			try {
 				if (x.getAutoCommit()) {
 					x.close();
+					SingleThreadConnectionHolder.removeConnection(dataSource);
 				}
 			} catch (Exception e) {//此处若获取事务状态异常，直接移除连接，防止连接占用
+				SingleThreadConnectionHolder.removeConnection(dataSource);
 				log.error("close connection error", e);
 				try {
 					x.close();
 				} catch (SQLException e1) {
-					log.error("close2 connection error", e1);
+					log.error("close connection error", e1);
 				}
 			}
 		}

@@ -30,9 +30,15 @@ public class SingleThreadConnectionHolder {
 	public static Connection getConnection(DataSource dataSource) throws SQLException {
 		return getConnectionHolder().getConnection(dataSource);
 	}
+	public static void putConnection(DataSource dataSource,Connection conn) throws SQLException {
+		getConnectionHolder().putConnection(dataSource,conn);
+	}
 
 	public static void removeConnection(DataSource dataSource) {
-		getConnectionHolder().removeConnection(dataSource);
+		ConnectionHolder connectionHolder = localConnectionHolder.get();
+		if (connectionHolder != null) {
+			connectionHolder.removeConnection(dataSource);
+		}
 	}
 	public static void removeConnection(Connection conn) {
 		getConnectionHolder().removeConnection(conn);

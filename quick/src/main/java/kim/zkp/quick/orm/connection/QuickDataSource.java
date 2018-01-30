@@ -48,7 +48,13 @@ public class QuickDataSource implements DataSource{
 
 	@Override
 	public Connection getConnection() throws SQLException {
-		return connPool.getConnection();
+		Connection conn = SingleThreadConnectionHolder.getConnection(this);
+		if (conn == null || conn.isClosed()) {
+			conn = connPool.getConnection();
+			SingleThreadConnectionHolder.putConnection(this, conn);
+		}
+		return conn;
+//		return connPool.getConnection();
 	}
 
 	@Override

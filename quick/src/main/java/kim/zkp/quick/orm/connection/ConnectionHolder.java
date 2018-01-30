@@ -32,13 +32,17 @@ public class ConnectionHolder {
 	private Map<DataSource, Connection> connectionMap = new HashMap<DataSource, Connection>();
 
 	public Connection getConnection(DataSource dataSource) throws SQLException {
-		Connection connection = connectionMap.get(dataSource);
-		if (connection == null || connection.isClosed()) {
-			connection = dataSource.getConnection();
-			connectionMap.put(dataSource, connection);
-		}
+		return connectionMap.get(dataSource);
+//		Connection connection = connectionMap.get(dataSource);
+//		if (connection == null || connection.isClosed()) {
+//			connection = dataSource.getConnection();
+//			connectionMap.put(dataSource, connection);
+//		}
 
-		return connection;
+//		return connection;
+	}
+	public void putConnection(DataSource dataSource,Connection conn) {
+		connectionMap.put(dataSource, conn);
 	}
 
 	public void removeConnection(DataSource dataSource) {
