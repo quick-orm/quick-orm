@@ -37,13 +37,13 @@ public class UpdateSqlBuilder extends AbstractSqlBuilder {
 		String tableName = super.getTableName(o);
 		List<Object> valueList = new ArrayList<>();
 		String modif = super.getModif(o, valueList);
-		String condition = super.getPrimaryKey(o,valueList);
-		if (condition == null || "".equals(condition)) {
+		String primaryKey = super.getPrimaryKey(o,valueList);
+		if (primaryKey == null || "".equals(primaryKey)) {
 			throw new SqlBuilderException("No update condition,disallow full table update!");
 		}
 		String sql = UPDATE_TEMPLATE.replace("#tableName", tableName);
 		sql = sql.replace("#modif", modif);
-		sql = sql.replace("#condition", condition);
+		sql = sql.replace("#primaryKey", primaryKey);
 		return new SqlInfo(sql, valueList);
 	}
 }

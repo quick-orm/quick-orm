@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>kim.zkp</groupId>
 	<artifactId>quick-orm</artifactId>
-	<version>1.0.3</version>
+	<version>1.0.4</version>
 	<packaging>jar</packaging>
 	<name>quick-orm</name>
 	<description>数据库层快速开发框架，完全面向对象操作，简单高效，30秒快速上手</description>

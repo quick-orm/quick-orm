@@ -265,10 +265,13 @@ public class Schema extends Model<Schema> {
 		}
 		try {
 			Object o = clzz.newInstance();
-			List<Field> fields = ClassCache.getAllDeclaredFields(clzz);
+			List<Field> fields = ClassCache.getAllFieldByCache(clzz);
 			fields.forEach(f->{
-				String k = f.getName().toUpperCase();
+				String k = f.getName();
 				Object v = result.get(k);
+				if (v == null) {
+					v = result.get(k.toUpperCase()); //DB2数据库返回字段全为大写
+				}
 				if (v != null) {
 					try {
 						f.setAccessible(true);

@@ -28,9 +28,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.xiaoleilu.hutool.log.Log;
+import com.xiaoleilu.hutool.log.LogFactory;
 
 import kim.zkp.quick.orm.annotation.Condition;
 import kim.zkp.quick.orm.annotation.Exclude;
+import kim.zkp.quick.orm.annotation.Find;
+import kim.zkp.quick.orm.annotation.Join;
 import kim.zkp.quick.orm.annotation.NoFind;
 import kim.zkp.quick.orm.annotation.OrderBy;
 import kim.zkp.quick.orm.annotation.PrimaryKey;
@@ -46,7 +50,10 @@ public class ClassCache {
 	private static final Map<Class<?>,List<Field>> annationOrderByCache = new HashMap<>();
 	private static final Map<Class<?>,List<Field>> annationConditionCache = new HashMap<>();
 	private static final Map<Class<?>,List<Field>> insertParamCache = new HashMap<>();
+	private static final Map<Class<?>,List<Field>> joinParamCache = new HashMap<>();
+	private static final Map<Class<?>,List<Field>> findParamCache = new HashMap<>();
 	private static final Map<Class<?>,Method> strategyMethodCache = new HashMap<>();
+	private static final Map<Class<?>,String> aliasCache = new HashMap<>();
 	
 	private static Map<String,Field> getAllFieldMap(Class<?> clzz){
 		Map<String,Field> fieldMap = allFieldClassCache.get(clzz);
@@ -57,8 +64,22 @@ public class ClassCache {
 		allFieldClassCache.put(clzz,fieldMap);
 		return fieldMap;
 	}
-	
-	private static List<Field> getDeclaredFields(Class<?> clzz){
+	/**
+	 * method name   : getNoJoinAllField 
+	 * description   : 获取排除联表外的所有字段
+	 * @return       : List<Field>
+	 * @param        : @param clzz
+	 * @param        : @return
+	 * modified      : zhukaipeng ,  2018年2月1日
+	 */
+	private static List<Field> getNoJoinAllField(Class<?> clzz){
+		List<Field> list = getAllField(clzz);
+		list.removeIf(f->f.getAnnotation(Join.class)!=null);
+		list.removeIf(f->f.getAnnotation(Find.class)!=null);
+		return list;
+		
+	}
+	private static List<Field> getAllField(Class<?> clzz){
 		Field[] fields = clzz.getDeclaredFields();
 		List<Field> list = new ArrayList<>(Arrays.asList(fields));
 		list.removeIf(f->{
@@ -84,11 +105,11 @@ public class ClassCache {
 	 * modified      : zhukaipeng ,  2017年8月29日
 	 * @see          : *
 	 */
-	public static List<Field> getAllDeclaredFields(Class<?> clzz){
+	public static List<Field> getAllFieldByCache(Class<?> clzz){
 		if (declaredFieldsCache.get(clzz) != null) {
 			return declaredFieldsCache.get(clzz);
 		}
-		List<Field> list = getDeclaredFields(clzz);
+		List<Field> list = getNoJoinAllField(clzz);
 		declaredFieldsCache.put(clzz, list);
 		return list;
 	}
@@ -108,21 +129,56 @@ public class ClassCache {
 		return tableName;
 		
 	}
-	public static String getSelect(Class<?> clzz){
+	public static String getSelect(Class<?> clzz,boolean nextFind){
 		if (annationSelectCache.get(clzz) != null) {
 			return annationSelectCache.get(clzz);
 		}
-		List<Field> fieldList = getDeclaredFields(clzz);
+		String alias = getAliasPoint(clzz);
+		String aliasUnderline = getAliasUnderline(clzz);
+		List<Field> fieldList = getNoJoinAllField(clzz);
 		fieldList.removeIf(f -> f.getAnnotation(Exclude.class)!=null); 
 		fieldList.removeIf(f -> f.getAnnotation(NoFind.class)!=null); 
 		StringBuffer selectsb = new StringBuffer();
 		fieldList.forEach((f) -> {
-			selectsb.append(Constants.SPACE).append(f.getName()).append(",");
+			selectsb.append(Constants.SPACE).append(alias).append(f.getName());
+			selectsb.append(" as ").append(aliasUnderline).append(f.getName()).append(Constants.COMMA);
 		});
 		if (selectsb.length() == 0) {
 			annationSelectCache.put(clzz, "");
 			return "";
 		}
+		if (nextFind) {
+			List<Field> joinList = getJoin(clzz);
+			for (Field f : joinList) {
+				Class<?> joinClass = f.getType();
+				String joinAlias = getAliasPoint(joinClass);
+				String joinAliasUnderline = getAliasUnderline(joinClass);
+				Join join = f.getAnnotation(Join.class);
+				String[] findList = join.findList();
+				if (findList.length != 0) {
+					for (int i = 0; i < findList.length; i++) {
+						selectsb.append(Constants.SPACE).append(joinAlias).append(findList[i]);
+						selectsb.append(" as ").append(joinAliasUnderline).append(findList[i]).append(Constants.COMMA);
+					}
+				}else {
+					String joinFind = getSelect(joinClass,false);
+					selectsb.append(joinFind).append(",");
+				}
+			}
+			List<Field> findList = getFind(clzz);
+			for (Field f : findList) {
+				Find find = f.getAnnotation(Find.class);
+				String findField = find.field();
+				if ("".equals(findField)) {
+					findField = f.getName();
+				}
+				String joinAlias = find.joinTable()+Constants.UNDERLINE+Constants.POINT;
+				selectsb.append(Constants.SPACE).append(joinAlias).append(findField);
+				selectsb.append(" as ").append(f.getName()).append(Constants.COMMA);
+			}
+		}
+		
+		
 		String select = selectsb.deleteCharAt(selectsb.lastIndexOf(",")).toString();
 		annationSelectCache.put(clzz, select);
 		return select;
@@ -143,10 +199,38 @@ public class ClassCache {
 		if (insertParamCache.get(clzz) != null) {
 			return insertParamCache.get(clzz);
 		}
-		List<Field> fieldList = getDeclaredFields(clzz);
+		List<Field> fieldList = getNoJoinAllField(clzz);
 		fieldList.removeIf(f -> f.getAnnotation(Exclude.class)!=null); 
 		insertParamCache.put(clzz, fieldList);
 		return fieldList;
+	}
+	public static List<Field> getJoin(Class<?> clzz){
+		if (joinParamCache.get(clzz) != null) {
+			return joinParamCache.get(clzz);
+		}
+		List<Field> fieldList = getAllField(clzz);
+		List<Field> joinList = new ArrayList<>();
+		fieldList.forEach(f->{
+			if (f.getAnnotation(Join.class) != null) {
+				joinList.add(f);
+			}
+		}); 
+		joinParamCache.put(clzz, joinList);
+		return joinList;
+	}
+	public static List<Field> getFind(Class<?> clzz){
+		if (findParamCache.get(clzz) != null) {
+			return findParamCache.get(clzz);
+		}
+		List<Field> fieldList = getAllField(clzz);
+		List<Field> findList = new ArrayList<>();
+		fieldList.forEach(f->{
+			if (f.getAnnotation(Find.class) != null) {
+				findList.add(f);
+			}
+		}); 
+		findParamCache.put(clzz, findList);
+		return findList;
 	}
 	
 	@SuppressWarnings({"unchecked","rawtypes"})
@@ -154,7 +238,7 @@ public class ClassCache {
 		if (fieldCache.get(clzz) != null) {
 			return (List<Field>) fieldCache.get(clzz);
 		}
-		List<Field> fieldList = getDeclaredFields(clzz);
+		List<Field> fieldList = getNoJoinAllField(clzz);
 		fieldList.removeIf(f -> f.getAnnotation(annotationClass)==null); 
 		fieldCache.put(clzz, fieldList);
 		return fieldList;
@@ -162,7 +246,7 @@ public class ClassCache {
 	
 	private static Map<String,Field> parseClass(Class<?> clzz){
 		Map<String,Field> fieldMap = new HashMap<>();
-		List<Field> list = getDeclaredFields(clzz);
+		List<Field> list = getNoJoinAllField(clzz);
 		list.forEach(f->{
 			fieldMap.put(f.getName(), f);
 		});
@@ -183,5 +267,29 @@ public class ClassCache {
 		}
 		return m;
 	}
+	private static final Log log = LogFactory.get();
+	public static String getAlias(Class<?> clzz){
+		String alias = aliasCache.get(clzz);
+		if (alias == null) {
+			alias = clzz.getSimpleName().toLowerCase();
+			if ("schema".equals(alias)) {
+				alias = "temp_0";
+			}
+			aliasCache.put(clzz, alias);
+		}
+		return alias;
+	}
 	
+	public static String getAliasPoint(Class<?> clzz){
+		return getAlias(clzz)+Constants.POINT;
+	}
+	public static String getAliasUnderline(Class<?> clzz){
+		return getAlias(clzz)+Constants.UNDERLINE;
+	}
 }
+
+
+
+
+
+

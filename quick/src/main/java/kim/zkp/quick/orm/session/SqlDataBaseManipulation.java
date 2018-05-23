@@ -42,15 +42,6 @@ public interface SqlDataBaseManipulation {
 	 */
 	int sqlSave(String sql, Object ... params);
 	/**
-	 * method name   : sqlSave 
-	 * description   : 保存
-	 * @return       : int
-	 * @param        : @param sql
-	 * @param        : @return
-	 * modified      : zhukaipeng ,  2018年1月28日
-	 */
-	int sqlSave(String sql);
-	/**
 	 * method name   : delete 
 	 * description   : 删除
 	 * @return       : int
@@ -62,15 +53,6 @@ public interface SqlDataBaseManipulation {
 	 */
 	int sqlDelete(String sql, Object ... params);
 	/**
-	 * method name   : sqlDelete 
-	 * description   : 删除
-	 * @return       : int
-	 * @param        : @param sql
-	 * @param        : @return
-	 * modified      : zhukaipeng ,  2018年1月28日
-	 */
-	int sqlDelete(String sql);
-	/**
 	 * method name   : update 
 	 * description   : 更新
 	 * @return       : int
@@ -81,16 +63,6 @@ public interface SqlDataBaseManipulation {
 	 * @see          : *
 	 */
 	int sqlUpdate(String sql, Object ... params);
-	
-	/**
-	 * method name   : update 
-	 * description   : 
-	 * @return       : int
-	 * @param        : @param sql 更新SQL
-	 * @param        : @return
-	 * modified      : zhukaipeng ,  2018年1月28日
-	 */
-	int sqlUpdate(String sql);
 	/**
 	 * method name   : get 
 	 * description   : 查询
@@ -104,16 +76,6 @@ public interface SqlDataBaseManipulation {
 	 */
 	Object sqlGet(String sql, Class<?> clzz, Object ... params);
 	/**
-	 * method name   : sqlGet 
-	 * description   : 查询
-	 * @return       : Object
-	 * @param        : @param sql
-	 * @param        : @param clzz
-	 * @param        : @return
-	 * modified      : zhukaipeng ,  2018年1月28日
-	 */
-	Object sqlGet(String sql, Class<?> clzz);
-	/**
 	 * method name   : list 
 	 * description   : 列表查询
 	 * @return       : List<Object>
@@ -125,16 +87,6 @@ public interface SqlDataBaseManipulation {
 	 * @see          : *
 	 */
 	List<Object> sqlList(String sql, Class<?> clzz, Object ... params);
-	/**
-	 * method name   : sqlList 
-	 * description   : 列表查询
-	 * @return       : List<Object>
-	 * @param        : @param sql
-	 * @param        : @param clzz
-	 * @param        : @return
-	 * modified      : zhukaipeng ,  2018年1月28日
-	 */
-	List<Object> sqlList(String sql, Class<?> clzz);
 	/**
 	 * method name   : page 
 	 * description   : 分页查询
@@ -148,17 +100,6 @@ public interface SqlDataBaseManipulation {
 	 * @see          : *
 	 */
 	Page<Object> sqlPage(String countSql,String listSql, Class<?> clzz, Object ... params);
-	/**
-	 * method name   : sqlPage 
-	 * description   : 分页查询
-	 * @return       : Page<Object>
-	 * @param        : @param countSql
-	 * @param        : @param listSql
-	 * @param        : @param clzz
-	 * @param        : @return
-	 * modified      : zhukaipeng ,  2018年1月28日
-	 */
-	Page<Object> sqlPage(String countSql,String listSql, Class<?> clzz);
 	
 
 }

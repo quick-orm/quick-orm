@@ -62,7 +62,7 @@ public class DefaultCreateTableSqlBuilder extends AbstractSqlBuilder {
 		fieldList = ClassCache.getPrimaryKey(clzz);
 		StringBuffer primaryKey = new StringBuffer();
 		if (fieldList.size() == 0) {
-			throw new SqlBuilderException("No primaryKey,Please configure it in Po.");
+			throw new SqlBuilderException("No primaryKey,Please configure it in Model.");
 		}
 		fieldList.forEach(f->{
 			primaryKey.append(f.getName()).append(",");

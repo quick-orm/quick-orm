@@ -19,6 +19,7 @@
 
 package kim.zkp.quick.orm.sql;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class SqlInfo {
@@ -29,8 +30,13 @@ public class SqlInfo {
 	public SqlInfo(String sql, List<Object> param) {
 		super();
 		this.sql = sql;
-		this.param = param;
+		if (param == null) {
+			this.param = new ArrayList<>();
+		}else {
+			this.param = param;
+		}
 	}
+	
 	public String getSql() {
 		return sql;
 	}
@@ -43,6 +49,7 @@ public class SqlInfo {
 	public void setParam(List<Object> param) {
 		this.param = param;
 	}
+
 	@Override
 	public String toString() {
 		return "Sql [sql=" + sql + " param=" + param + "]";

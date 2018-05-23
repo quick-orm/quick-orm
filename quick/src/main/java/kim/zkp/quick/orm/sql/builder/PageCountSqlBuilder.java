@@ -35,9 +35,13 @@ public class PageCountSqlBuilder extends AbstractSqlBuilder {
 	@Override
 	public SqlInfo builderSql(Object o) {
 		String tableName = super.getTableName(o);
+		String alias = super.getAlias(o);
 		List<Object> valueList = new ArrayList<>();
 		String condition = super.getCondition(o, valueList);
+		String join = super.getJoin(o);
 		String sql = PAGE_COUNT_TEMPLATE.replace("#tableName", tableName);
+		sql = sql.replace("#alias", alias);
+		sql = sql.replace("#join", join);
 		sql = sql.replace("#condition", condition);
 		return new SqlInfo(sql, valueList);
 	}

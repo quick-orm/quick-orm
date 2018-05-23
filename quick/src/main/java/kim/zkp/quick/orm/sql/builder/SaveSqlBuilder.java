@@ -22,6 +22,7 @@ package kim.zkp.quick.orm.sql.builder;
 import java.util.ArrayList;
 import java.util.List;
 
+import kim.zkp.quick.orm.common.Constants;
 import kim.zkp.quick.orm.sql.SqlInfo;
 /**
  * class       :  SaveSqlBuilder
@@ -35,13 +36,13 @@ public class SaveSqlBuilder extends AbstractSqlBuilder {
 	@Override
 	public SqlInfo builderSql(Object o) {
 		String tableName = super.getTableName(o);
-		StringBuffer insertParam = new StringBuffer();
-		StringBuffer insertValue = new StringBuffer();
+		StringBuilder insertParam = new StringBuilder();
+		StringBuilder insertValue = new StringBuilder();
 		List<Object> valueList = new ArrayList<>();
 		super.getInsert(o, insertParam, insertValue, valueList);	
 		
-		insertParam.deleteCharAt(insertParam.lastIndexOf(","));
-		insertValue.deleteCharAt(insertValue.lastIndexOf(","));
+		insertParam.deleteCharAt(insertParam.lastIndexOf(Constants.COMMA));
+		insertValue.deleteCharAt(insertValue.lastIndexOf(Constants.COMMA));
 
 		String sql = SAVE_TEMPLATE.replace("#tableName", tableName);
 		sql = sql.replace("#insertParam", insertParam);

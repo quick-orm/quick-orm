@@ -22,6 +22,9 @@ package kim.zkp.quick.orm.sql.builder;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.xiaoleilu.hutool.log.Log;
+import com.xiaoleilu.hutool.log.LogFactory;
+
 import kim.zkp.quick.orm.exception.SqlBuilderException;
 import kim.zkp.quick.orm.sql.SqlInfo;
 /**
@@ -32,15 +35,16 @@ import kim.zkp.quick.orm.sql.SqlInfo;
  * @see        :  *
  */
 public class DeleteSqlBuilder extends AbstractSqlBuilder {
-
 	@Override
 	public SqlInfo builderSql(Object o) {
 		String tableName = super.getTableName(o);
+		String alias = super.getAlias(o);
 		List<Object> valueList = new ArrayList<>();
 		String condition = super.getCondition(o, valueList);
 		if (condition == null || "".equals(condition)) {
 			throw new SqlBuilderException("No delete condition,disallow full table delete!");
 		}
+		condition = condition.replaceAll(alias+".", "");
 		String sql = DELETE_TEMPLATE.replace("#tableName", tableName);
 		sql = sql.replace("#condition", condition);
 		return new SqlInfo(sql, valueList);

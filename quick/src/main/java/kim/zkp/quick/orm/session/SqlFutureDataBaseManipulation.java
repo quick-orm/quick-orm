@@ -43,15 +43,6 @@ public interface SqlFutureDataBaseManipulation {
 	 */
 	Future<Integer> ftSqlSave(String sql, Object ... params);
 	/**
-	 * method name   : ftSqlSave 
-	 * description   : 异步保存
-	 * @return       : Future<Integer>
-	 * @param        : @param sql
-	 * @param        : @return
-	 * modified      : zhukaipeng ,  2018年1月28日
-	 */
-	Future<Integer> ftSqlSave(String sql);
-	/**
 	 * method name   : ftDelete 
 	 * description   : 异步删除
 	 * @return       : Future<Integer>
@@ -63,15 +54,6 @@ public interface SqlFutureDataBaseManipulation {
 	 */
 	Future<Integer> ftSqlDelete(String sql, Object ... params);
 	/**
-	 * method name   : ftSqlDelete 
-	 * description   : 异步删除
-	 * @return       : Future<Integer>
-	 * @param        : @param sql
-	 * @param        : @return
-	 * modified      : zhukaipeng ,  2018年1月28日
-	 */
-	Future<Integer> ftSqlDelete(String sql);
-	/**
 	 * method name   : ftUpdate 
 	 * description   : 异步更新
 	 * @return       : Future<Integer>
@@ -82,15 +64,6 @@ public interface SqlFutureDataBaseManipulation {
 	 * @see          : *
 	 */
 	Future<Integer> ftSqlUpdate(String sql, Object ... params);
-	/**
-	 * method name   : ftSqlUpdate 
-	 * description   : 异步更新
-	 * @return       : Future<Integer>
-	 * @param        : @param sql
-	 * @param        : @return
-	 * modified      : zhukaipeng ,  2018年1月28日
-	 */
-	Future<Integer> ftSqlUpdate(String sql);
 	/**
 	 * method name   : ftGet 
 	 * description   : 异步查询
@@ -104,16 +77,6 @@ public interface SqlFutureDataBaseManipulation {
 	 */
 	Future<Object> ftSqlGet(String sql, Class<?> clzz, Object ... params);
 	/**
-	 * method name   : ftSqlGet 
-	 * description   : 异步查询
-	 * @return       : Future<Object>
-	 * @param        : @param sql
-	 * @param        : @param clzz
-	 * @param        : @return
-	 * modified      : zhukaipeng ,  2018年1月28日
-	 */
-	Future<Object> ftSqlGet(String sql, Class<?> clzz);
-	/**
 	 * method name   : ftList 
 	 * description   : 异步列表查询
 	 * @return       : Future<List<Object>>
@@ -125,16 +88,6 @@ public interface SqlFutureDataBaseManipulation {
 	 * @see          : *
 	 */
 	Future<List<Object>> ftSqlList(String sql, Class<?> clzz, Object ... params);
-	/**
-	 * method name   : ftSqlList 
-	 * description   : 异步列表查询
-	 * @return       : Future<List<Object>>
-	 * @param        : @param sql
-	 * @param        : @param clzz
-	 * @param        : @return
-	 * modified      : zhukaipeng ,  2018年1月28日
-	 */
-	Future<List<Object>> ftSqlList(String sql, Class<?> clzz);
 	/**
 	 * method name   : ftPage 
 	 * description   : 异步分页查询
@@ -148,17 +101,6 @@ public interface SqlFutureDataBaseManipulation {
 	 * @see          : *
 	 */
 	Future<Page<Object>> ftSqlPage(String countSql,String listSql, Class<?> clzz, Object ... params);
-	/**
-	 * method name   : ftSqlPage 
-	 * description   : 异步分页查询
-	 * @return       : Future<Page<Object>>
-	 * @param        : @param countSql
-	 * @param        : @param listSql
-	 * @param        : @param clzz
-	 * @param        : @return
-	 * modified      : zhukaipeng ,  2018年1月28日
-	 */
-	Future<Page<Object>> ftSqlPage(String countSql,String listSql, Class<?> clzz);
 
 
 }

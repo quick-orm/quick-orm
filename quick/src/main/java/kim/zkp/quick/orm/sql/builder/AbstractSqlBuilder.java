@@ -21,6 +21,7 @@ package kim.zkp.quick.orm.sql.builder;
 
 import java.util.List;
 
+import kim.zkp.quick.orm.cache.ClassCache;
 import kim.zkp.quick.orm.exception.SqlBuilderException;
 import kim.zkp.quick.orm.model.Schema;
 import kim.zkp.quick.orm.util.AnnotationSqlBuilderUtils;
@@ -29,10 +30,10 @@ import kim.zkp.quick.orm.util.ObjectSqlBuilderUtils;
 public abstract class AbstractSqlBuilder implements SqlBuilder {
 	protected static final String SAVE_TEMPLATE = "insert into #tableName(#insertParam) values(#insertValue)";
 	protected static final String DELETE_TEMPLATE = "delete from #tableName #condition";
-	protected static final String UPDATE_TEMPLATE = "update #tableName set #modif #condition";
-	protected static final String GET_TEMPLATE = "select #select from #tableName #condition";
-	protected static final String LIST_TEMPLATE = "select #select from #tableName #condition";
-	protected static final String PAGE_COUNT_TEMPLATE = "select count(1) from #tableName #condition";
+	protected static final String UPDATE_TEMPLATE = "update #tableName set #modif #primaryKey";
+	protected static final String GET_TEMPLATE = "select #select from #tableName as #alias #join #condition";
+	protected static final String LIST_TEMPLATE = "select #select from #tableName as #alias #join #condition";
+	protected static final String PAGE_COUNT_TEMPLATE = "select count(1) from #tableName as #alias #join #condition";
 	
 	/**
 	 * ********************************************
@@ -56,6 +57,15 @@ public abstract class AbstractSqlBuilder implements SqlBuilder {
 		}
 		return AnnotationSqlBuilderUtils.getTableName(o);
 	}
+	protected String getAlias(Object o){
+		return ClassCache.getAlias(o.getClass());
+	}
+	
+	protected String getJoin(Object o){
+		
+		
+		return AnnotationSqlBuilderUtils.getJoin(o);
+	}
 	
 	protected String getSelect(Object o){
 		String select = ObjectSqlBuilderUtils.getSelect(o);
@@ -68,7 +78,7 @@ public abstract class AbstractSqlBuilder implements SqlBuilder {
 		}
 		return select;
 	}
-	protected void getInsert(Object o,StringBuffer insertParam,StringBuffer insertValue,List<Object> valueList){
+	protected void getInsert(Object o,StringBuilder insertParam,StringBuilder insertValue,List<Object> valueList){
 		ObjectSqlBuilderUtils.getInsert(o, insertParam, insertValue, valueList);
 		if (valueList.size()>0) {
 			return ;
@@ -78,9 +88,7 @@ public abstract class AbstractSqlBuilder implements SqlBuilder {
 			throw new SqlBuilderException("Insert param is null");
 		}
 	}
-	
 	protected String getCondition(Object o,List<Object> valueList){
-		
 		String condition = ObjectSqlBuilderUtils.getCondition(o, valueList);
 		if (condition != null) {
 			return condition;

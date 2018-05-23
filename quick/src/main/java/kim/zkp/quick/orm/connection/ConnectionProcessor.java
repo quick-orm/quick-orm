@@ -36,6 +36,7 @@ import javax.sql.DataSource;
 import com.xiaoleilu.hutool.log.Log;
 import com.xiaoleilu.hutool.log.LogFactory;
 
+import kim.zkp.quick.orm.annotation.Join;
 import kim.zkp.quick.orm.cache.ClassCache;
 import kim.zkp.quick.orm.exception.ConnectionException;
 import kim.zkp.quick.orm.exception.ConnectionExceptionCount;
@@ -147,6 +148,9 @@ public class ConnectionProcessor {
 	public Object get(Connection conn, SqlInfo sqlInfo,Class<?> clzz) {
 		List<Object> list = list(conn, sqlInfo, clzz);
 		if (list == null || list.size()==0) {
+			if (clzz.isAssignableFrom(Schema.class)) {
+				return Schema.open();
+			}
 			return null;
 		}
 		if (list.size()==1) {
@@ -161,34 +165,13 @@ public class ConnectionProcessor {
 		try {
 			stmt = createPreparedStatement(conn, sqlInfo);
 			rs = stmt.executeQuery();
-			return parseResultSetToObject(rs,clzz);
+			return parseResultSetToObject(rs,clzz,sqlInfo);
 		} catch (Exception e) {
 			throw new ExecuteSqlException(e);
 		} finally {
 			close(stmt);
 			close(rs);
 			release(conn);
-		}
-	}
-	
-	private List<Object> parseResultSetToObject(ResultSet rs,Class<?> clzz) {
-		List<Object> list = new ArrayList<>();
-		try {
-			ResultSetMetaData rsmd = rs.getMetaData();
-			int count = rsmd.getColumnCount();
-			while (rs.next()) {
-				Map<String,Object> result = new HashMap<>();
-				for (int i = 0; i < count; i++) {
-					String cloumn = rsmd.getColumnName(i + 1);
-					Object value = rs.getObject(i + 1);
-					result.put(cloumn.toUpperCase(), value);
-				}
-				 Object o = toJavaObject(result, clzz);
-				 list.add(o);
-			}
-			return list;
-		} catch (SQLException e) {
-			throw new ExecuteSqlException(e);
 		}
 	}
 	
@@ -216,7 +199,28 @@ public class ConnectionProcessor {
 		return new PreparedStatementWrapper(stmt, sqlInfo,jdbcConfig.getExecuteTimeMonitor(),jdbcConfig.getMaxExecuteTime());
 	}
 	
-	private Object toJavaObject(Map<String,Object> result,Class<?> clzz){
+	private List<Object> parseResultSetToObject(ResultSet rs,Class<?> clzz, SqlInfo sqlInfo) {
+		List<Object> list = new ArrayList<>();
+		try {
+			ResultSetMetaData rsmd = rs.getMetaData();
+			int count = rsmd.getColumnCount();
+			while (rs.next()) {
+				Map<String,Object> result = new HashMap<>();
+				for (int i = 0; i < count; i++) {
+					String columnLabel = rsmd.getColumnLabel(i + 1);
+					Object value = rs.getObject(i + 1);
+					result.put(columnLabel, value);
+				}
+				 Object o = toJavaObject(result, clzz, sqlInfo);
+				 list.add(o);
+			}
+			return list;
+		} catch (SQLException e) {
+			throw new ExecuteSqlException(e);
+		}
+	}
+	
+	private Object toJavaObject(Map<String,Object> result,Class<?> clzz, SqlInfo sqlInfo){
 		try {
 			if (clzz.isAssignableFrom(Map.class)) {
 				return result;
@@ -268,28 +272,61 @@ public class ConnectionProcessor {
 				}
 				return result.get(result.keySet().toArray()[0]).toString();
 			}
-			
-			Object o = clzz.newInstance();
-			List<Field> list = ClassCache.getAllDeclaredFields(clzz);
-			list.forEach((f)->{
-				String k = f.getName().toUpperCase();
-				Object v = result.get(k);
-				if (v != null) {
-					try {
-						f.setAccessible(true);
-						f.set(o, FieldConvertProcessor.toJava(f.getType(),v));
-					} catch (Exception e) {
-						log.error(e, "db type to java type error");
-					}
-				}
-				
-			});
-			return o;
-		} catch (InstantiationException | IllegalAccessException e) {
+//			log.debug("result:{}",result);
+			return fillResultObject(clzz, result,true);
+		} catch (Exception e) {
 			log.error(e, "query result convert java object error");
 		}
 		return null;
 		
+	}
+	
+	private Object fillResultObject(Class<?> clzz, Map<String,Object> result,boolean nextFind){
+		Object o;
+		try {
+			o = clzz.newInstance();
+		} catch (InstantiationException | IllegalAccessException e1) {
+			return null;
+		}
+		String aliasUnderline = ClassCache.getAliasUnderline(clzz);
+		List<Field> joinAnnotationFields = ClassCache.getJoin(clzz);
+		List<Field> findAnnotationFields = ClassCache.getFind(clzz);
+		List<Field> cachelist = ClassCache.getAllFieldByCache(clzz);
+		List<Field> attrFieldList = new ArrayList<>(cachelist);
+		attrFieldList.addAll(joinAnnotationFields);
+		attrFieldList.addAll(findAnnotationFields);
+		
+		for (Field field : attrFieldList) {
+			Join join = field.getAnnotation(Join.class);
+			Object v = null;
+			if (join != null && nextFind) {
+				v = fillResultObject(field.getType(), result,false);
+			}else {
+				String fieldName = field.getName();
+				String k = aliasUnderline + fieldName;
+				v = result.get(k);
+				if (v == null) {
+					v = result.get(fieldName);
+					if (v == null) { //某些数据库返回的字段全为大写
+						v = result.get(k.toUpperCase());
+						if (v == null) {
+							v = result.get(fieldName.toUpperCase());
+							
+						}
+					}
+				}
+//				log.debug("key:{},value:{}", k,v);
+			}
+			if (v != null) {
+				try {
+					field.setAccessible(true);
+					field.set(o, FieldConvertProcessor.toJava(field.getType(),v));
+				} catch (Exception e) {
+					log.error(e, "db type to java type error");
+				}
+			}
+		}
+		return o;
 	}
 	
 	private final void release(Connection x) {

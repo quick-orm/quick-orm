@@ -34,7 +34,7 @@ import com.xiaoleilu.hutool.util.RandomUtil;
  * class       :  Identity
  * @author     :  zhukaipeng
  * @version    :  1.0  
- * description :  主键生成器 ip标识+yyyyMMddHH+7位自增序列
+ * description :  主键生成器 yyyyMMddmm+ip标识+两位随机数+7位自增序列
  * @see        :  *
  */
 public class Identity {
@@ -42,9 +42,9 @@ public class Identity {
 	private static Map<String, Identity> identityCache = new HashMap<String, Identity>();
 	private final AtomicInteger count = new AtomicInteger(0);
 	private String ipAddress;
-	private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHH");
+	private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmm");
 	private Identity() {
-		ipAddress = getIpAddress();
+		ipAddress = getIpAddress()+RandomUtil.randomInt(10, 99);
 	}
 
 	private String get() {
@@ -108,6 +108,9 @@ public class Identity {
 		return nextId("default");
 	}
 	public static void main(String[] args) {
+		for (int i = 0; i < 100; i++) {
+			System.out.println(RandomUtil.randomInt(10, 99));
+		}
 	}
 	
 }

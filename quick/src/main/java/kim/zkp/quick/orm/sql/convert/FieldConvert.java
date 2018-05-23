@@ -154,6 +154,19 @@ class TimestampFieldConvert implements FieldConvert {
 	}
 	
 }
+class StringBuilderConvert implements FieldConvert {
+	
+	@Override
+	public Object toJava(Object o) {
+		return new StringBuilder(o.toString());
+	}
+	
+	@Override
+	public Object toDB(Object o) {
+		return o.toString();
+	}
+	
+}
 class DefaultFieldConvert implements FieldConvert {
 	
 	@Override

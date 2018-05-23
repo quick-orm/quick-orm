@@ -37,19 +37,20 @@ import kim.zkp.quick.orm.session.Session;
 public abstract class Model<T> extends ConditionSetting<T> {
 	
 	private String tableName;
-	private String select;
-	private String where;
+	private String[] select;
+	private StringBuilder where;
+	private List<Object> whereParam;
 	private List<String> orderByAsc;
 	private List<String> orderByDesc;
 	private Map<String, Object> pk;
 	private Map<String, Object> insert;
 	private Map<String, Object> modif;
-	
 	protected Session session;
 	
 	public Model(){
 		session = Session.getDefaultSession();
 	}
+	
 	/**
 	 * method name   : setSession 
 	 * description   : 设置session，Model通过此数据源操作数据库，若不设置，则默认使用jdbc.setting配置的数据源
@@ -105,7 +106,10 @@ public abstract class Model<T> extends ConditionSetting<T> {
 	 * @see          : *
 	 */
 	public String where() {
-		return where;
+		if (where == null) {
+			return null;
+		}
+		return where.toString();
 	}
 	/**
 	 * method name   : where 
@@ -116,10 +120,24 @@ public abstract class Model<T> extends ConditionSetting<T> {
 	 * modified      : zhukaipeng ,  2017年9月15日
 	 * @see          : *
 	 */
-	public T where(String where) {
-		this.where = where;
+	public T where(String where,Object ... params) {
+		if (this.where == null) {
+			this.where = new StringBuilder();
+			this.where.append(where);
+		}else {
+			this.where.append(" and ").append(where);
+		}
+		if (whereParam == null) {
+			whereParam = new ArrayList<>(params.length);
+		}
+		this.whereParam.addAll(Arrays.asList(params));
 		return (T) this;
 	}
+	
+	public List<Object> getWhereParam() {
+		return whereParam;
+	}
+
 	/**
 	 * method name   : orderByAsc 
 	 * description   : 设置升序排序字段
@@ -169,12 +187,12 @@ public abstract class Model<T> extends ConditionSetting<T> {
 	 * modified      : zhukaipeng ,  2017年9月15日
 	 * @see          : *
 	 */
-	public T select(String select) {
-		this.select = select;
+	public T select(String ... selectKey) {
+		this.select = selectKey;
 		return (T) this;
 	}
 	
-	public String getSelect(){
+	public String[] getSelect(){
 		return select;
 	}
 	
@@ -352,17 +370,6 @@ public abstract class Model<T> extends ConditionSetting<T> {
 	}
 	/**
 	 * method name   : sqlUpdate 
-	 * description   : sql更新
-	 * @return       : int
-	 * @param        : @param sql
-	 * @param        : @return
-	 * modified      : zhukaipeng ,  2018年1月28日
-	 */
-	public int sqlUpdate(String sql) {
-		return session.sqlUpdate(sql);
-	}
-	/**
-	 * method name   : sqlUpdate 
 	 * description   : sql更新，带参数
 	 * @return       : int
 	 * @param        : @param sql
@@ -467,17 +474,6 @@ public abstract class Model<T> extends ConditionSetting<T> {
 	}
 	/**
 	 * method name   : sqlDelete 
-	 * description   : sql删除
-	 * @return       : int
-	 * @param        : @param sql
-	 * @param        : @return
-	 * modified      : zhukaipeng ,  2018年1月28日
-	 */
-	public int sqlDelete(String sql) {
-		return session.sqlDelete(sql);
-	}
-	/**
-	 * method name   : sqlDelete 
 	 * description   : sql删除，带参数
 	 * @return       : int
 	 * @param        : @param sql
@@ -537,18 +533,6 @@ public abstract class Model<T> extends ConditionSetting<T> {
 		return session.sqlGet(sql, clzz, params);
 	}
 	/**
-	 * method name   : sqlGet 
-	 * description   : 执行sql查询
-	 * @return       : Object
-	 * @param        : @param sql
-	 * @param        : @param clzz
-	 * @param        : @return
-	 * modified      : zhukaipeng ,  2018年1月28日
-	 */
-	public Object sqlGet(String sql,Class<?> clzz) {
-		return session.sqlGet(sql, clzz);
-	}
-	/**
 	 * method name   : list 
 	 * description   : 执行sql查询列表
 	 * @return       : List<Object>
@@ -561,18 +545,6 @@ public abstract class Model<T> extends ConditionSetting<T> {
 	 */
 	public List<Object> sqlList(String sql,Class<?> clzz, Object ... params) {
 		return session.sqlList(sql, clzz, params);
-	}
-	/**
-	 * method name   : sqlList 
-	 * description   : 执行sql查询列表
-	 * @return       : List<Object>
-	 * @param        : @param sql
-	 * @param        : @param clzz
-	 * @param        : @return
-	 * modified      : zhukaipeng ,  2018年1月28日
-	 */
-	public List<Object> sqlList(String sql,Class<?> clzz) {
-		return session.sqlList(sql, clzz);
 	}
 	/**
 	 * method name   : get 
@@ -588,17 +560,6 @@ public abstract class Model<T> extends ConditionSetting<T> {
 		return (T) session.sqlGet(sql, this.getClass(), params);
 	}
 	/**
-	 * method name   : sqlGet 
-	 * description   : 执行sql查询
-	 * @return       : T
-	 * @param        : @param sql
-	 * @param        : @return
-	 * modified      : zhukaipeng ,  2018年1月28日
-	 */
-	public T sqlGet(String sql) {
-		return (T) session.sqlGet(sql, this.getClass());
-	}
-	/**
 	 * method name   : list 
 	 * description   : 执行sql查询列表
 	 * @return       : List<T>
@@ -610,17 +571,6 @@ public abstract class Model<T> extends ConditionSetting<T> {
 	 */
 	public List<T> sqlList(String sql, Object ... params) {
 		return (List<T>) session.sqlList(sql, this.getClass(), params);
-	}
-	/**
-	 * method name   : sqlList 
-	 * description   : 执行sql查询列表
-	 * @return       : List<T>
-	 * @param        : @param sql
-	 * @param        : @return
-	 * modified      : zhukaipeng ,  2018年1月28日
-	 */
-	public List<T> sqlList(String sql) {
-		return (List<T>) session.sqlList(sql, this.getClass());
 	}
 	/**
 	 * method name   : page 
@@ -667,22 +617,6 @@ public abstract class Model<T> extends ConditionSetting<T> {
 	public Page<Object> sqlPage(Integer pageNum,Integer pageSize,String countSql,String listSql, Class<?> clzz, Object ... params){
 		Page.page(pageNum, pageSize);
 		return session.sqlPage(countSql, listSql, clzz, params);
-	}
-	/**
-	 * method name   : sqlPage 
-	 * description   : 执行SQL分页查询
-	 * @return       : Page<Object>
-	 * @param        : @param pageNum
-	 * @param        : @param pageSize
-	 * @param        : @param countSql
-	 * @param        : @param listSql
-	 * @param        : @param clzz
-	 * @param        : @return
-	 * modified      : zhukaipeng ,  2018年1月28日
-	 */
-	public Page<Object> sqlPage(Integer pageNum,Integer pageSize,String countSql,String listSql, Class<?> clzz){
-		Page.page(pageNum, pageSize);
-		return session.sqlPage(countSql, listSql, clzz);
 	}
 	/**
 	 * method name   : ftPage 
@@ -912,18 +846,6 @@ public abstract class Model<T> extends ConditionSetting<T> {
 	public Future<Object> ftSqlGet(String sql, Class<?> clzz, Object ... params) {
 		return session.ftSqlGet(sql, clzz, params);
 	}
-	/**
-	 * method name   : ftSqlGet 
-	 * description   : 异步SQL查询
-	 * @return       : Future<Object>
-	 * @param        : @param sql
-	 * @param        : @param clzz
-	 * @param        : @return
-	 * modified      : zhukaipeng ,  2018年1月28日
-	 */
-	public Future<Object> ftSqlGet(String sql, Class<?> clzz) {
-		return session.ftSqlGet(sql, clzz);
-	}
 	
 	/**
 	 * method name   : ftList 
@@ -940,27 +862,17 @@ public abstract class Model<T> extends ConditionSetting<T> {
 		return session.ftSqlList(sql, clzz, params);
 	}
 	/**
-	 * method name   : ftSqlList 
+	 * method name   : ftList 
 	 * description   : 异步执行SQL查询列表
 	 * @return       : Future<List<Object>>
 	 * @param        : @param sql
-	 * @param        : @param clzz
+	 * @param        : @param params
 	 * @param        : @return
-	 * modified      : zhukaipeng ,  2018年1月28日
+	 * modified      : zhukaipeng ,  2017年9月15日
+	 * @see          : *
 	 */
-	public Future<List<Object>> ftSqlList(String sql, Class<?> clzz) {
-		return session.ftSqlList(sql, clzz);
-	}
-	/**
-	 * method name   : ftSqlList 
-	 * description   : 异步执行SQL查询列表
-	 * @return       : Future<List<Object>>
-	 * @param        : @param sql
-	 * @param        : @return
-	 * modified      : zhukaipeng ,  2018年1月28日
-	 */
-	public Future<List<Object>> ftSqlList(String sql) {
-		return session.ftSqlList(sql, this.getClass());
+	public Future<List<Object>> ftSqlList(String sql, Object ... params) {
+		return session.ftSqlList(sql, this.getClass(), params);
 	}
 	/**
 	 * method name   : ftGet 
@@ -976,17 +888,6 @@ public abstract class Model<T> extends ConditionSetting<T> {
 		return (Future<T>) session.ftSqlGet(sql, this.getClass(), params);
 	}
 	/**
-	 * method name   : ftSqlGet 
-	 * description   : 异步执行SQL查询
-	 * @return       : Future<T>
-	 * @param        : @param sql
-	 * @param        : @return
-	 * modified      : zhukaipeng ,  2018年1月28日
-	 */
-	public Future<T> ftSqlGet(String sql) {
-		return (Future<T>) session.ftSqlGet(sql, this.getClass());
-	}
-	/**
 	 * method name   : ftSqlUpdate 
 	 * description   : 异步SQL更新，带参数
 	 * @return       : Future<T>
@@ -999,17 +900,6 @@ public abstract class Model<T> extends ConditionSetting<T> {
 		return (Future<T>) session.ftSqlUpdate(sql, params);
 	}
 	/**
-	 * method name   : ftSqlUpdate 
-	 * description   : 异步sql更新
-	 * @return       : Future<T>
-	 * @param        : @param sql
-	 * @param        : @return
-	 * modified      : zhukaipeng ,  2018年1月28日
-	 */
-	public Future<T> ftSqlUpdate(String sql) {
-		return (Future<T>) session.ftSqlUpdate(sql);
-	}
-	/**
 	 * method name   : ftSqlDelete 
 	 * description   : 异步sql删除，带参数 
 	 * @return       : Future<T>
@@ -1020,16 +910,5 @@ public abstract class Model<T> extends ConditionSetting<T> {
 	 */
 	public Future<T> ftSqlDelete(String sql, Object ... params) {
 		return (Future<T>) session.ftSqlDelete(sql, params);
-	}
-	/**
-	 * method name   : ftSqlDelete 
-	 * description   : 异步sql删除
-	 * @return       : Future<T>
-	 * @param        : @param sql
-	 * @param        : @return
-	 * modified      : zhukaipeng ,  2018年1月28日
-	 */
-	public Future<T> ftSqlDelete(String sql) {
-		return (Future<T>) session.ftSqlDelete(sql);
 	}
 }

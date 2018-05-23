@@ -27,12 +27,15 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import com.xiaoleilu.hutool.log.Log;
+import com.xiaoleilu.hutool.log.LogFactory;
+
 import kim.zkp.quick.orm.exception.SqlBuilderException;
 
 public class FieldConvertProcessor {
 	
 	private static final Map<Class<?>,FieldConvert> converts = new HashMap<Class<?>,FieldConvert>();
-	
+	private static final Log log = LogFactory.get();
 	static{
 		registerConvert(Boolean.class, new BooleanFieldConvert());
 		registerConvert(String.class, new StringFieldConvert());
@@ -43,6 +46,7 @@ public class FieldConvertProcessor {
 		registerConvert(Double.class, new DoubleFieldConvert());
 		registerConvert(BigDecimal.class, new BigDecimalFieldConvert());
 		registerConvert(Timestamp.class, new TimestampFieldConvert());
+		registerConvert(StringBuilder.class, new StringBuilderConvert());
 		registerConvert(LinkedHashMap.class, new DefaultFieldConvert());
 		registerConvert(ArrayList.class, new DefaultFieldConvert());
 	}
@@ -61,7 +65,9 @@ public class FieldConvertProcessor {
 	public static Object toDB(Object o){
 		FieldConvert ac = converts.get(o.getClass());
 		if (ac == null) {
-			throw new SqlBuilderException(o.getClass()+"未注册转换器");
+			log.info("{}未注册java至数据库的类型转换器，无法获取到值",o.getClass());
+			return null;
+//			throw new SqlBuilderException(o.getClass()+"未注册转换器");
 		}
 		return ac.toDB(o);
 	}

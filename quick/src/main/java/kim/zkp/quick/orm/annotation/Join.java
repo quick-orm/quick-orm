@@ -26,24 +26,18 @@ import java.lang.annotation.Target;
 
 /**
  * ******************  类说明  *********************
- * class       :  Condition
+ * class       :  Join
  * @author     :  zhukaipeng
  * @version    :  1.0  
- * description :  在po属性上添加此标签后，该属性会作为判断条件出现在where后
+ * description :  在po属性上添加此标签后，该属性会作为联表查询
  * @see        :                        
  * ***********************************************
  */
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Condition {
-	/**条件类型，默认等于*/
-	ConditionType value() default ConditionType.EQ;
-	/**
-	 * method name   : columnName 
-	 * description   : 数据库字段名
-	 * @return       : String
-	 * @param        : @return
-	 * modified      : zhukaipeng ,  2018年2月4日
-	 */
-	String columnName() default "";
+public @interface Join {
+	String foreignKey();
+	String joinPk() default "";
+	String[] findList() default {};
+//	boolean nextFind() default false;
 }

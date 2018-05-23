@@ -23,9 +23,13 @@ import java.lang.reflect.Field;
 import java.util.List;
 
 import kim.zkp.quick.orm.annotation.Condition;
+import kim.zkp.quick.orm.annotation.Find;
+import kim.zkp.quick.orm.annotation.Join;
 import kim.zkp.quick.orm.annotation.OrderBy;
 import kim.zkp.quick.orm.cache.ClassCache;
 import kim.zkp.quick.orm.common.Constants;
+import kim.zkp.quick.orm.exception.SqlBuilderException;
+import kim.zkp.quick.orm.model.Schema;
 import kim.zkp.quick.orm.sql.convert.FieldConvertProcessor;
 
 public class AnnotationSqlBuilderUtils {
@@ -33,25 +37,33 @@ public class AnnotationSqlBuilderUtils {
 		return ClassCache.getTableName(o.getClass());
 	}
 	public static String getSelect(Object o) {
-		return ClassCache.getSelect(o.getClass());
+		if (o instanceof Schema) {
+			return " * ";
+		}
+		return ClassCache.getSelect(o.getClass(),true);
 	}
-
 	public static String getCondition(Object o, List<Object> valueList) {
-		StringBuffer condition = new StringBuffer();
-		List<Field> fieldList = ClassCache.getAllDeclaredFields(o.getClass());
+		StringBuilder condition = new StringBuilder();
+		String alias = ClassCache.getAliasPoint(o.getClass());
+		List<Field> fieldList = ClassCache.getAllFieldByCache(o.getClass());
 		fieldList.forEach((f) -> {
 			Object v = FieldConvertProcessor.toDB(f, o);
 			if (v == null) {
 				return;
 			}
-			String operation = " = ";
-			if ( f.getAnnotation(Condition.class) != null) {
-				operation = f.getAnnotation(Condition.class).value().getOperation();
+			String operation = Constants.EQUAL;
+			String columnName = f.getName();
+			Condition conditionAnnotation = f.getAnnotation(Condition.class);
+			if (conditionAnnotation != null) {
+				operation = conditionAnnotation.value().getOperation();
+				if (!"".equals(conditionAnnotation.columnName())) {
+					columnName = conditionAnnotation.columnName();
+				}
 			}
 			if (condition.length() == 0) {
-				condition.append("where").append(Constants.SPACE).append(f.getName()).append(operation).append(Constants.PLACEHOLDER);
+				condition.append(Constants.WHERE).append(alias).append(columnName).append(operation).append(Constants.PLACEHOLDER);
 			} else {
-				condition.append(Constants.SPACE).append("and").append(Constants.SPACE).append(f.getName())
+				condition.append(Constants.AND).append(alias).append(columnName)
 				.append(operation).append(Constants.PLACEHOLDER);
 			}
 			valueList.add(v);
@@ -59,7 +71,7 @@ public class AnnotationSqlBuilderUtils {
 		return condition.toString();
 	}
 	public static String getPrimaryKey(Object o, List<Object> valueList) {
-		StringBuffer condition = new StringBuffer();
+		StringBuilder condition = new StringBuilder();
 		List<Field> fieldList =ClassCache.getPrimaryKey(o.getClass());
 		fieldList.forEach((f) -> {
 			Object v = FieldConvertProcessor.toDB(f, o);
@@ -67,10 +79,10 @@ public class AnnotationSqlBuilderUtils {
 				return;
 			}
 			if (condition.length() == 0) {
-				condition.append("where").append(Constants.SPACE).append(f.getName()).append("=").append(Constants.PLACEHOLDER);
+				condition.append(Constants.WHERE).append(f.getName()).append(Constants.EQUAL).append(Constants.PLACEHOLDER);
 			} else {
-				condition.append(Constants.SPACE).append("and").append(Constants.SPACE).append(f.getName())
-				.append("=").append(Constants.PLACEHOLDER);
+				condition.append(Constants.AND).append(f.getName())
+				.append(Constants.EQUAL).append(Constants.PLACEHOLDER);
 			}
 			valueList.add(v);
 		});
@@ -81,38 +93,89 @@ public class AnnotationSqlBuilderUtils {
 		if (fieldList.size()==0) {
 			return "";
 		}
-		StringBuffer orderBy = new StringBuffer(Constants.ORDERBY);
+		String alias = ClassCache.getAliasPoint(o.getClass());
+		StringBuilder orderBy = new StringBuilder(Constants.ORDERBY);
 		fieldList.forEach((f) -> {
 			String sort = f.getAnnotation(OrderBy.class).value().toString();
-			orderBy.append(f.getName()).append(Constants.SPACE).append(sort).append(",");
+			orderBy.append(alias).append(f.getName()).append(Constants.SPACE).append(sort).append(Constants.COMMA);
 		});
-		return orderBy.deleteCharAt(orderBy.lastIndexOf(",")).toString();
+		return orderBy.deleteCharAt(orderBy.lastIndexOf(Constants.COMMA)).toString();
 	}
 	
-	public static List<Field> getInsert(Object o,StringBuffer insertParam,StringBuffer insertValue,List<Object> valueList) {
+	public static List<Field> getInsert(Object o,StringBuilder insertParam,StringBuilder insertValue,List<Object> valueList) {
 		List<Field> fieldList =ClassCache.getInsert(o.getClass());
 		fieldList.forEach((f) -> {
 			Object v = FieldConvertProcessor.toDB(f, o);
 			if (v == null) {
 				return;
 			}
-			insertParam.append(Constants.SPACE).append(f.getName()).append(",");
-			insertValue.append(Constants.PLACEHOLDER).append(",");
+			insertParam.append(Constants.SPACE).append(f.getName()).append(Constants.COMMA);
+			insertValue.append(Constants.PLACEHOLDER).append(Constants.COMMA);
 			valueList.add(v);
 		});
 		return fieldList;
 	}
 	public static String getModif(Object o,List<Object> valueList) {
 		List<Field> fieldList =ClassCache.getInsert(o.getClass());
-		StringBuffer modif = new StringBuffer();
+		StringBuilder modif = new StringBuilder();
 		fieldList.forEach((f) -> {
 			Object v = FieldConvertProcessor.toDB(f, o);
 			if (v == null) {
 				return;
 			}
-			modif.append(f.getName()).append("=").append(Constants.PLACEHOLDER).append(",");
+			modif.append(f.getName()).append(Constants.EQUAL).append(Constants.PLACEHOLDER).append(Constants.COMMA);
 			valueList.add(v);
 		});
 		return modif.toString();
 	}
+	public static String getJoin(Object o) {
+		List<Field> joinList = ClassCache.getJoin(o.getClass());
+		StringBuilder joinsb = new StringBuilder();
+		String mainAlias = ClassCache.getAliasPoint(o.getClass());
+		for (Field f : joinList) {
+			joinsb.append(Constants.SPACE).append(Constants.LEFT_JOIN);
+			Class<?> joinClass = f.getType();
+			String joinTable = ClassCache.getTableName(joinClass);
+			
+			joinsb.append(joinTable).append(Constants.AS).append(ClassCache.getAlias(joinClass));
+			String joinAlias = ClassCache.getAliasPoint(joinClass);
+			
+			Join join = f.getAnnotation(Join.class);
+			String foreignKey = join.foreignKey();
+			
+			String joinPk = join.joinPk();
+			if ("".equals(joinPk)) {
+				List<Field> pkList = ClassCache.getPrimaryKey(f.getType());
+				if (pkList.size() == 0) {
+					throw new SqlBuilderException("Is not specified joinPk");
+				}else if (pkList.size() > 1){
+					throw new SqlBuilderException("Combined the primary key can't use join find");
+				}
+				joinPk = pkList.get(0).getName();
+			}
+			
+			joinsb.append(Constants.ON).append(mainAlias).append(foreignKey);
+			joinsb.append(Constants.EQUAL).append(joinAlias).append(joinPk);
+		}
+		
+		List<Field> findList = ClassCache.getFind(o.getClass());
+		for (Field field : findList) {
+			Find find = field.getAnnotation(Find.class);
+			String joinAlias = find.joinTable()+Constants.UNDERLINE;
+			joinsb.append(Constants.SPACE).append(Constants.LEFT_JOIN);
+			joinsb.append(find.joinTable()).append(Constants.AS).append(joinAlias);
+			joinsb.append(Constants.ON).append(mainAlias).append(find.foreignKey());
+			joinsb.append(Constants.EQUAL).append(joinAlias).append(Constants.POINT).append(find.joinPk());
+		}
+		
+		return joinsb.toString();
+	}
 }
+
+
+
+
+
+
+
+

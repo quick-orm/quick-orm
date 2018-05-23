@@ -21,8 +21,19 @@ package kim.zkp.quick.orm.common;
 
 public class Constants {
 	public static final String SPACE = " ";
+	public static final String POINT = ".";
+	public static final String UNDERLINE = "_";
 	public static final String PLACEHOLDER = "?";
+	public static final String COMMA = ",";
+	public static final String EQUAL = " = ";
 	public static final String ORDERBY = " order by ";
+	public static final String AS = " as ";
+	public static final String AND = " and ";
+	public static final String WHERE = " where ";
+	public static final String ASC = " asc ";
+	public static final String DESC = " desc ";
+	public static final String ON = " on ";
+	public static final String LEFT_JOIN = " left join ";
 	
 	
 }
