@@ -62,8 +62,6 @@ public abstract class AbstractSqlBuilder implements SqlBuilder {
 	}
 	
 	protected String getJoin(Object o){
-		
-		
 		return AnnotationSqlBuilderUtils.getJoin(o);
 	}
 	
@@ -80,21 +78,16 @@ public abstract class AbstractSqlBuilder implements SqlBuilder {
 	}
 	protected void getInsert(Object o,StringBuilder insertParam,StringBuilder insertValue,List<Object> valueList){
 		ObjectSqlBuilderUtils.getInsert(o, insertParam, insertValue, valueList);
-		if (valueList.size()>0) {
-			return ;
-		}
 		AnnotationSqlBuilderUtils.getInsert(o, insertParam, insertValue, valueList);;
 		if (valueList.size()<=0) {
 			throw new SqlBuilderException("Insert param is null");
 		}
 	}
 	protected String getCondition(Object o,List<Object> valueList){
-		String condition = ObjectSqlBuilderUtils.getCondition(o, valueList);
-		if (condition != null) {
-			return condition;
-		}
-		condition = AnnotationSqlBuilderUtils.getCondition(o, valueList);
-		return condition;
+		StringBuilder condition = new StringBuilder();
+		ObjectSqlBuilderUtils.getCondition(o, condition,valueList);
+		AnnotationSqlBuilderUtils.getCondition(o,condition, valueList);
+		return condition.toString();
 	}
 	protected String getPrimaryKey(Object o,List<Object> valueList){
 		String condition = ObjectSqlBuilderUtils.getPrimaryKey(o, valueList);
@@ -105,12 +98,9 @@ public abstract class AbstractSqlBuilder implements SqlBuilder {
 		return condition;
 	}
 	protected String getModif(Object o,List<Object> valueList){
-		
-		String modif = ObjectSqlBuilderUtils.getModif(o, valueList);
-		if (modif != null) {
-			return modif.substring(0,modif.lastIndexOf(","));
-		}
-		modif = AnnotationSqlBuilderUtils.getModif(o, valueList);
+		StringBuilder modif = new StringBuilder();
+		ObjectSqlBuilderUtils.getModif(o,modif, valueList);
+		AnnotationSqlBuilderUtils.getModif(o,modif, valueList);
 		if (modif.length()<=0) {
 			throw new SqlBuilderException("Modif param is null");
 		}

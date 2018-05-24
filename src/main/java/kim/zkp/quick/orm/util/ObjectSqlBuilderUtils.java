@@ -101,9 +101,8 @@ public class ObjectSqlBuilderUtils {
 		return null;
 	}
 
-	public static String getCondition(Object o, List<Object> valueList) {
+	public static void getCondition(Object o, StringBuilder condition,List<Object> valueList) {
 		Class<?> clzz = o.getClass();
-		StringBuilder condition = new StringBuilder();
 		if (o instanceof Model) {
 			CONDITION_PARAM.forEach(s -> {
 				Field f = ClassCache.getField(clzz, s);
@@ -127,7 +126,6 @@ public class ObjectSqlBuilderUtils {
 			}
 			
 		}
-		return condition.length() == 0 ? null : condition.toString();
 	}
 	
 	public static String getPrimaryKey(Object o, List<Object> valueList) {
@@ -184,10 +182,9 @@ public class ObjectSqlBuilderUtils {
 		return null;
 	}
 
-	public static String getModif(Object o, List<Object> valueList) {
+	public static void getModif(Object o,StringBuilder modif, List<Object> valueList) {
 		if (o instanceof Model) {
 			Class<?> clzz = o.getClass();
-			StringBuilder modif = new StringBuilder();
 			Field f = ClassCache.getField(clzz, "modif");
 			Object param = FieldConvertProcessor.toDB(f, o);
 			if (param != null) {
@@ -199,9 +196,7 @@ public class ObjectSqlBuilderUtils {
 					});
 				}
 			}
-			return modif.length() == 0 ? null : modif.toString();
 		}
-		return null;
 	}
 
 	public static void getInsert(Object o, StringBuilder insertParam, StringBuilder insertValue, List<Object> valueList) {

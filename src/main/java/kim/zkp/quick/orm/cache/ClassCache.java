@@ -28,9 +28,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.xiaoleilu.hutool.log.Log;
-import com.xiaoleilu.hutool.log.LogFactory;
-
 import kim.zkp.quick.orm.annotation.Condition;
 import kim.zkp.quick.orm.annotation.Exclude;
 import kim.zkp.quick.orm.annotation.Find;
@@ -141,7 +138,7 @@ public class ClassCache {
 		StringBuffer selectsb = new StringBuffer();
 		fieldList.forEach((f) -> {
 			selectsb.append(Constants.SPACE).append(alias).append(f.getName());
-			selectsb.append(" as ").append(aliasUnderline).append(f.getName()).append(Constants.COMMA);
+			selectsb.append(Constants.AS).append(aliasUnderline).append(f.getName()).append(Constants.COMMA);
 		});
 		if (selectsb.length() == 0) {
 			annationSelectCache.put(clzz, "");
@@ -158,7 +155,7 @@ public class ClassCache {
 				if (findList.length != 0) {
 					for (int i = 0; i < findList.length; i++) {
 						selectsb.append(Constants.SPACE).append(joinAlias).append(findList[i]);
-						selectsb.append(" as ").append(joinAliasUnderline).append(findList[i]).append(Constants.COMMA);
+						selectsb.append(Constants.AS).append(joinAliasUnderline).append(findList[i]).append(Constants.COMMA);
 					}
 				}else {
 					String joinFind = getSelect(joinClass,false);
@@ -174,7 +171,7 @@ public class ClassCache {
 				}
 				String joinAlias = find.joinTable()+Constants.UNDERLINE+Constants.POINT;
 				selectsb.append(Constants.SPACE).append(joinAlias).append(findField);
-				selectsb.append(" as ").append(f.getName()).append(Constants.COMMA);
+				selectsb.append(Constants.AS).append(aliasUnderline).append(f.getName()).append(Constants.COMMA);
 			}
 		}
 		
@@ -267,7 +264,6 @@ public class ClassCache {
 		}
 		return m;
 	}
-	private static final Log log = LogFactory.get();
 	public static String getAlias(Class<?> clzz){
 		String alias = aliasCache.get(clzz);
 		if (alias == null) {

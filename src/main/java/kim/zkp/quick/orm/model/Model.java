@@ -113,7 +113,7 @@ public abstract class Model<T> extends ConditionSetting<T> {
 	}
 	/**
 	 * method name   : where 
-	 * description   : 设置查询条件，格式为 "(c1=v1 and c2=v2) or (c3 like v3)"
+	 * description   : 设置查询条件，格式为 "(c1=? and c2=?) or (c3 like ?)"
 	 * @return       : T
 	 * @param        : @param where
 	 * @param        : @return

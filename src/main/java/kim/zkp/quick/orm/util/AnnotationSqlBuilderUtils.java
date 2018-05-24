@@ -42,8 +42,7 @@ public class AnnotationSqlBuilderUtils {
 		}
 		return ClassCache.getSelect(o.getClass(),true);
 	}
-	public static String getCondition(Object o, List<Object> valueList) {
-		StringBuilder condition = new StringBuilder();
+	public static void getCondition(Object o, StringBuilder condition,List<Object> valueList) {
 		String alias = ClassCache.getAliasPoint(o.getClass());
 		List<Field> fieldList = ClassCache.getAllFieldByCache(o.getClass());
 		fieldList.forEach((f) -> {
@@ -68,7 +67,6 @@ public class AnnotationSqlBuilderUtils {
 			}
 			valueList.add(v);
 		});
-		return condition.toString();
 	}
 	public static String getPrimaryKey(Object o, List<Object> valueList) {
 		StringBuilder condition = new StringBuilder();
@@ -115,9 +113,8 @@ public class AnnotationSqlBuilderUtils {
 		});
 		return fieldList;
 	}
-	public static String getModif(Object o,List<Object> valueList) {
+	public static void getModif(Object o,StringBuilder modif,List<Object> valueList) {
 		List<Field> fieldList =ClassCache.getInsert(o.getClass());
-		StringBuilder modif = new StringBuilder();
 		fieldList.forEach((f) -> {
 			Object v = FieldConvertProcessor.toDB(f, o);
 			if (v == null) {
@@ -126,7 +123,6 @@ public class AnnotationSqlBuilderUtils {
 			modif.append(f.getName()).append(Constants.EQUAL).append(Constants.PLACEHOLDER).append(Constants.COMMA);
 			valueList.add(v);
 		});
-		return modif.toString();
 	}
 	public static String getJoin(Object o) {
 		List<Field> joinList = ClassCache.getJoin(o.getClass());
